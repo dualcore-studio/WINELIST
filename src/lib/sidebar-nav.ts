@@ -32,14 +32,8 @@ export const WINELIST_CATEGORIES: SidebarNavItem[] = [
   }
 ];
 
-/** Categorie di default gestibili dalla pagina Impostazioni (aggiungi/elimina). */
-export const DEFAULT_EXTRA_CATEGORIES: SidebarNavItem[] = [
-  {
-    id: "cat-cognac",
-    label: "Cognac e Brandy",
-    icon: "GlassWater"
-  }
-];
+/** Categorie extra inizialmente vuote; si aggiungono da Impostazioni. */
+export const DEFAULT_EXTRA_CATEGORIES: SidebarNavItem[] = [];
 
 /** Area amministrativa (in basso). */
 export const ADMIN_NAV: SidebarNavItem[] = [

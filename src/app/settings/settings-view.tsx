@@ -85,7 +85,7 @@ export function SettingsView() {
               }
             }}
             className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-700 shadow-sm transition-colors hover:bg-neutral-50"
-            title="Ripristina le categorie predefinite (Distillati, Cognac e Brandy)"
+            title="Ripristina: nessuna categoria extra (solo Wine List e Distillati fissi)"
           >
             <RotateCcw className="size-3.5" aria-hidden />
             Ripristina default

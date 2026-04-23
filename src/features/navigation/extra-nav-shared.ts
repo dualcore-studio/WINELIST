@@ -7,6 +7,9 @@ import {
 
 export const NAV_EXTRA_STORAGE_KEY = "winelist-extra-nav-sections";
 
+/** Voce default rimossa; se ancora in InstantDB/localStorage viene ignorata o eliminata. */
+export const REMOVED_LEGACY_NAV_EXTRA_ID = "cat-cognac";
+
 const FIXED_LABELS = new Set(
   WINELIST_CATEGORIES.map((c) => c.label.trim().toLowerCase())
 );

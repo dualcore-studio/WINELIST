@@ -17,6 +17,7 @@ import {
   mergeDefaultHrefs,
   NAV_EXTRA_STORAGE_KEY,
   parseStoredNav,
+  REMOVED_LEGACY_NAV_EXTRA_ID,
   stripFixedCategories
 } from "@/features/navigation/extra-nav-shared";
 import {
@@ -53,7 +54,9 @@ function LocalExtraProvider({ children }: { children: ReactNode }) {
       }
     } else {
       setExtraSections(
-        stripFixedCategories(mergeDefaultHrefs(parseStoredNav(raw)))
+        stripFixedCategories(mergeDefaultHrefs(parseStoredNav(raw))).filter(
+          (s) => s.id !== REMOVED_LEGACY_NAV_EXTRA_ID
+        )
       );
     }
     setHydrated(true);
@@ -165,6 +168,14 @@ function InstantExtraProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (isLoading) return;
+    if (!navRows.some((r) => r.id === REMOVED_LEGACY_NAV_EXTRA_ID)) return;
+    void db!.transact([db!.tx.navExtraSections[REMOVED_LEGACY_NAV_EXTRA_ID].delete()]).catch(
+      (e) => console.error("Rimozione voce nav legacy (Cognac):", e)
+    );
+  }, [isLoading, navRows]);
+
+  useEffect(() => {
+    if (isLoading) return;
     if (navRows.length > 0) {
       try {
         localStorage.removeItem(NAV_EXTRA_STORAGE_KEY);
@@ -182,7 +193,7 @@ function InstantExtraProvider({ children }: { children: ReactNode }) {
           mergeDefaultHrefs(
             parseStoredNav(localStorage.getItem(NAV_EXTRA_STORAGE_KEY))
           )
-        );
+        ).filter((s) => s.id !== REMOVED_LEGACY_NAV_EXTRA_ID);
         if (items.length) {
           try {
             localStorage.removeItem(NAV_EXTRA_STORAGE_KEY);
