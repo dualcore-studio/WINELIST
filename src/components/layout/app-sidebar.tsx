@@ -152,15 +152,11 @@ export function AppSidebarTop() {
       aria-label="Navigazione principale"
     >
       <div className="flex min-w-0 items-center gap-1.5 px-2 py-2 sm:gap-3 sm:px-4">
-        <Link
-          href="/"
-          className="flex min-w-0 shrink-0 items-center border-r border-white/[0.1] pr-3 sm:pr-4"
-          aria-label="Home"
-        >
+        <div className="flex min-w-0 shrink-0 items-center border-r border-white/[0.1] pr-3 sm:pr-4">
           <span className="whitespace-nowrap font-display text-xl font-bold tracking-wide text-wine-gold sm:text-2xl md:text-[1.75rem]">
             Wine List Manager
           </span>
-        </Link>
+        </div>
 
         <nav className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
           <ul className="flex flex-nowrap items-center gap-0.5 py-0.5">

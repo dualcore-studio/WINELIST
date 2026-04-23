@@ -211,10 +211,10 @@ export function SettingsView() {
       </section>
 
       <Link
-        href="/"
+        href="/wines"
         className="mt-8 inline-flex text-sm font-semibold text-wine-bordeaux underline-offset-4 hover:underline"
       >
-        ← Torna alla dashboard
+        ← Torna alla wine list
       </Link>
     </div>
   );
