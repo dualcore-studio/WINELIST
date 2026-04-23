@@ -69,8 +69,8 @@ export function SettingsView() {
           <div>
             <h2 className="text-base font-semibold text-wine-graphite">Categorie winelist</h2>
             <p className="mt-1 text-sm text-neutral-600">
-              Aggiungi nuove categorie o elimina quelle esistenti. Le voci appaiono subito nel menu
-              in alto. I dati restano salvati in questo browser.
+              Aggiungi nuove categorie o elimina quelle esistenti. Le voci compaiono subito nel menu
+              in alto e sono salvate in InstantDB (stesso elenco su Vercel e su ogni dispositivo).
             </p>
           </div>
           <button

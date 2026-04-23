@@ -18,7 +18,10 @@ Dopo il clone l’ambiente si ricostruisce con i comandi sotto.
    npm install
    ```
 
-3. **Variabili d’ambiente** (non committare segreti)
+3. **Regole InstantDB (facoltativo ma consigliato)**  
+   Nella dashboard Instant, abilita lettura e scrittura per la collection **`navExtraSections`** (categorie aggiuntive in topbar) e per **`wines`**, in linea con l’app.
+
+4. **Variabili d’ambiente** (non committare segreti)
 
    ```bash
    cp .env.example .env.local
@@ -26,13 +29,13 @@ Dopo il clone l’ambiente si ricostruisce con i comandi sotto.
 
    Imposta `NEXT_PUBLIC_INSTANT_APP_ID` con l’ID della tua app Instant.
 
-4. **Sviluppo**
+5. **Sviluppo**
 
    ```bash
    npm run dev
    ```
 
-5. **Build produzione**
+6. **Build produzione**
 
    ```bash
    npm run build
