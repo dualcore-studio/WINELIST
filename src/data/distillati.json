@@ -1,0 +1,723 @@
+[
+  {
+    "name": "Grappa del Barbaresco",
+    "winery": "Antonella Bocchino",
+    "spiritType": "Grappa di Nebbiolo",
+    "price": 1,
+    "pricePerGlass": 30
+  },
+  {
+    "name": "Grappa di Moscato",
+    "winery": "Antonella Bocchino",
+    "spiritType": "Grappa di Moscato",
+    "price": 1,
+    "pricePerGlass": 30
+  },
+  {
+    "name": "Grappa di Vinaccia di Picolit",
+    "winery": "Nonino",
+    "spiritType": "Grappa Cru",
+    "price": 1,
+    "pricePerGlass": 35
+  },
+  {
+    "name": "Grappa di Vinaccia di Ribolla Gialla",
+    "winery": "Nonino",
+    "spiritType": "Grappa Cru",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Grappa di Vinaccia di Muller Thurgau",
+    "winery": "Nonino",
+    "spiritType": "Grappa Monovitigno",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Grappa di Vinaccia Fragola",
+    "winery": "Nonino",
+    "spiritType": "Grappa Monovitigno",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Distillato di Uva Moscato",
+    "winery": "Nonino",
+    "spiritType": "Distillato di Uva",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Distillato di Uva Cabernet",
+    "winery": "Nonino",
+    "spiritType": "Distillato di Uva",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Distillato di Uva Verduzzo",
+    "winery": "Nonino",
+    "spiritType": "Distillato di Uva",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Distillato di Uva Traminer",
+    "winery": "Nonino",
+    "spiritType": "Distillato di Uva",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Distillato di Uva Fragola",
+    "winery": "Nonino",
+    "spiritType": "Distillato di Uva",
+    "price": 1,
+    "pricePerGlass": 28
+  },
+  {
+    "name": "Distillato di Uva Chardonnay",
+    "winery": "Nonino",
+    "spiritType": "Distillato di Uva",
+    "price": 1,
+    "pricePerGlass": 28
+  },
+  {
+    "name": "Distillato di Uva Merlot",
+    "winery": "Nonino",
+    "spiritType": "Distillato di Uva",
+    "price": 1,
+    "pricePerGlass": 28
+  },
+  {
+    "name": "Distillato Decennale (Cabernet Franc)",
+    "winery": "Nonino",
+    "spiritType": "Distillato Invecchiato",
+    "price": 1,
+    "pricePerGlass": 35
+  },
+  {
+    "name": "Remy Martin Louis XIII",
+    "winery": "Remy Martin",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 300
+  },
+  {
+    "name": "Remy Martin VSOP",
+    "winery": "Remy Martin",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Remy Martin XO",
+    "winery": "Remy Martin",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 55
+  },
+  {
+    "name": "Remy Martin 1738",
+    "winery": "Remy Martin",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Hennessy VS",
+    "winery": "Hennessy",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 15
+  },
+  {
+    "name": "Hennessy XO",
+    "winery": "Hennessy",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 45
+  },
+  {
+    "name": "Martell VS",
+    "winery": "Martell",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Martell Gordon Bleu",
+    "winery": "Martell",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 42
+  },
+  {
+    "name": "Delamain Pale Dry",
+    "winery": "Delamain",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 30
+  },
+  {
+    "name": "Delamain Tres Venerable",
+    "winery": "Delamain",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 50
+  },
+  {
+    "name": "Courvoisier VS",
+    "winery": "Courvoisier",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 15
+  },
+  {
+    "name": "Courvoisier VSOP",
+    "winery": "Courvoisier",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 15
+  },
+  {
+    "name": "Courvoisier XO",
+    "winery": "Courvoisier",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 45
+  },
+  {
+    "name": "Hine Rare",
+    "winery": "Hine",
+    "spiritType": "Cognac",
+    "price": 1,
+    "pricePerGlass": 15
+  },
+  {
+    "name": "Armagnac Saint Vivant",
+    "winery": "Saint Vivant",
+    "spiritType": "Armagnac",
+    "price": 1,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Cardenal Mendoza",
+    "winery": "Sanchez Romate",
+    "spiritType": "Brandy",
+    "price": 1,
+    "pricePerGlass": 15
+  },
+  {
+    "name": "Lepanto",
+    "winery": "Gonzalez Byass",
+    "spiritType": "Brandy",
+    "price": 1,
+    "pricePerGlass": 17
+  },
+  {
+    "name": "Vecchia Romagna Black Label",
+    "winery": "Vecchia Romagna",
+    "spiritType": "Brandy",
+    "price": 1,
+    "pricePerGlass": 15
+  },
+  {
+    "name": "Vecchia Romagna Riserva",
+    "winery": "Vecchia Romagna",
+    "spiritType": "Brandy",
+    "price": 1,
+    "pricePerGlass": 30
+  },
+  {
+    "name": "Grand Marnier Cuvee 100 Years",
+    "winery": "Grand Marnier",
+    "spiritType": "Liquore",
+    "price": 1,
+    "pricePerGlass": 40
+  },
+  {
+    "name": "Calvados Boulard Grande Solage",
+    "winery": "Boulard",
+    "spiritType": "Calvados",
+    "price": 1,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Taylor Port 1994",
+    "winery": "Taylor",
+    "spiritType": "Porto",
+    "price": 230,
+    "pricePerGlass": 0
+  },
+  {
+    "name": "Fonseca Ruby LBV",
+    "winery": "Fonseca",
+    "spiritType": "Porto",
+    "price": 50,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Niepoort Port 1997",
+    "winery": "Niepoort",
+    "spiritType": "Porto",
+    "price": 150,
+    "pricePerGlass": 0
+  },
+  {
+    "name": "Dows Port 1985",
+    "winery": "Dows",
+    "spiritType": "Porto",
+    "price": 250,
+    "pricePerGlass": 0
+  },
+  {
+    "name": "Dows Port 1997",
+    "winery": "Dows",
+    "spiritType": "Porto",
+    "price": 200,
+    "pricePerGlass": 0
+  },
+  {
+    "name": "Warres Port 1997",
+    "winery": "Warres",
+    "spiritType": "Porto",
+    "price": 180,
+    "pricePerGlass": 0
+  },
+  {
+    "name": "Broadbent Port 1994",
+    "winery": "Broadbent",
+    "spiritType": "Porto",
+    "price": 150,
+    "pricePerGlass": 0
+  },
+  {
+    "name": "Presidential Tawny 20yo",
+    "winery": "Presidential",
+    "spiritType": "Porto",
+    "price": 60,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Sandeman Founders Reserve",
+    "winery": "Sandeman",
+    "spiritType": "Porto",
+    "price": 50,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Dows LBV",
+    "winery": "Dows",
+    "spiritType": "Porto",
+    "price": 80,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Sandeman Tawny 20yo",
+    "winery": "Sandeman",
+    "spiritType": "Porto",
+    "price": 120,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "The Macallan (18 yr. old)",
+    "winery": "The Macallan",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 78
+  },
+  {
+    "name": "The Macallan (12 yr. old)",
+    "winery": "The Macallan",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 26
+  },
+  {
+    "name": "The Macallan (15 yr. old)",
+    "winery": "The Macallan",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 50
+  },
+  {
+    "name": "Glenmorangie (10 yr. old)",
+    "winery": "Glenmorangie",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Glenmorangie (18 yr. old)",
+    "winery": "Glenmorangie",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 40
+  },
+  {
+    "name": "The Glenlivet (18 yr. old)",
+    "winery": "The Glenlivet",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 38
+  },
+  {
+    "name": "The Glenlivet (15 yr. old)",
+    "winery": "The Glenlivet",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 30
+  },
+  {
+    "name": "The Glenlivet (12 yr. old)",
+    "winery": "The Glenlivet",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Oban (14 yr. old)",
+    "winery": "Oban",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 23
+  },
+  {
+    "name": "The Balvenie Double Wood (12 yr. old)",
+    "winery": "The Balvenie",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 30
+  },
+  {
+    "name": "The Balvenie Caribbean Cask (14 yr. old)",
+    "winery": "The Balvenie",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 32
+  },
+  {
+    "name": "Lagavulin (16 yr. old)",
+    "winery": "Lagavulin",
+    "spiritType": "Single Malt Scotch",
+    "price": 1,
+    "pricePerGlass": 28
+  },
+  {
+    "name": "Bookers",
+    "winery": "Bookers",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 30
+  },
+  {
+    "name": "Blanton's",
+    "winery": "Blanton's",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 38
+  },
+  {
+    "name": "Maker's Mark",
+    "winery": "Maker's Mark",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Woodford Reserve Bourbon",
+    "winery": "Woodford Reserve",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Woodford Reserve Rye",
+    "winery": "Woodford Reserve",
+    "spiritType": "Rye Whiskey",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Bulleit Bourbon",
+    "winery": "Bulleit",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Bulleit Rye",
+    "winery": "Bulleit",
+    "spiritType": "Rye Whiskey",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Hudson",
+    "winery": "Hudson",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Eagle Rare",
+    "winery": "Eagle Rare",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 35
+  },
+  {
+    "name": "Basil Hayden's",
+    "winery": "Basil Hayden's",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 28
+  },
+  {
+    "name": "Angels Envy Bourbon",
+    "winery": "Angels Envy",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Angels Envy Rye",
+    "winery": "Angels Envy",
+    "spiritType": "Rye Whiskey",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Willett Family Pot Still Reserve",
+    "winery": "Willett",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Whistlepig",
+    "winery": "Whistlepig",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 17
+  },
+  {
+    "name": "Buffalo Trace",
+    "winery": "Buffalo Trace",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Legend",
+    "winery": "Legend",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Widow Jane",
+    "winery": "Widow Jane",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Knob Creek",
+    "winery": "Knob Creek",
+    "spiritType": "Bourbon",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Clase Azul Reposado",
+    "winery": "Clase Azul",
+    "spiritType": "Tequila Reposado",
+    "price": 1,
+    "pricePerGlass": 45
+  },
+  {
+    "name": "Clase Azul Plata",
+    "winery": "Clase Azul",
+    "spiritType": "Tequila Plata",
+    "price": 1,
+    "pricePerGlass": 38
+  },
+  {
+    "name": "Don Julio 1942 Anejo",
+    "winery": "Don Julio",
+    "spiritType": "Tequila Anejo",
+    "price": 1,
+    "pricePerGlass": 45
+  },
+  {
+    "name": "Don Julio Anejo",
+    "winery": "Don Julio",
+    "spiritType": "Tequila Anejo",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Don Julio Blanco",
+    "winery": "Don Julio",
+    "spiritType": "Tequila Blanco",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Patron Silver",
+    "winery": "Patron",
+    "spiritType": "Tequila Silver",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Fortaleza Blanco",
+    "winery": "Fortaleza",
+    "spiritType": "Tequila Blanco",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Fortaleza Reposado",
+    "winery": "Fortaleza",
+    "spiritType": "Tequila Reposado",
+    "price": 1,
+    "pricePerGlass": 30
+  },
+  {
+    "name": "Casamigos Mezcal",
+    "winery": "Casamigos",
+    "spiritType": "Mezcal",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Casamigos Reposado",
+    "winery": "Casamigos",
+    "spiritType": "Tequila Reposado",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Casamigos Blanco",
+    "winery": "Casamigos",
+    "spiritType": "Tequila Blanco",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Casamigos Anejo",
+    "winery": "Casamigos",
+    "spiritType": "Tequila Anejo",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Don Julio Reposado",
+    "winery": "Don Julio",
+    "spiritType": "Tequila Reposado",
+    "price": 1,
+    "pricePerGlass": 25
+  },
+  {
+    "name": "Komos Anejo Cristallino",
+    "winery": "Komos",
+    "spiritType": "Tequila Anejo",
+    "price": 1,
+    "pricePerGlass": 35
+  },
+  {
+    "name": "Komos Reposado",
+    "winery": "Komos",
+    "spiritType": "Tequila Reposado",
+    "price": 1,
+    "pricePerGlass": 30
+  },
+  {
+    "name": "Cazcanes Blanco",
+    "winery": "Cazcanes",
+    "spiritType": "Tequila Blanco",
+    "price": 1,
+    "pricePerGlass": 26
+  },
+  {
+    "name": "Ocho Plata",
+    "winery": "Ocho",
+    "spiritType": "Tequila Plata",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Ocho Reposado",
+    "winery": "Ocho",
+    "spiritType": "Tequila Reposado",
+    "price": 1,
+    "pricePerGlass": 20
+  },
+  {
+    "name": "Amaro Averna",
+    "winery": "Averna",
+    "spiritType": "Amaro",
+    "price": 1,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Borsci San Marsano",
+    "winery": "Borsci",
+    "spiritType": "Amaro",
+    "price": 1,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Amaro del Capo",
+    "winery": "Caffo",
+    "spiritType": "Amaro",
+    "price": 1,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Amaro Ramazzotti",
+    "winery": "Ramazzotti",
+    "spiritType": "Amaro",
+    "price": 1,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Amaro Nonino",
+    "winery": "Nonino",
+    "spiritType": "Amaro",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Amaro Lucano",
+    "winery": "Lucano",
+    "spiritType": "Amaro",
+    "price": 1,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Amaro Serravalle",
+    "winery": "Serravalle",
+    "spiritType": "Amaro",
+    "price": 1,
+    "pricePerGlass": 12
+  },
+  {
+    "name": "Amaro Importante Jefferson",
+    "winery": "Vecchio Magazzino Doganale",
+    "spiritType": "Amaro",
+    "price": 1,
+    "pricePerGlass": 18
+  },
+  {
+    "name": "Amaro Roger Sottobanco",
+    "winery": "Vecchio Magazzino Doganale",
+    "spiritType": "Amaro",
+    "price": 1,
+    "pricePerGlass": 18
+  }
+]

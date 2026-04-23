@@ -1,0 +1,36 @@
+{
+  "name": "carta-vini-manager",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "clear-wines": "node scripts/clear-wines.mjs",
+    "dedupe:wines": "node scripts/dedupe-wines-by-bin.mjs",
+    "seed:page26": "node scripts/seed-page26-california-wines.mjs",
+    "seed:distillati": "node scripts/seed-distillati.mjs",
+    "reset-wines:dev": "npm run clear-wines && npm run dev"
+  },
+  "dependencies": {
+    "@instantdb/react": "latest",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.511.0",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@instantdb/admin": "^0.22.185",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9",
+    "eslint-config-next": "latest",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.3",
+    "typescript": "^5"
+  }
+}
