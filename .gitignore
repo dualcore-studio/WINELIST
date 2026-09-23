@@ -44,3 +44,6 @@ yarn-error.log*
 # IDE
 .idea/
 .vscode/
+
+# Backup locali del database
+/backups

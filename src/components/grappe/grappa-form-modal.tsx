@@ -26,7 +26,7 @@ const DEFAULTS = {
   grape: "",
   region: "—",
   country: "Italia",
-  binNumber: 0,
+  binNumber: "",
   quantity: 1,
   isAvailable: true
 };
@@ -179,7 +179,7 @@ export function GrappaFormModal({
           region: wine.region || DEFAULTS.region,
           country: wine.country || DEFAULTS.country,
           binNumber: wine.binNumber ?? DEFAULTS.binNumber,
-          vintage: wine.vintage || new Date().getFullYear(),
+          vintage: wine.vintage,
           quantity: quantityValue,
           isAvailable
         });
@@ -196,7 +196,7 @@ export function GrappaFormModal({
           region: DEFAULTS.region,
           country: DEFAULTS.country,
           binNumber: DEFAULTS.binNumber,
-          vintage: new Date().getFullYear(),
+          vintage: null,
           quantity: quantityValue,
           isAvailable
         });

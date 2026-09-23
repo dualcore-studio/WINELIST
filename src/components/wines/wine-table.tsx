@@ -1,7 +1,7 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { TableScrollArea } from "@/components/ui/table-scroll-area";
 import { cn, formatPriceEur } from "@/lib/utils";
-import type { Wine } from "@/types/wine";
+import { formatVintage, type Wine } from "@/types/wine";
 
 type Props = {
   wines: Wine[];
@@ -115,7 +115,7 @@ export function WineTable({
                         "bg-inherit text-right font-mono text-[12px] text-neutral-700"
                       )}
                     >
-                      {wine.binNumber > 0 ? wine.binNumber : "—"}
+                      {wine.binNumber || "—"}
                     </td>
                     <td
                       className={cn(
@@ -143,7 +143,7 @@ export function WineTable({
                         "bg-inherit text-right tabular-nums text-neutral-800"
                       )}
                     >
-                      {wine.vintage}
+                      {formatVintage(wine.vintage) || "—"}
                     </td>
                     <td className={cn(cellPad, cellWrap, "bg-inherit text-left")}>
                       {wine.type}

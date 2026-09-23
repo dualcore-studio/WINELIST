@@ -10,7 +10,6 @@ import {
 } from "@/components/grappe/grappa-filters";
 import { GrappaFormModal } from "@/components/grappe/grappa-form-modal";
 import { GrappaTable } from "@/components/grappe/grappa-table";
-import { DistillatiClientSeed } from "@/components/grappe/distillati-client-seed";
 import { printGrappe } from "@/features/grappe/print";
 import {
   createWine,
@@ -34,14 +33,7 @@ const HEADING = "Distillati";
 const DESCRIPTION = "Cerca, filtra e organizza l'elenco dei distillati.";
 const ITEM_NOUN = "distillato";
 
-type Props = {
-  /** Se true e in dev, esegue l'upsert dei record da `src/data/distillati.json`. */
-  autoSeedDistillati?: boolean;
-};
-
-export function GrappeDistillatiClientPage({
-  autoSeedDistillati = false
-}: Props = {}) {
+export function GrappeDistillatiClientPage() {
   const { wines, isLoading, error } = getWines(GRAPPE_COLLECTION);
   const [filters, setFilters] = useState<GrappaFiltersState>(initialGrappaFilters);
   const [formOpen, setFormOpen] = useState(false);
@@ -202,12 +194,6 @@ export function GrappeDistillatiClientPage({
               </button>
             </div>
           </section>
-
-          <DistillatiClientSeed
-            enabled={autoSeedDistillati}
-            wines={wines}
-            isLoading={isLoading}
-          />
 
           {error ? (
             <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

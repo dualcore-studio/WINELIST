@@ -1,11 +1,10 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WineFilters, type WineFiltersState } from "@/components/wines/wine-filters";
 import { WineFormModal } from "@/components/wines/wine-form-modal";
-import { Page26ClientSeed } from "@/components/wines/page26-client-seed";
+import { PrintMenu } from "@/components/wines/print-menu";
 import { WineTable } from "@/components/wines/wine-table";
 import { printWines } from "@/features/wines/print";
 import {
@@ -16,7 +15,7 @@ import {
   updateWine,
   type WineInput
 } from "@/features/wines/repository";
-import type { Wine } from "@/types/wine";
+import { formatVintage, type Wine } from "@/types/wine";
 
 const initialFilters: WineFiltersState = {
   binNumber: "",
@@ -34,8 +33,6 @@ const initialFilters: WineFiltersState = {
 };
 
 type WinesPageProps = {
-  /** Con `?seedPage26=1` in dev: import client bin 322–463 (senza token admin). */
-  autoSeedPage26?: boolean;
   /** Nome della collection InstantDB da usare come storage. Default: "wines". */
   collection?: string;
   /** Titolo mostrato in testa alla pagina. Default: "Wine List Manager". */
@@ -47,7 +44,6 @@ type WinesPageProps = {
 };
 
 export function WinesClientPage({
-  autoSeedPage26 = false,
   collection = DEFAULT_WINES_COLLECTION,
   heading = "Wine List Manager",
   description = "Cerca, filtra e organizza l'elenco vini del ristorante.",
@@ -79,10 +75,10 @@ export function WinesClientPage({
       if (filters.type && wine.type !== filters.type) return false;
       if (filters.region && wine.region !== filters.region) return false;
       if (filters.category && wine.category !== filters.category) return false;
-      if (byBin && !String(wine.binNumber).includes(byBin)) return false;
+      if (byBin && !wine.binNumber.toLowerCase().includes(byBin.toLowerCase())) return false;
       if (byName && !wine.name.toLowerCase().includes(byName)) return false;
       if (byWinery && !wine.winery.toLowerCase().includes(byWinery)) return false;
-      if (byVintage && !String(wine.vintage).includes(byVintage)) return false;
+      if (byVintage && !formatVintage(wine.vintage).toLowerCase().includes(byVintage.toLowerCase())) return false;
       if (!Number.isNaN(qtyMin) && filters.quantityMin.trim() !== "" && wine.quantity < qtyMin) return false;
       if (!Number.isNaN(qtyMax) && filters.quantityMax.trim() !== "" && wine.quantity > qtyMax) return false;
       if (
@@ -173,17 +169,10 @@ export function WinesClientPage({
               <p className="mt-1 text-sm text-neutral-600">{description}</p>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => printWines(filteredWines, filters)}
+              <PrintMenu
+                onPrintInternal={() => printWines(filteredWines, filters)}
                 disabled={isLoading || filteredWines.length === 0}
-                className="inline-flex h-10 items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-800 shadow-sm transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400/60 disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Stampa lista filtrata"
-                title="Stampa lista filtrata"
-              >
-                <Printer className="size-4" strokeWidth={2} aria-hidden />
-                Stampa
-              </button>
+              />
               <button
                 type="button"
                 onClick={openCreate}
@@ -205,14 +194,6 @@ export function WinesClientPage({
             </p>
           ) : null}
 
-          <Page26ClientSeed
-            enabled={
-              autoSeedPage26 ||
-              process.env.NEXT_PUBLIC_TRIGGER_PAGE26_SEED === "1"
-            }
-            wines={wines}
-            isLoading={isLoading}
-          />
 
           <WineFilters
             filters={filters}

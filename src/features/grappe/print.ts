@@ -39,7 +39,7 @@ export function printGrappe(
   wines: readonly Wine[],
   filters: GrappaFiltersState
 ): void {
-  const win = window.open("", "_blank", "width=1200,height=800,noopener");
+  const win = window.open("", "_blank", "width=1200,height=800");
   if (!win) {
     alert(
       "Impossibile aprire la finestra di stampa. Consenti i popup per questo sito e riprova."

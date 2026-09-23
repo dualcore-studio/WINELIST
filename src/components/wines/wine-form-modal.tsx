@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { ITALIAN_REGIONS } from "@/constants/italian-regions";
-import type { Wine, WineCategory, WineType } from "@/types/wine";
+import { formatVintage, type Wine, type WineCategory, type WineType } from "@/types/wine";
 import type { WineInput } from "@/features/wines/repository";
 
 type Props = {
@@ -24,10 +24,25 @@ type Props = {
 const BIN_DUPLICATE_MESSAGE =
   "Bin Number già in uso. Scegline uno libero o elimina il vino che lo occupa.";
 
-/** Bin ≤ 0 = non assegnato; nessun vincolo di unicità. */
-function isBinNumberTaken(bin: number, wines: Wine[], excludeWineId?: string): boolean {
-  if (bin <= 0) return false;
-  return wines.some((w) => w.binNumber === bin && w.id !== excludeWineId);
+/** Bin vuoto = non assegnato; nessun vincolo di unicità. Confronto senza maiuscole/spazi ("GB1" = "gb 1"). */
+function binKey(bin: string): string {
+  return bin.replace(/\s+/g, "").toLowerCase();
+}
+
+function isBinNumberTaken(bin: string, wines: Wine[], excludeWineId?: string): boolean {
+  const key = binKey(bin);
+  if (!key) return false;
+  return wines.some((w) => binKey(w.binNumber) === key && w.id !== excludeWineId);
+}
+
+/** Annata dal campo di testo: anno, "NV" (0) o vuoto (null). Undefined se non valida. */
+function parseVintage(raw: string): number | null | undefined {
+  const v = raw.trim();
+  if (!v) return null;
+  if (/^nv$/i.test(v)) return 0;
+  const n = Number(v);
+  if (!Number.isInteger(n) || n < 1900 || n > 2100) return undefined;
+  return n;
 }
 
 const WINE_TYPES: WineType[] = [
@@ -106,10 +121,11 @@ function regionsForNation(country: string): readonly string[] {
   return [];
 }
 
-type FormState = Omit<WineInput, "type" | "category" | "binNumber"> & {
+type FormState = Omit<WineInput, "type" | "category" | "vintage" | "pricePerGlass"> & {
   type: WineType | "";
   category: WineCategory | "";
-  binNumber: number | "";
+  vintage: string;
+  pricePerGlass: number | "";
 };
 
 const initialState: FormState = {
@@ -121,8 +137,9 @@ const initialState: FormState = {
   region: "",
   country: "",
   binNumber: "",
-  vintage: new Date().getFullYear(),
+  vintage: String(new Date().getFullYear()),
   price: 0,
+  pricePerGlass: "",
   quantity: 1,
   isAvailable: true
 };
@@ -159,8 +176,9 @@ export function WineFormModal({
         region: wine.region,
         country: wine.country,
         binNumber: wine.binNumber,
-        vintage: wine.vintage,
+        vintage: formatVintage(wine.vintage),
         price: wine.price,
+        pricePerGlass: wine.pricePerGlass ?? "",
         quantity: wine.isAvailable ? wine.quantity : 0,
         isAvailable: wine.isAvailable
       });
@@ -212,23 +230,24 @@ export function WineFormModal({
       setError("Seleziona una tipologia.");
       return;
     }
-    if (!form.name.trim() || !form.winery.trim() || !form.region.trim()) {
-      setError("Compila nome, cantina e regione.");
+    if (!form.name.trim()) {
+      setError("Compila il nome.");
       return;
     }
-    if (Number.isNaN(form.vintage) || form.vintage < 1900 || form.vintage > 2100) {
-      setError("Inserisci un'annata valida.");
+    const vintage = parseVintage(form.vintage);
+    if (vintage === undefined) {
+      setError("Inserisci un'annata valida, NV oppure lascia vuoto.");
       return;
     }
     if (Number.isNaN(form.price) || form.price < 0) {
       setError("Inserisci un prezzo valido.");
       return;
     }
-    const binResolved = form.binNumber === "" ? 0 : Number(form.binNumber);
-    if (Number.isNaN(binResolved) || binResolved < 0) {
-      setError("Inserisci un Bin Number valido (minimo 0).");
+    if (form.pricePerGlass !== "" && (Number.isNaN(form.pricePerGlass) || form.pricePerGlass < 0)) {
+      setError("Inserisci un prezzo al calice valido.");
       return;
     }
+    const binResolved = form.binNumber.trim().replace(/\s+/g, " ");
     const excludeId = mode === "edit" && wine ? wine.id : undefined;
     if (isBinNumberTaken(binResolved, wines, excludeId)) {
       setError(BIN_DUPLICATE_MESSAGE);
@@ -250,6 +269,8 @@ export function WineFormModal({
         region: form.region.trim(),
         country: form.country.trim(),
         binNumber: binResolved,
+        vintage,
+        pricePerGlass: form.pricePerGlass === "" ? undefined : form.pricePerGlass,
         grape: form.grape.trim(),
         quantity
       });
@@ -280,23 +301,10 @@ export function WineFormModal({
               <Input
                 ref={binInputRef}
                 id="wine-bin"
-                type="number"
-                min={0}
-                step={1}
-                inputMode="numeric"
-                className="no-number-spin"
-                value={form.binNumber === "" ? "" : form.binNumber}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (v === "") {
-                    setForm((prev) => ({ ...prev, binNumber: "" }));
-                    return;
-                  }
-                  const n = Number(v);
-                  if (!Number.isNaN(n)) {
-                    setForm((prev) => ({ ...prev, binNumber: n }));
-                  }
-                }}
+                type="text"
+                placeholder="es. 23, GB 1, HB 2a"
+                value={form.binNumber}
+                onChange={(e) => setForm((prev) => ({ ...prev, binNumber: e.target.value }))}
               />
             </div>
             <div className="space-y-1.5">
@@ -431,18 +439,15 @@ export function WineFormModal({
           </label>
 
           <div
-            className={`grid gap-3 ${form.isAvailable ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
+            className={`grid gap-3 ${form.isAvailable ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}
           >
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-neutral-700">Annata</label>
               <Input
-                type="number"
-                inputMode="numeric"
-                className="no-number-spin"
+                type="text"
+                placeholder="es. 2021 o NV"
                 value={form.vintage}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, vintage: Number(e.target.value) }))
-                }
+                onChange={(e) => setForm((prev) => ({ ...prev, vintage: e.target.value }))}
               />
             </div>
             <div className="space-y-1.5">
@@ -456,6 +461,24 @@ export function WineFormModal({
                 value={form.price}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, price: Number(e.target.value) }))
+                }
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-neutral-700">Prezzo calice</label>
+              <Input
+                type="number"
+                min={0}
+                step="0.5"
+                inputMode="decimal"
+                className="no-number-spin"
+                placeholder="—"
+                value={form.pricePerGlass}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    pricePerGlass: e.target.value === "" ? "" : Number(e.target.value)
+                  }))
                 }
               />
             </div>

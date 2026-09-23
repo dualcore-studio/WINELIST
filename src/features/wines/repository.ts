@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { db, id, isInstantConfigured } from "@/lib/instant/client";
-import type { Wine, WineCategory, WineType } from "@/types/wine";
+import { compareBins, type Wine, type WineCategory, type WineType } from "@/types/wine";
 
 const WINE_TYPES: readonly WineType[] = [
   "Rosso",
@@ -88,14 +88,21 @@ type InstantWineRecord = Partial<Wine> & {
   collectionTag?: string;
 };
 
-function normalizeBinNumber(raw: unknown): number {
-  const n = Number(raw ?? 0);
-  if (!Number.isFinite(n) || n < 0) return 0;
-  return Math.trunc(n);
+/** Bin come testo: i numeri legacy diventano stringhe, 0/vuoto diventa "". */
+function normalizeBinNumber(raw: unknown): string {
+  if (typeof raw === "number") return Number.isFinite(raw) && raw > 0 ? String(Math.trunc(raw)) : "";
+  return String(raw ?? "").trim().replace(/\s+/g, " ");
+}
+
+/** 0 = NV; null/undefined = nessuna annata. */
+function normalizeVintage(raw: unknown): number | null {
+  if (raw === null || raw === undefined || raw === "") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? Math.trunc(n) : null;
 }
 
 function normalizeWine(record: InstantWineRecord): Wine | null {
-  if (!record.id || !record.name || !record.winery || !record.region) {
+  if (!record.id || !record.name) {
     return null;
   }
 
@@ -104,14 +111,14 @@ function normalizeWine(record: InstantWineRecord): Wine | null {
   return {
     id: String(record.id),
     name: String(record.name),
-    winery: String(record.winery),
+    winery: String(record.winery ?? ""),
     type,
     category: normalizeWineCategory(record.category),
     grape: String(record.grape ?? ""),
-    region: String(record.region),
+    region: String(record.region ?? ""),
     country: normalizeCountry(record.country ?? "Italia"),
     binNumber: normalizeBinNumber(record.binNumber),
-    vintage: Number(record.vintage ?? new Date().getFullYear()),
+    vintage: normalizeVintage(record.vintage),
     price: Number(record.price ?? 0),
     pricePerGlass:
       record.pricePerGlass === undefined || record.pricePerGlass === null
@@ -132,47 +139,12 @@ function normalizeWine(record: InstantWineRecord): Wine | null {
   };
 }
 
-/** Un solo record per Bin assegnato (> 0): vince updatedAt più recente. Bin0: tutti conservati. */
-function dedupeWinesByAssignedBin(wines: Wine[]): Wine[] {
-  const withBin: Wine[] = [];
-  const noBin: Wine[] = [];
-  for (const w of wines) {
-    if (w.binNumber > 0) withBin.push(w);
-    else noBin.push(w);
-  }
-  const byBin = new Map<number, Wine[]>();
-  for (const w of withBin) {
-    const list = byBin.get(w.binNumber) ?? [];
-    list.push(w);
-    byBin.set(w.binNumber, list);
-  }
-  const unique: Wine[] = [];
-  for (const [, group] of byBin) {
-    if (group.length === 1) {
-      unique.push(group[0]);
-      continue;
-    }
-    let best = group[0];
-    for (let i = 1; i < group.length; i++) {
-      const a = best;
-      const b = group[i];
-      if (
-        b.updatedAt > a.updatedAt ||
-        (b.updatedAt === a.updatedAt && b.createdAt > a.createdAt) ||
-        (b.updatedAt === a.updatedAt &&
-          b.createdAt === a.createdAt &&
-          b.id > a.id)
-      ) {
-        best = b;
-      }
-    }
-    unique.push(best);
-  }
-  return [...unique, ...noBin].sort(
-    (a, b) =>
-      a.binNumber - b.binNumber ||
-      a.displayOrder - b.displayOrder ||
-      a.name.localeCompare(b.name, "it")
+/** Ordine della lista: bin naturale, poi ordine di carta, poi nome. */
+function compareWines(a: Wine, b: Wine): number {
+  return (
+    compareBins(a.binNumber, b.binNumber) ||
+    a.displayOrder - b.displayOrder ||
+    a.name.localeCompare(b.name, "it")
   );
 }
 
@@ -218,17 +190,11 @@ export function useWines(collection: string = DEFAULT_WINES_COLLECTION): UseWine
 
   const wines = useMemo(() => {
     const raw = (data?.wines ?? []) as InstantWineRecord[];
-    const list = raw
+    return raw
       .filter((record) => resolveCollectionTag(record) === collection)
       .map(normalizeWine)
       .filter((wine): wine is Wine => Boolean(wine))
-      .sort(
-        (a, b) =>
-          a.binNumber - b.binNumber ||
-          a.displayOrder - b.displayOrder ||
-          a.name.localeCompare(b.name, "it")
-      );
-    return dedupeWinesByAssignedBin(list);
+      .sort(compareWines);
   }, [data, collection]);
 
   return {

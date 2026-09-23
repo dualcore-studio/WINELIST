@@ -1,6 +1,6 @@
 import { formatPriceEur } from "@/lib/utils";
 import type { WineFiltersState } from "@/components/wines/wine-filters";
-import type { Wine } from "@/types/wine";
+import { formatVintage, type Wine } from "@/types/wine";
 
 /** Escape HTML basilare per iniezione sicura nel documento di stampa. */
 function escapeHtml(value: string | number): string {
@@ -40,7 +40,7 @@ function buildFiltersSummary(filters: WineFiltersState): string[] {
 
 /** Apre una finestra di stampa con la lista filtrata. */
 export function printWines(wines: readonly Wine[], filters: WineFiltersState): void {
-  const win = window.open("", "_blank", "width=1200,height=800,noopener");
+  const win = window.open("", "_blank", "width=1200,height=800");
   if (!win) {
     alert(
       "Impossibile aprire la finestra di stampa. Consenti i popup per questo sito e riprova."
@@ -68,11 +68,11 @@ export function printWines(wines: readonly Wine[], filters: WineFiltersState): v
     .map(
       (w) => `
       <tr>
-        <td class="num">${w.binNumber > 0 ? escapeHtml(w.binNumber) : "—"}</td>
+        <td class="num">${w.binNumber ? escapeHtml(w.binNumber) : "—"}</td>
         <td class="strong">${escapeHtml(w.name)}</td>
         <td>${escapeHtml(w.winery)}</td>
         <td>${escapeHtml(grapeAndCategory(w))}</td>
-        <td class="num">${escapeHtml(w.vintage)}</td>
+        <td class="num">${escapeHtml(formatVintage(w.vintage) || "—")}</td>
         <td>${escapeHtml(w.type)}</td>
         <td>${escapeHtml(w.country)}</td>
         <td>${escapeHtml(w.region)}</td>
