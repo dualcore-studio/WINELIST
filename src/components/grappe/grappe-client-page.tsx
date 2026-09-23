@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   GrappaFilters,
@@ -10,7 +9,8 @@ import {
 } from "@/components/grappe/grappa-filters";
 import { GrappaFormModal } from "@/components/grappe/grappa-form-modal";
 import { GrappaTable } from "@/components/grappe/grappa-table";
-import { printGrappe } from "@/features/grappe/print";
+import { filterSpirits, spiritFiltersToSearchParams } from "@/features/grappe/filters";
+import { PrintMenu } from "@/components/wines/print-menu";
 import {
   createWine,
   deleteWine,
@@ -45,51 +45,7 @@ export function GrappeDistillatiClientPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const filteredWines = useMemo(() => {
-    const byName = filters.name.trim().toLowerCase();
-    const byWinery = filters.winery.trim().toLowerCase();
-    const priceMax = Number(filters.priceMax);
-    const glassMax = Number(filters.pricePerGlassMax);
-    const qtyMin = Number(filters.quantityMin);
-    const qtyMax = Number(filters.quantityMax);
-    const hasPriceMax =
-      filters.priceMax.trim() !== "" && !Number.isNaN(priceMax);
-    const hasGlassMax =
-      filters.pricePerGlassMax.trim() !== "" && !Number.isNaN(glassMax);
-    const hasQtyMin =
-      filters.quantityMin.trim() !== "" && !Number.isNaN(qtyMin);
-    const hasQtyMax =
-      filters.quantityMax.trim() !== "" && !Number.isNaN(qtyMax);
-
-    return wines.filter((wine) => {
-      if (byName && !wine.name.toLowerCase().includes(byName)) return false;
-      if (byWinery && !wine.winery.toLowerCase().includes(byWinery)) return false;
-      if (filters.spiritType) {
-        // Il valore del filtro può essere una tipologia completa (es. "Tequila Blanco")
-        // oppure una "famiglia" che raggruppa più sottocategorie (es. "Tequila",
-        // che deve includere Tequila Blanco/Reposado/Anejo/…). Accetto la riga se la
-        // sua spiritType coincide col filtro oppure inizia con "<filtro> ".
-        const st = (wine.spiritType ?? "").trim();
-        const f = filters.spiritType.trim();
-        if (st !== f && !st.startsWith(`${f} `)) return false;
-      }
-      if (hasPriceMax && wine.price > priceMax) return false;
-      if (hasGlassMax) {
-        // Se filtri per prezzo al bicchiere, mostra solo quelli che ce l'hanno e rientrano.
-        if (
-          wine.pricePerGlass === undefined ||
-          wine.pricePerGlass === null ||
-          !Number.isFinite(Number(wine.pricePerGlass)) ||
-          Number(wine.pricePerGlass) > glassMax
-        ) {
-          return false;
-        }
-      }
-      if (hasQtyMin && wine.quantity < qtyMin) return false;
-      if (hasQtyMax && wine.quantity > qtyMax) return false;
-      return true;
-    });
-  }, [wines, filters]);
+  const filteredWines = useMemo(() => filterSpirits(wines, filters), [wines, filters]);
 
   const openCreate = useCallback(() => {
     setActionError(null);
@@ -174,17 +130,16 @@ export function GrappeDistillatiClientPage() {
               <p className="mt-1 text-sm text-neutral-600">{DESCRIPTION}</p>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => printGrappe(filteredWines, filters)}
+              <PrintMenu
+                onPrintInternal={() =>
+                  window.open(
+                    `/stampa/interna/distillati?${spiritFiltersToSearchParams(filters)}`,
+                    "_blank"
+                  )
+                }
+                internalDescription="Distillati filtrati con prezzi e quantità"
                 disabled={isLoading || filteredWines.length === 0}
-                className="inline-flex h-10 items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-800 shadow-sm transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400/60 disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Stampa lista filtrata"
-                title="Stampa lista filtrata"
-              >
-                <Printer className="size-4" strokeWidth={2} aria-hidden />
-                Stampa
-              </button>
+              />
               <button
                 type="button"
                 onClick={openCreate}

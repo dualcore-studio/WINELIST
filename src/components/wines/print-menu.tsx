@@ -6,11 +6,17 @@ import { BookOpen, ChevronDown, ClipboardList, Printer } from "lucide-react";
 type Props = {
   /** Stampa ad uso interno della lista filtrata. */
   onPrintInternal: () => void;
+  /** Descrizione della voce "Uso interno" (cambia tra vini e distillati). */
+  internalDescription?: string;
   disabled?: boolean;
 };
 
 /** Pulsante "Stampa" con le due stampe: carta per il cliente e lista interna. */
-export function PrintMenu({ onPrintInternal, disabled = false }: Props) {
+export function PrintMenu({
+  onPrintInternal,
+  internalDescription = "Lista filtrata con tutte le colonne, quantità incluse",
+  disabled = false
+}: Props) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -81,9 +87,7 @@ export function PrintMenu({ onPrintInternal, disabled = false }: Props) {
             <ClipboardList className="mt-0.5 size-4 shrink-0 text-neutral-600" aria-hidden />
             <span>
               <span className="block text-sm font-semibold text-neutral-800">Uso interno</span>
-              <span className="block text-xs text-neutral-500">
-                Lista filtrata con tutte le colonne, quantità incluse
-              </span>
+              <span className="block text-xs text-neutral-500">{internalDescription}</span>
             </span>
           </button>
         </div>

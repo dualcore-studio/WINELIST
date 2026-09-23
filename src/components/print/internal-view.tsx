@@ -2,15 +2,17 @@
 
 import { useMemo } from "react";
 import { Printer, X } from "lucide-react";
+import type { GrappaFiltersState } from "@/components/grappe/grappa-filters";
 import type { WineFiltersState } from "@/components/wines/wine-filters";
+import { describeSpiritFilters, filterSpirits } from "@/features/grappe/filters";
 import { formatCartaPrice } from "@/features/print/carta";
 import { describeFilters, filterWines } from "@/features/wines/filters";
 import { useWines } from "@/features/wines/repository";
 import { formatVintage, type Wine } from "@/types/wine";
 
 /**
- * Stampa ad uso interno: la lista filtrata con tutte le colonne, quantità comprese,
- * ordinata per bin, con una colonna vuota "Conteggio" per l'inventario a mano e i totali in fondo.
+ * Stampa ad uso interno (vini e distillati): la lista filtrata con tutte le colonne, quantità
+ * comprese, una colonna vuota "Conteggio" per l'inventario a mano e i totali in fondo.
  */
 
 /** Stessa soglia della tabella: sotto 6 bottiglie la quantità è evidenziata. */
@@ -71,25 +73,76 @@ html, body { background: #fff !important; }
 }
 `;
 
+type Column = {
+  label: string;
+  width: string;
+  numeric?: boolean;
+  bold?: boolean;
+  value: (item: Wine) => string;
+};
+
 function grapeAndCategory(wine: Wine): string {
   return [wine.grape.trim(), wine.category.trim()].filter(Boolean).join(" · ");
 }
 
-export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
-  const { wines, isLoading, error } = useWines("wines");
-  const rows = useMemo(() => filterWines(wines, filters), [wines, filters]);
-  const filterParts = describeFilters(filters);
+const dash = (v: string) => v || "—";
 
+const WINE_COLUMNS: Column[] = [
+  { label: "Bin", width: "5%", value: (w) => dash(w.binNumber) },
+  { label: "Vino", width: "17%", bold: true, value: (w) => w.name },
+  { label: "Cantina", width: "13%", value: (w) => dash(w.winery) },
+  { label: "Vitigno · Cat.", width: "12%", value: (w) => dash(grapeAndCategory(w)) },
+  { label: "Annata", width: "5%", numeric: true, value: (w) => dash(formatVintage(w.vintage)) },
+  { label: "Tipologia", width: "7%", value: (w) => w.type },
+  { label: "Nazione", width: "7%", value: (w) => dash(w.country) },
+  { label: "Regione", width: "10%", value: (w) => dash(w.region) },
+  { label: "Prezzo", width: "6%", numeric: true, value: (w) => dash(formatCartaPrice(w.price)) },
+  { label: "Calice", width: "5%", numeric: true, value: (w) => dash(formatCartaPrice(w.pricePerGlass)) }
+];
+
+/** I distillati non hanno bottiglia a listino (prezzo segnaposto 1): mostrata solo se > 1. */
+const SPIRIT_COLUMNS: Column[] = [
+  { label: "Distillato", width: "30%", bold: true, value: (w) => w.name },
+  { label: "Produttore", width: "18%", value: (w) => (w.winery.trim().toLowerCase() === "other" ? "—" : dash(w.winery)) },
+  { label: "Tipologia", width: "16%", value: (w) => dash(w.spiritType ?? "") },
+  { label: "Calice", width: "8%", numeric: true, value: (w) => dash(formatCartaPrice(w.pricePerGlass)) },
+  { label: "Bottiglia", width: "8%", numeric: true, value: (w) => dash(w.price > 1 ? formatCartaPrice(w.price) : "") }
+];
+
+type LayoutProps = {
+  title: string;
+  noun: [string, string];
+  items: Wine[];
+  columns: Column[];
+  filterParts: string[];
+  isLoading: boolean;
+  error: string | null;
+  /** Valore di magazzino: solo dove esiste un prezzo a bottiglia. */
+  showValue: boolean;
+  footnote: string;
+};
+
+function InternalPrintLayout({
+  title,
+  noun,
+  items,
+  columns,
+  filterParts,
+  isLoading,
+  error,
+  showValue,
+  footnote
+}: LayoutProps) {
   const totals = useMemo(() => {
     let bottles = 0;
     let value = 0;
-    for (const w of rows) {
+    for (const w of items) {
       const qty = w.isAvailable ? w.quantity : 0;
       bottles += qty;
-      value += qty * w.price;
+      if (w.price > 1) value += qty * w.price;
     }
-    return { labels: rows.length, bottles, value };
-  }, [rows]);
+    return { labels: items.length, bottles, value };
+  }, [items]);
 
   const printedAt = new Date().toLocaleString("it-IT", {
     day: "2-digit",
@@ -98,6 +151,7 @@ export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
     hour: "2-digit",
     minute: "2-digit"
   });
+  const colCount = columns.length + 2;
 
   return (
     <div className="int-root">
@@ -122,17 +176,17 @@ export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
       </div>
 
       {isLoading ? (
-        <p className="int-status">Caricamento dei vini…</p>
+        <p className="int-status">Caricamento…</p>
       ) : error ? (
         <p className="int-status">{error}</p>
       ) : (
         <div className="int-sheet">
           <div className="int-head">
-            <h1>Lista vini · uso interno</h1>
+            <h1>{title}</h1>
             <div className="meta">
               Stampata il {printedAt}
               <br />
-              {rows.length} {rows.length === 1 ? "vino" : "vini"}
+              {items.length} {items.length === 1 ? noun[0] : noun[1]}
             </div>
           </div>
           <div className="int-filters">
@@ -141,57 +195,40 @@ export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
 
           <table className="int-table">
             <colgroup>
-              <col style={{ width: "5%" }} />
-              <col style={{ width: "17%" }} />
-              <col style={{ width: "13%" }} />
-              <col style={{ width: "12%" }} />
-              <col style={{ width: "5%" }} />
-              <col style={{ width: "7%" }} />
-              <col style={{ width: "7%" }} />
-              <col style={{ width: "10%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "5%" }} />
+              {columns.map((c) => (
+                <col key={c.label} style={{ width: c.width }} />
+              ))}
               <col style={{ width: "4%" }} />
               <col style={{ width: "9%" }} />
             </colgroup>
             <thead>
               <tr>
-                <th>Bin</th>
-                <th>Vino</th>
-                <th>Cantina</th>
-                <th>Vitigno · Cat.</th>
-                <th className="num">Annata</th>
-                <th>Tipologia</th>
-                <th>Nazione</th>
-                <th>Regione</th>
-                <th className="num">Prezzo</th>
-                <th className="num">Calice</th>
+                {columns.map((c) => (
+                  <th key={c.label} className={c.numeric ? "num" : undefined}>
+                    {c.label}
+                  </th>
+                ))}
                 <th className="num">Qtà</th>
                 <th>Conteggio</th>
               </tr>
             </thead>
             <tbody>
-              {rows.length === 0 ? (
+              {items.length === 0 ? (
                 <tr>
-                  <td colSpan={12} style={{ textAlign: "center", padding: "20pt", color: "#666" }}>
-                    Nessun vino con i filtri correnti.
+                  <td colSpan={colCount} style={{ textAlign: "center", padding: "20pt", color: "#666" }}>
+                    Nessun elemento con i filtri correnti.
                   </td>
                 </tr>
               ) : (
-                rows.map((w) => {
+                items.map((w) => {
                   const qty = w.isAvailable ? w.quantity : 0;
                   return (
                     <tr key={w.id} className={qty === 0 ? "out" : undefined}>
-                      <td>{w.binNumber || "—"}</td>
-                      <td className="name">{w.name}</td>
-                      <td>{w.winery || "—"}</td>
-                      <td>{grapeAndCategory(w) || "—"}</td>
-                      <td className="num">{formatVintage(w.vintage) || "—"}</td>
-                      <td>{w.type}</td>
-                      <td>{w.country || "—"}</td>
-                      <td>{w.region || "—"}</td>
-                      <td className="num">{formatCartaPrice(w.price) || "—"}</td>
-                      <td className="num">{formatCartaPrice(w.pricePerGlass) || "—"}</td>
+                      {columns.map((c) => (
+                        <td key={c.label} className={[c.numeric ? "num" : "", c.bold ? "name" : ""].join(" ")}>
+                          {c.value(w)}
+                        </td>
+                      ))}
                       <td className={`num ${qty < LOW_STOCK ? "low" : ""}`}>{qty === 0 ? "esaurito" : qty}</td>
                       <td className="count">
                         <span className="count-box" />
@@ -210,15 +247,53 @@ export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
             <span>
               Bottiglie totali <b>{totals.bottles}</b>
             </span>
-            <span>
-              Valore magazzino (prezzi di carta) <b>{formatCartaPrice(totals.value) || "0"}</b>
-            </span>
+            {showValue ? (
+              <span>
+                Valore magazzino (prezzi di carta) <b>{formatCartaPrice(totals.value) || "0"}</b>
+              </span>
+            ) : null}
           </div>
           <div className="int-legend">
-            Quantità in grassetto: sotto {LOW_STOCK} bottiglie. Ordine per bin.
+            Quantità in grassetto: sotto {LOW_STOCK} bottiglie. {footnote}
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
+  const { wines, isLoading, error } = useWines("wines");
+  const items = useMemo(() => filterWines(wines, filters), [wines, filters]);
+  return (
+    <InternalPrintLayout
+      title="Lista vini · uso interno"
+      noun={["vino", "vini"]}
+      items={items}
+      columns={WINE_COLUMNS}
+      filterParts={describeFilters(filters)}
+      isLoading={isLoading}
+      error={error}
+      showValue
+      footnote="Ordine per bin."
+    />
+  );
+}
+
+export function InternalSpiritsPrintView({ filters }: { filters: GrappaFiltersState }) {
+  const { wines, isLoading, error } = useWines("grappeDistillati");
+  const items = useMemo(() => filterSpirits(wines, filters), [wines, filters]);
+  return (
+    <InternalPrintLayout
+      title="Distillati · uso interno"
+      noun={["distillato", "distillati"]}
+      items={items}
+      columns={SPIRIT_COLUMNS}
+      filterParts={describeSpiritFilters(filters)}
+      isLoading={isLoading}
+      error={error}
+      showValue={false}
+      footnote="Ordine della carta."
+    />
   );
 }
