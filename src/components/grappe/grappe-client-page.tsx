@@ -131,6 +131,9 @@ export function GrappeDistillatiClientPage() {
             </div>
             <div className="flex items-center gap-2">
               <PrintMenu
+                cartaHref="/stampa/carta/distillati"
+                cartaLabel="Carta dei distillati"
+                cartaDescription="Per il cliente: distillati disponibili, formato Letter"
                 onPrintInternal={() =>
                   window.open(
                     `/stampa/interna/distillati?${spiritFiltersToSearchParams(filters)}`,

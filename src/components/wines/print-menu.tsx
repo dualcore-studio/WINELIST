@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { BookOpen, ChevronDown, ClipboardList, Printer } from "lucide-react";
 
 type Props = {
+  /** Carta per il cliente: pagina da aprire, titolo e descrizione della voce. */
+  cartaHref?: string;
+  cartaLabel?: string;
+  cartaDescription?: string;
   /** Stampa ad uso interno della lista filtrata. */
   onPrintInternal: () => void;
   /** Descrizione della voce "Uso interno" (cambia tra vini e distillati). */
@@ -11,8 +15,11 @@ type Props = {
   disabled?: boolean;
 };
 
-/** Pulsante "Stampa" con le due stampe: carta per il cliente e lista interna. */
+/** Pulsante "Stampa" con le due stampe della sezione: carta per il cliente e lista interna. */
 export function PrintMenu({
+  cartaHref = "/stampa/carta",
+  cartaLabel = "Carta dei vini",
+  cartaDescription = "Per il cliente: vini disponibili, formato Letter",
   onPrintInternal,
   internalDescription = "Lista filtrata con tutte le colonne, quantità incluse",
   disabled = false
@@ -64,15 +71,13 @@ export function PrintMenu({
             className={itemClass}
             onClick={() => {
               setOpen(false);
-              window.open("/stampa/carta", "_blank");
+              window.open(cartaHref, "_blank");
             }}
           >
             <BookOpen className="mt-0.5 size-4 shrink-0 text-neutral-600" aria-hidden />
             <span>
-              <span className="block text-sm font-semibold text-neutral-800">Carta dei vini</span>
-              <span className="block text-xs text-neutral-500">
-                Per il cliente: vini e distillati disponibili, formato Letter
-              </span>
+              <span className="block text-sm font-semibold text-neutral-800">{cartaLabel}</span>
+              <span className="block text-xs text-neutral-500">{cartaDescription}</span>
             </span>
           </button>
           <button

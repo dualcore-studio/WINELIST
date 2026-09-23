@@ -161,7 +161,7 @@ const SECTIONS: SectionDef[] = [
   { key: "PORTS", title: "PORTS BY THE BOTTLE", columns: "glass-bottle", showBin: false, breakBefore: true },
   { key: "DESSERT_BOTTLE", title: "DESSERT WINE BY THE BOTTLE", columns: "size-bottle", showBin: false, breakBefore: true },
   { key: "LARGE", title: "LARGE FORMAT", columns: "size-bottle", showBin: true, breakBefore: true },
-  { key: "SCOTCH", title: "SINGLE MALT SCOTCHES", columns: "glass", showBin: false, breakBefore: false },
+  { key: "SCOTCH", title: "SINGLE MALT SCOTCHES", columns: "glass", showBin: false, breakBefore: true },
   { key: "BOURBON", title: "BOURBON and RYE WHISKEY", columns: "glass", showBin: false, breakBefore: true },
   { key: "AMARI", title: "AMARI & DIGESTIVI", columns: "glass", showBin: false, breakBefore: true },
   { key: "DESSERT_GLASS_IT", title: "ITALIAN DESSERT WINES", columns: "glass", showBin: false, breakBefore: false },
@@ -347,7 +347,10 @@ function buildRows(def: SectionDef, items: Wine[], isSpirit: boolean): CartaRow[
   return rows;
 }
 
-/** Costruisce le sezioni della carta da vini e distillati. Le sezioni vuote vengono omesse. */
+/**
+ * Costruisce le sezioni della carta. Si passano i vini (carta dei vini) oppure i distillati
+ * (carta dei distillati): le sezioni vuote vengono omesse.
+ */
 export function buildCarta(wines: Wine[], spirits: Wine[]): CartaSection[] {
   const buckets = new Map<string, { items: Wine[]; isSpirit: boolean }>();
   const add = (key: string, wine: Wine, isSpirit: boolean) => {

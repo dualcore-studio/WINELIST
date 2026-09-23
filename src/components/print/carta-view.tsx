@@ -259,15 +259,20 @@ function SpecialSelectionsPage() {
   );
 }
 
-export function CartaView() {
-  const wines = useWines("wines");
-  const spirits = useWines("grappeDistillati");
-  const isLoading = wines.isLoading || spirits.isLoading;
-  const error = wines.error ?? spirits.error;
+type Scope = "wines" | "spirits";
+
+const SCOPE_LABEL: Record<Scope, string> = {
+  wines: "Carta dei vini",
+  spirits: "Carta dei distillati"
+};
+
+/** Carta dei vini (lista vini) o carta dei distillati (pagina Distillati): ognuna stampa solo la sua sezione. */
+export function CartaView({ scope }: { scope: Scope }) {
+  const { wines, isLoading, error } = useWines(scope === "wines" ? "wines" : "grappeDistillati");
 
   const sections = useMemo(
-    () => buildCarta(wines.wines, spirits.wines),
-    [wines.wines, spirits.wines]
+    () => (scope === "wines" ? buildCarta(wines, []) : buildCarta([], wines)),
+    [wines, scope]
   );
 
   return (
@@ -275,7 +280,7 @@ export function CartaView() {
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div className="carta-toolbar">
         <span>
-          <strong>Carta dei vini</strong> · anteprima di stampa, formato Letter
+          <strong>{SCOPE_LABEL[scope]}</strong> · anteprima di stampa, formato Letter
         </span>
         <span style={{ display: "flex", gap: 8 }}>
           <button type="button" onClick={() => window.close()}>
