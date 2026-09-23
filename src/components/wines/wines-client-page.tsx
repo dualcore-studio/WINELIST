@@ -6,7 +6,7 @@ import { WineFilters, type WineFiltersState } from "@/components/wines/wine-filt
 import { WineFormModal } from "@/components/wines/wine-form-modal";
 import { PrintMenu } from "@/components/wines/print-menu";
 import { WineTable } from "@/components/wines/wine-table";
-import { printWines } from "@/features/wines/print";
+import { filterWines, filtersToSearchParams, initialWineFilters } from "@/features/wines/filters";
 import {
   createWine,
   DEFAULT_WINES_COLLECTION,
@@ -15,22 +15,7 @@ import {
   updateWine,
   type WineInput
 } from "@/features/wines/repository";
-import { formatVintage, type Wine } from "@/types/wine";
-
-const initialFilters: WineFiltersState = {
-  binNumber: "",
-  name: "",
-  winery: "",
-  categoryText: "",
-  type: "",
-  country: "",
-  region: "",
-  category: "",
-  vintage: "",
-  quantityMin: "",
-  quantityMax: "",
-  onlyAvailable: true
-};
+import type { Wine } from "@/types/wine";
 
 type WinesPageProps = {
   /** Nome della collection InstantDB da usare come storage. Default: "wines". */
@@ -50,7 +35,7 @@ export function WinesClientPage({
   itemNoun = "vino"
 }: WinesPageProps) {
   const { wines, isLoading, error } = getWines(collection);
-  const [filters, setFilters] = useState<WineFiltersState>(initialFilters);
+  const [filters, setFilters] = useState<WineFiltersState>(initialWineFilters);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [selectedWine, setSelectedWine] = useState<Wine | null>(null);
@@ -60,36 +45,7 @@ export function WinesClientPage({
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const filteredWines = useMemo(() => {
-    const byName = filters.name.trim().toLowerCase();
-    const byWinery = filters.winery.trim().toLowerCase();
-    const byCategoryText = filters.categoryText.trim().toLowerCase();
-    const byBin = filters.binNumber.trim();
-    const byVintage = filters.vintage.trim();
-    const qtyMin = Number(filters.quantityMin);
-    const qtyMax = Number(filters.quantityMax);
-
-    return wines.filter((wine) => {
-      if (filters.onlyAvailable && !wine.isAvailable) return false;
-      if (filters.country && wine.country !== filters.country) return false;
-      if (filters.type && wine.type !== filters.type) return false;
-      if (filters.region && wine.region !== filters.region) return false;
-      if (filters.category && wine.category !== filters.category) return false;
-      if (byBin && !wine.binNumber.toLowerCase().includes(byBin.toLowerCase())) return false;
-      if (byName && !wine.name.toLowerCase().includes(byName)) return false;
-      if (byWinery && !wine.winery.toLowerCase().includes(byWinery)) return false;
-      if (byVintage && !formatVintage(wine.vintage).toLowerCase().includes(byVintage.toLowerCase())) return false;
-      if (!Number.isNaN(qtyMin) && filters.quantityMin.trim() !== "" && wine.quantity < qtyMin) return false;
-      if (!Number.isNaN(qtyMax) && filters.quantityMax.trim() !== "" && wine.quantity > qtyMax) return false;
-      if (
-        byCategoryText &&
-        !`${wine.grape} ${wine.category}`.toLowerCase().includes(byCategoryText)
-      ) {
-        return false;
-      }
-      return true;
-    });
-  }, [wines, filters]);
+  const filteredWines = useMemo(() => filterWines(wines, filters), [wines, filters]);
 
   const openCreate = useCallback(() => {
     setActionError(null);
@@ -170,7 +126,9 @@ export function WinesClientPage({
             </div>
             <div className="flex items-center gap-2">
               <PrintMenu
-                onPrintInternal={() => printWines(filteredWines, filters)}
+                onPrintInternal={() =>
+                  window.open(`/stampa/interna?${filtersToSearchParams(filters)}`, "_blank")
+                }
                 disabled={isLoading || filteredWines.length === 0}
               />
               <button
@@ -199,7 +157,7 @@ export function WinesClientPage({
             filters={filters}
             wines={wines}
             onFiltersChange={setFilters}
-            onReset={() => setFilters(initialFilters)}
+            onReset={() => setFilters(initialWineFilters)}
           />
         </div>
 
