@@ -11,6 +11,8 @@ type Props = {
   deletingWineId: string | null;
   onEdit: (wine: Wine) => void;
   onDeleteRequest: (wine: Wine) => void;
+  /** Riga aperta nel pannello laterale (evidenziata). */
+  selectedId?: string | null;
   className?: string;
 };
 
@@ -31,13 +33,13 @@ const tableRoot = "flex min-h-0 w-full min-w-0 flex-1 flex-col pb-1";
 
 /** Messaggi vuoto/caricamento: 12px su tutti gli angoli. */
 const messageCardShell =
-  "rounded-[12px] border border-neutral-200 bg-white shadow-soft";
+  "rounded-xl border border-line bg-white shadow-soft";
 
 /** Card tabella: larghezza piena tra i margini; scroll orizzontale per tutte le colonne. */
 const tableCardShell =
-  "flex w-full min-w-0 min-h-0 flex-1 flex-col overflow-hidden rounded-[12px] border border-neutral-200 bg-white shadow-soft";
+  "flex w-full min-w-0 min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft";
 
-const cellPad = "px-2 py-2.5 md:px-3 md:py-3";
+const cellPad = "px-3 py-3 md:px-4";
 
 const cellNowrap = "whitespace-nowrap";
 
@@ -46,11 +48,11 @@ const cellWrap = "break-words [overflow-wrap:anywhere]";
 
 /** Sticky su ogni th rispetto al contenitore overflow-y-auto; border-separate abilita sticky sulle celle. */
 const thBase =
-  "sticky top-0 z-30 whitespace-nowrap border-b border-[#2d3236] bg-[#383e42] px-2 py-2.5 text-[10px] font-bold uppercase tracking-wide text-white first:rounded-tl-[12px] last:rounded-tr-[12px] md:px-3 md:py-3 md:text-[11px]";
+  "sticky top-0 z-30 whitespace-nowrap border-b border-line bg-white px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-neutral-500 md:px-4";
 
 /** Zebra solido su ogni tr (niente alpha) così non si interrompe su lunghe liste. */
 const rowZebra =
-  "odd:bg-white even:bg-neutral-100 hover:bg-neutral-200/90 [&>td]:border-t [&>td]:border-neutral-100";
+  "cursor-pointer bg-white transition-colors hover:bg-canvas [&>td]:border-t [&>td]:border-line/70";
 
 export function WineTable({
   wines,
@@ -58,6 +60,7 @@ export function WineTable({
   deletingWineId,
   onEdit,
   onDeleteRequest,
+  selectedId = null,
   className
 }: Props) {
   const { t, lang } = useI18n();
@@ -108,7 +111,11 @@ export function WineTable({
               </thead>
               <tbody className="relative z-0 [&_tr:first-child>td]:border-t-0">
                 {wines.map((wine) => (
-                  <tr key={wine.id} className={rowZebra}>
+                  <tr
+                    key={wine.id}
+                    className={cn(rowZebra, selectedId === wine.id && "!bg-accent-soft")}
+                    onClick={() => onEdit(wine)}
+                  >
                     <td
                       className={cn(
                         cellPad,
@@ -178,21 +185,27 @@ export function WineTable({
                       <div className="flex items-center justify-center gap-0.5 whitespace-nowrap">
                         <button
                           type="button"
-                          className="rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800 disabled:pointer-events-none disabled:opacity-40"
+                          className="rounded-md p-1.5 text-neutral-400 hover:bg-white hover:text-accent disabled:pointer-events-none disabled:opacity-40"
                           aria-label={t.common.editItem(wine.name)}
-                          onClick={() => onEdit(wine)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit(wine);
+                          }}
                           disabled={deletingWineId === wine.id}
                         >
-                          <Pencil size={16} />
+                          <Pencil size={15} />
                         </button>
                         <button
                           type="button"
-                          className="rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-red-700 disabled:pointer-events-none disabled:opacity-40"
+                          className="rounded-md p-1.5 text-neutral-400 hover:bg-white hover:text-red-700 disabled:pointer-events-none disabled:opacity-40"
                           aria-label={t.common.deleteItem(wine.name)}
-                          onClick={() => onDeleteRequest(wine)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteRequest(wine);
+                          }}
                           disabled={deletingWineId === wine.id}
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={15} />
                         </button>
                       </div>
                     </td>

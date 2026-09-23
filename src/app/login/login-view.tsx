@@ -44,8 +44,8 @@ export function LoginView({ redirectTo }: Props) {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-paper p-4">
-      <div className="w-full max-w-sm rounded-xl2 border border-neutral-200 bg-white p-6 shadow-soft">
+    <div className="flex min-h-dvh items-center justify-center bg-canvas p-4">
+      <div className="w-full max-w-sm rounded-2xl border border-line bg-white p-7 shadow-[0_24px_60px_rgba(17,17,17,0.14)]">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
             <h1 className="font-display text-xl font-semibold text-text">Wine List Manager</h1>

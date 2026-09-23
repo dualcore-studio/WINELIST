@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { RotateCcw } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 import { SPIRIT_TYPE_SUGGESTIONS } from "@/components/grappe/grappa-form-modal";
@@ -51,10 +50,10 @@ export function GrappaFilters({
   onReset
 }: Props) {
   const { t } = useI18n();
-  const field = "min-w-0 flex-1 px-2 text-sm";
+  const field = "h-9 w-40 min-w-[8rem] flex-auto rounded-full border border-line bg-white px-3.5 text-[13px] text-text outline-none transition-colors placeholder:text-neutral-500 hover:border-neutral-300 focus:border-accent/40 focus:ring-2 focus:ring-accent-ring";
 
   const selectBase =
-    "min-w-0 flex-1 rounded-lg border border-neutral-200 bg-white px-2 py-0 text-sm text-text outline-none focus:border-neutral-300 focus:ring-2 focus:ring-neutral-200";
+  "h-9 w-auto max-w-[11rem] flex-none cursor-pointer truncate rounded-full border border-line bg-white pl-3.5 pr-2 text-[13px] text-text outline-none transition-colors hover:border-neutral-300 focus:border-accent/40 focus:ring-2 focus:ring-accent-ring";
 
   // Costruisce la lista delle tipologie disponibili: unione dei suggerimenti
   // predefiniti e delle tipologie effettivamente presenti nei dati, più i
@@ -97,15 +96,15 @@ export function GrappaFilters({
   }, [wines, t]);
 
   return (
-    <div className="w-full rounded-[12px] border border-neutral-200 bg-white p-4 shadow-soft">
-      <div className="flex w-full flex-nowrap items-center gap-2">
-        <Input
+    <div className="w-full">
+      <div className="flex w-full flex-wrap items-center gap-2">
+        <input
           placeholder={t.spirits.col.name}
           value={filters.name}
           onChange={(e) => onFiltersChange({ ...filters, name: e.target.value })}
           className={field}
         />
-        <Input
+        <input
           placeholder={t.spirits.col.producer}
           value={filters.winery}
           onChange={(e) =>
@@ -118,7 +117,7 @@ export function GrappaFilters({
           onChange={(e) =>
             onFiltersChange({ ...filters, spiritType: e.target.value })
           }
-          className={cn(selectBase, "h-10")}
+          className={selectBase}
         >
           <option value="">{t.spirits.col.type}</option>
           {spiritTypeOptions.map((opt) => (
@@ -127,7 +126,7 @@ export function GrappaFilters({
             </option>
           ))}
         </select>
-        <Input
+        <input
           placeholder={t.spirits.filter.glassMax}
           type="number"
           min={0}
@@ -137,9 +136,9 @@ export function GrappaFilters({
           onChange={(e) =>
             onFiltersChange({ ...filters, pricePerGlassMax: e.target.value })
           }
-          className={cn(field, "max-w-[11rem] shrink-0 no-number-spin")}
+          className={cn(field, "!w-44 flex-none no-number-spin")}
         />
-        <Input
+        <input
           placeholder={t.spirits.filter.bottleMax}
           type="number"
           min={0}
@@ -149,33 +148,32 @@ export function GrappaFilters({
           onChange={(e) =>
             onFiltersChange({ ...filters, priceMax: e.target.value })
           }
-          className={cn(field, "max-w-[11rem] shrink-0 no-number-spin")}
+          className={cn(field, "!w-44 flex-none no-number-spin")}
         />
-        <Input
+        <input
           placeholder={t.common.qtyMin}
           value={filters.quantityMin}
           onChange={(e) =>
             onFiltersChange({ ...filters, quantityMin: e.target.value })
           }
-          className={cn(field, "max-w-[4rem] shrink-0")}
+          className={cn(field, "!w-[5.5rem] !min-w-0 flex-none")}
         />
-        <Input
+        <input
           placeholder={t.common.qtyMax}
           value={filters.quantityMax}
           onChange={(e) =>
             onFiltersChange({ ...filters, quantityMax: e.target.value })
           }
-          className={cn(field, "max-w-[4rem] shrink-0")}
+          className={cn(field, "!w-[5.5rem] !min-w-0 flex-none")}
         />
         <button
           type="button"
           onClick={onReset}
-          style={{ backgroundColor: "#dc2626", width: 40, height: 40, padding: 0 }}
-          className="ml-2 box-border inline-flex aspect-square shrink-0 items-center justify-center rounded-lg !text-white shadow-sm transition-colors hover:!bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/40"
+          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-line bg-white text-neutral-500 transition-colors hover:border-accent/40 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-ring"
           aria-label={t.common.resetFilters}
           title={t.common.resetFilters}
         >
-          <RotateCcw className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
+          <RotateCcw className="size-4 shrink-0" strokeWidth={2} aria-hidden />
         </button>
       </div>
     </div>

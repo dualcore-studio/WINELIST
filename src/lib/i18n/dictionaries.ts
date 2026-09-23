@@ -41,7 +41,9 @@ const it = {
     users: "Utenti",
     logout: "Esci",
     comingSoon: "Sezione in arrivo",
-    language: "Lingua"
+    language: "Lingua",
+    expandMenu: "Espandi menu",
+    collapseMenu: "Riduci menu"
   },
   wines: {
     heading: "Wine List Manager",
@@ -297,7 +299,9 @@ const en: Dictionary = {
     users: "Users",
     logout: "Log out",
     comingSoon: "Coming soon",
-    language: "Language"
+    language: "Language",
+    expandMenu: "Expand menu",
+    collapseMenu: "Collapse menu"
   },
   wines: {
     heading: "Wine List Manager",

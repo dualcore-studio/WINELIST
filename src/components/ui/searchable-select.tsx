@@ -202,7 +202,7 @@ export function SearchableSelect({
           }}
           onKeyDown={handleKeyDown}
           className={cn(
-            "h-10 w-full rounded-lg border border-neutral-200 bg-white pr-9 pl-3 text-sm text-text outline-none placeholder:text-neutral-400 focus:border-neutral-300 focus:ring-2 focus:ring-neutral-200",
+            "h-10 w-full rounded-lg border border-transparent bg-field pr-9 pl-3 text-sm text-text outline-none transition-colors placeholder:text-neutral-400 focus:border-accent/30 focus:bg-white focus:ring-2 focus:ring-accent-ring",
             disabled && "cursor-not-allowed opacity-60"
           )}
         />
@@ -219,7 +219,7 @@ export function SearchableSelect({
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-lg border border-neutral-200 bg-white py-1 shadow-lg"
+          className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-xl border border-line bg-white py-1 shadow-[0_12px_32px_rgba(17,17,17,0.12)]"
         >
           {filtered.map((opt, i) => (
             <li
@@ -228,7 +228,7 @@ export function SearchableSelect({
               aria-selected={value === opt}
               className={cn(
                 "cursor-pointer px-3 py-2 text-sm text-text",
-                i === highlight ? "bg-neutral-100" : "hover:bg-neutral-50"
+                i === highlight ? "bg-accent-soft text-accent" : "hover:bg-canvas"
               )}
               onMouseEnter={() => setHighlight(i)}
               onMouseDown={(e) => {

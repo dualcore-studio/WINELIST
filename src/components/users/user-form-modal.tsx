@@ -73,8 +73,8 @@ export function UserFormModal({ open, mode, user, isSaving, onClose, onSubmit }:
   }
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/30 p-4">
-      <div className="w-full max-w-md rounded-xl2 border border-neutral-200 bg-white p-6 shadow-soft">
+    <div className="fixed inset-0 z-[200] flex animate-fade-in items-center justify-center bg-black/25 p-4">
+      <div className="w-full max-w-md rounded-2xl border border-line bg-white p-7 shadow-[0_24px_60px_rgba(17,17,17,0.14)]">
         <div className="mb-4">
           <h4 className="text-lg font-semibold text-text">{title}</h4>
           <p className="text-sm text-neutral-500">{t.users.form.subtitle}</p>

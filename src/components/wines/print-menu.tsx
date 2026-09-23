@@ -46,7 +46,7 @@ export function PrintMenu({
   }, [open]);
 
   const itemClass =
-    "flex w-full items-start gap-3 rounded-md px-3 py-2 text-left hover:bg-neutral-100 focus-visible:bg-neutral-100 focus-visible:outline-none";
+    "flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-canvas focus-visible:bg-canvas focus-visible:outline-none";
 
   return (
     <div ref={rootRef} className="relative">
@@ -56,7 +56,7 @@ export function PrintMenu({
         disabled={disabled}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="inline-flex h-10 items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-800 shadow-sm transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400/60 disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex h-9 items-center gap-2 rounded-lg border border-line bg-white px-3.5 text-sm font-semibold text-neutral-700 shadow-sm transition-colors hover:bg-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-ring disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Printer className="size-4" strokeWidth={2} aria-hidden />
         {t.common.print}
@@ -65,7 +65,7 @@ export function PrintMenu({
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-50 mt-2 w-72 rounded-lg border border-neutral-200 bg-white p-1.5 shadow-soft"
+          className="absolute right-0 z-50 mt-2 w-72 rounded-xl border border-line bg-white p-1.5 shadow-[0_12px_32px_rgba(17,17,17,0.12)]"
         >
           <button
             type="button"
@@ -76,7 +76,7 @@ export function PrintMenu({
               window.open(cartaHref, "_blank");
             }}
           >
-            <BookOpen className="mt-0.5 size-4 shrink-0 text-neutral-600" aria-hidden />
+            <BookOpen className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden />
             <span>
               <span className="block text-sm font-semibold text-neutral-800">{cartaLabel}</span>
               <span className="block text-xs text-neutral-500">{cartaDescription}</span>
@@ -91,7 +91,7 @@ export function PrintMenu({
               onPrintInternal();
             }}
           >
-            <ClipboardList className="mt-0.5 size-4 shrink-0 text-neutral-600" aria-hidden />
+            <ClipboardList className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden />
             <span>
               <span className="block text-sm font-semibold text-neutral-800">{t.print.menu.internal}</span>
               <span className="block text-xs text-neutral-500">{internalDescription}</span>

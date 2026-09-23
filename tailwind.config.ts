@@ -9,7 +9,18 @@ const config: Config = {
         display: ["var(--font-display)", "Georgia", "ui-serif", "serif"]
       },
       colors: {
-        brand: "#ff7a00",
+        /* Stile chiaro ispirato alle app di gestione cantina: fondo neutro caldo, un solo accento bordeaux. */
+        canvas: "#f6f5f3",
+        line: "#e7e4e0",
+        muted: "#77706a",
+        field: "#f1efec",
+        accent: {
+          DEFAULT: "#8e2f45",
+          hover: "#76263a",
+          soft: "#f6e9ec",
+          ring: "rgba(142,47,69,0.25)"
+        },
+        brand: "#8e2f45",
         panel: "#f5f5f5",
         surface: "#fafafa",
         text: "#111111",
@@ -26,8 +37,17 @@ const config: Config = {
           gold: "#b8a369"
         }
       },
+      keyframes: {
+        "drawer-in": { from: { transform: "translateX(24px)", opacity: "0" }, to: { transform: "none", opacity: "1" } },
+        "fade-in": { from: { opacity: "0" }, to: { opacity: "1" } }
+      },
+      animation: {
+        "drawer-in": "drawer-in 180ms ease-out",
+        "fade-in": "fade-in 150ms ease-out"
+      },
       boxShadow: {
-        soft: "0 2px 14px rgba(17,17,17,0.06)"
+        soft: "0 1px 2px rgba(17,17,17,0.04), 0 4px 16px rgba(17,17,17,0.04)",
+        drawer: "-12px 0 40px rgba(17,17,17,0.12)"
       }
     }
   },

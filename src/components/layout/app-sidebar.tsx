@@ -6,6 +6,8 @@ import {
   FlaskConical,
   GlassWater,
   LayoutDashboard,
+  PanelLeftClose,
+  PanelLeftOpen,
   Settings,
   Users,
   Wine,
@@ -45,75 +47,60 @@ const NAV_LABEL_KEYS = {
   users: "users"
 } as const;
 
-/** Voci mostrate come solo-icona (area amministrativa compatta, in alto a destra). */
-const COMPACT_ICON_IDS = new Set(["settings", "users"]);
-
 function NavRow({
   item,
   active,
+  collapsed,
   onNavigate
 }: {
   item: SidebarNavItem;
   active: boolean;
+  /** Barra ridotta: solo icona, etichetta nel tooltip. */
+  collapsed: boolean;
   onNavigate?: () => void;
 }) {
   const { t } = useI18n();
   const Icon = ICON_MAP[item.icon];
-  const settingsOnlyIcon = COMPACT_ICON_IDS.has(item.id);
   const labelKey = NAV_LABEL_KEYS[item.id as keyof typeof NAV_LABEL_KEYS];
   const label = labelKey ? t.nav[labelKey] : item.label;
 
   const base = clsx(
-    "flex w-auto shrink-0 items-center rounded-lg py-2 font-semibold leading-tight transition-colors duration-200",
-    settingsOnlyIcon
-      ? "gap-0 px-2 sm:px-2.5"
-      : "gap-1.5 whitespace-nowrap px-2 text-[13px] sm:gap-2 sm:px-2.5 sm:text-[14px] md:text-[15px]",
-    settingsOnlyIcon && "text-[15px]"
+    "group flex w-full items-center rounded-lg py-2 text-[13.5px] font-medium transition-colors",
+    collapsed ? "justify-center px-0" : "gap-3 px-3"
   );
-  const interactive = item.href
-    ? clsx(
-        active
-          ? "border-l-2 border-wine-gold bg-white/[0.08] text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
-          : "border-l-2 border-transparent text-wine-mist/85 hover:bg-white/[0.05] hover:text-white"
-      )
-    : "cursor-not-allowed border-l-2 border-transparent text-wine-mist/40";
-
-  if (item.href && settingsOnlyIcon) {
-    return (
-      <Link
-        href={item.href}
-        onClick={onNavigate}
-        className={clsx(base, interactive)}
-        aria-label={label}
-        aria-current={active ? "page" : undefined}
-      >
-        <Icon className="size-4 shrink-0 opacity-95 sm:size-[1.05rem]" strokeWidth={1.75} aria-hidden />
-      </Link>
-    );
-  }
+  const state = item.href
+    ? active
+      ? "bg-accent-soft text-accent"
+      : "text-neutral-600 hover:bg-canvas hover:text-text"
+    : "cursor-not-allowed text-neutral-300";
+  const icon = (
+    <Icon
+      className={clsx("size-[18px] shrink-0", active ? "text-accent" : "text-neutral-400 group-hover:text-neutral-600")}
+      strokeWidth={1.75}
+      aria-hidden
+    />
+  );
 
   if (item.href) {
     return (
       <Link
         href={item.href}
         onClick={onNavigate}
-        className={clsx(base, interactive)}
+        className={clsx(base, state)}
         aria-current={active ? "page" : undefined}
+        aria-label={collapsed ? label : undefined}
+        title={collapsed ? label : undefined}
       >
-        <Icon className="size-4 shrink-0 opacity-95 sm:size-[1.05rem]" strokeWidth={1.75} aria-hidden />
-        <span className="min-w-0 max-w-[5.5rem] truncate tracking-wide sm:max-w-[8rem] md:max-w-[12rem] md:overflow-visible lg:max-w-none">
-          {label}
-        </span>
+        {icon}
+        {collapsed ? null : <span className="min-w-0 truncate">{label}</span>}
       </Link>
     );
   }
 
   return (
-    <span className={clsx(base, interactive)} title={t.nav.comingSoon}>
-      <Icon className="size-4 shrink-0 sm:size-[1.05rem]" strokeWidth={1.75} aria-hidden />
-      <span className="min-w-0 max-w-[5.5rem] truncate tracking-wide sm:max-w-[8rem] md:max-w-[12rem] md:overflow-visible lg:max-w-none">
-        {item.label}
-      </span>
+    <span className={clsx(base, state)} title={collapsed ? `${label} · ${t.nav.comingSoon}` : t.nav.comingSoon}>
+      {icon}
+      {collapsed ? null : <span className="min-w-0 truncate">{label}</span>}
     </span>
   );
 }
@@ -164,7 +151,8 @@ function useSidebarNavState() {
   return { primaryLinks, isRouteActive };
 }
 
-export function AppSidebarTop() {
+/** Barra laterale sinistra richiudibile: aperta mostra le etichette, chiusa solo le icone. */
+export function AppSidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const { primaryLinks, isRouteActive } = useSidebarNavState();
   const { user } = useCurrentUser();
   const { t } = useI18n();
@@ -174,45 +162,85 @@ export function AppSidebarTop() {
     [user]
   );
 
+  const ToggleIcon = collapsed ? PanelLeftOpen : PanelLeftClose;
+  const toggleLabel = collapsed ? t.nav.expandMenu : t.nav.collapseMenu;
+  const toggleButton = (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-canvas hover:text-text"
+      aria-label={toggleLabel}
+      aria-expanded={!collapsed}
+      title={toggleLabel}
+    >
+      <ToggleIcon className="size-[18px]" strokeWidth={1.75} aria-hidden />
+    </button>
+  );
+
   return (
-    <header
-      className="sticky top-0 z-[115] w-full shrink-0 border-b border-white/[0.06] bg-gradient-to-b from-wine-graphite to-wine-bordeauxMuted shadow-[0_4px_24px_rgba(0,0,0,0.12)]"
+    <aside
+      className={clsx(
+        "flex h-dvh shrink-0 flex-col border-r border-line bg-white transition-[width] duration-200 ease-out",
+        collapsed ? "w-[68px]" : "w-[216px]"
+      )}
       aria-label={t.nav.mainNavigation}
     >
-      <div className="flex min-w-0 items-center gap-1.5 px-2 py-2 sm:gap-3 sm:px-4">
-        <div className="flex min-w-0 shrink-0 items-center border-r border-white/[0.1] pr-3 sm:pr-4">
-          <span className="whitespace-nowrap font-display text-xl font-bold tracking-wide text-wine-gold sm:text-2xl md:text-[1.75rem]">
+      {collapsed ? (
+        <div className="flex flex-col items-center gap-3 pb-5 pt-6">
+          <span
+            className="flex size-8 items-center justify-center rounded-lg bg-accent text-white"
+            title="Wine List Manager"
+          >
+            <Wine className="size-[18px]" strokeWidth={1.75} aria-hidden />
+          </span>
+          {toggleButton}
+        </div>
+      ) : (
+        <div className="flex items-start gap-2.5 pb-6 pl-5 pr-3 pt-6">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent text-white">
+            <Wine className="size-[18px]" strokeWidth={1.75} aria-hidden />
+          </span>
+          <span className="min-w-0 flex-1 font-display text-[19px] font-bold leading-[1.05] tracking-tight text-text">
             Wine List Manager
           </span>
+          {toggleButton}
         </div>
+      )}
 
-        <nav className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
-          <ul className="flex flex-nowrap items-center gap-0.5 py-0.5">
-            {primaryLinks.map((item) => (
-              <li key={item.id}>
-                <NavRow item={item} active={isRouteActive(item.href)} />
-              </li>
-            ))}
-          </ul>
-        </nav>
+      <nav className={clsx("min-h-0 flex-1 overflow-y-auto", collapsed ? "px-2.5" : "px-3")}>
+        <ul className="space-y-0.5">
+          {primaryLinks.map((item) => (
+            <li key={item.id}>
+              <NavRow item={item} active={isRouteActive(item.href)} collapsed={collapsed} />
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-        <div className="flex shrink-0 items-center gap-0.5 border-l border-white/[0.1] pl-2 sm:gap-1 sm:pl-3">
-          <LanguageSwitch className="mr-1" />
-          <ul className="flex flex-nowrap items-center gap-0.5">
-            {adminLinks.map((item) => (
-              <li key={item.id}>
-                <NavRow item={item} active={isRouteActive(item.href)} />
-              </li>
-            ))}
-          </ul>
-          {user ? (
-            <LogoutButton
-              iconOnly
-              className="rounded-lg px-2 text-wine-mist/85 hover:bg-white/[0.05] hover:text-white sm:px-2.5"
-            />
-          ) : null}
-        </div>
+      <div className={clsx("space-y-0.5 border-t border-line py-3", collapsed ? "px-2.5" : "px-3")}>
+        <ul className="space-y-0.5">
+          {adminLinks.map((item) => (
+            <li key={item.id}>
+              <NavRow item={item} active={isRouteActive(item.href)} collapsed={collapsed} />
+            </li>
+          ))}
+        </ul>
+        {user ? (
+          <LogoutButton variant="sidebar" iconOnly={collapsed} />
+        ) : null}
+        {collapsed ? (
+          <div className="flex justify-center pt-2">
+            <LanguageSwitch tone="light" vertical />
+          </div>
+        ) : (
+          <div className="flex items-center justify-between px-3 pt-2">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+              {t.nav.language}
+            </span>
+            <LanguageSwitch tone="light" />
+          </div>
+        )}
       </div>
-    </header>
+    </aside>
   );
 }

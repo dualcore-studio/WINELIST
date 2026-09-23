@@ -44,7 +44,7 @@ html, body { background: #fff !important; }
   display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px;
   border-radius: 8px; border: 1px solid #d4d4d4; background: #fff; font-weight: 600; cursor: pointer;
 }
-.int-toolbar .primary { background: #f2711c; border-color: #f2711c; color: #fff; }
+.int-toolbar .primary { background: #8e2f45; border-color: #8e2f45; color: #fff; }
 .int-sheet { width: 11in; margin: 24px auto; padding: 0.45in 0.4in 0.5in; background: #fff; box-shadow: 0 1px 12px rgba(0,0,0,.12); }
 .int-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; border-bottom: 2px solid #111; padding-bottom: 6pt; }
 .int-head h1 { font-size: 15pt; margin: 0; letter-spacing: .02em; }

@@ -57,18 +57,18 @@ export function SettingsView() {
   }, [editingId]);
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-3 py-6 sm:px-4 md:px-6 md:py-10">
-      <h1 className="font-display text-2xl font-semibold tracking-tight text-wine-graphite sm:text-3xl">
+    <div className="h-full w-full max-w-3xl overflow-y-auto px-5 pb-10 pt-7 sm:px-8 md:pt-9 lg:px-10">
+      <h1 className="font-display text-[34px] font-bold leading-none tracking-tight text-text">
         {tr.settings.title}
       </h1>
-      <p className="mt-2 text-sm leading-relaxed text-neutral-600 sm:text-[15px]">
+      <p className="mt-2 text-sm leading-relaxed text-muted">
         {tr.settings.description}
       </p>
 
-      <section className="mt-8 rounded-xl border border-neutral-200 bg-white p-4 shadow-soft sm:p-6">
+      <section className="mt-8 rounded-xl border border-line bg-white p-5 shadow-soft sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <h2 className="text-base font-semibold text-wine-graphite">{tr.settings.sectionTitle}</h2>
+            <h2 className="text-base font-semibold text-text">{tr.settings.sectionTitle}</h2>
             <p className="mt-1 text-sm text-neutral-600">
               {tr.settings.sectionDescription}
             </p>
@@ -82,7 +82,7 @@ export function SettingsView() {
                 resetToDefaults();
               }
             }}
-            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-700 shadow-sm transition-colors hover:bg-neutral-50"
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-line bg-white px-3 text-xs font-semibold text-neutral-700 shadow-sm transition-colors hover:bg-canvas"
             title={tr.settings.resetTitle}
           >
             <RotateCcw className="size-3.5" aria-hidden />
@@ -106,12 +106,12 @@ export function SettingsView() {
               }
             }}
             placeholder={tr.settings.newPlaceholder}
-            className="min-h-10 w-full flex-1 rounded-lg border border-neutral-200 bg-wine-cream/40 px-3 text-sm outline-none ring-wine-bordeaux/20 placeholder:text-neutral-400 focus:border-wine-bordeaux/35 focus:ring-2"
+            className="min-h-10 w-full flex-1 rounded-lg border border-neutral-200 bg-field px-3 text-sm outline-none ring-accent-ring placeholder:text-neutral-400 focus:border-accent/40 focus:ring-2"
           />
           <button
             type="button"
             onClick={handleAdd}
-            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-wine-bordeaux px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wine-bordeauxMuted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wine-bordeaux/40"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-accent px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-ring"
           >
             <Plus className="size-4" strokeWidth={2} aria-hidden />
             {tr.settings.add}
@@ -121,7 +121,7 @@ export function SettingsView() {
         {extraSections.length === 0 ? (
           <p className="mt-4 text-sm text-neutral-500">{tr.settings.empty}</p>
         ) : (
-          <ul className="mt-4 divide-y divide-neutral-100 rounded-lg border border-neutral-100">
+          <ul className="mt-4 divide-y divide-line rounded-lg border border-line">
             {extraSections.map((s) => {
               const isEditing = editingId === s.id;
               return (
@@ -144,7 +144,7 @@ export function SettingsView() {
                           cancelEdit();
                         }
                       }}
-                      className="min-w-0 flex-1 rounded-md border border-neutral-300 bg-white px-2 py-1 text-sm font-medium text-neutral-800 outline-none ring-wine-bordeaux/20 focus:border-wine-bordeaux/35 focus:ring-2"
+                      className="min-w-0 flex-1 rounded-md border border-neutral-300 bg-white px-2 py-1 text-sm font-medium text-neutral-800 outline-none ring-accent-ring focus:border-accent/40 focus:ring-2"
                       aria-label={tr.settings.categoryName(s.label)}
                     />
                   ) : (
@@ -182,7 +182,7 @@ export function SettingsView() {
                         <button
                           type="button"
                           onClick={() => startEdit(s.id, s.label)}
-                          className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-wine-bordeaux hover:bg-wine-bordeaux/5"
+                          className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-accent hover:bg-accent-soft"
                           aria-label={tr.common.editItem(s.label)}
                           title={tr.settings.rename}
                         >
@@ -210,7 +210,7 @@ export function SettingsView() {
 
       <Link
         href="/wines"
-        className="mt-8 inline-flex text-sm font-semibold text-wine-bordeaux underline-offset-4 hover:underline"
+        className="mt-8 inline-flex text-sm font-semibold text-accent underline-offset-4 hover:underline"
       >
         {tr.common.backToWineList}
       </Link>

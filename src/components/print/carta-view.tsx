@@ -47,7 +47,7 @@ html, body { background: #fff !important; }
   display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px;
   border-radius: 8px; border: 1px solid #d4d4d4; background: #fff; font-weight: 600; cursor: pointer;
 }
-.carta-toolbar .primary { background: #f2711c; border-color: #f2711c; color: #fff; }
+.carta-toolbar .primary { background: #8e2f45; border-color: #8e2f45; color: #fff; }
 .carta-sheet { width: 8.5in; margin: 24px auto; padding: 0.69in 0.44in 0.5in; background: #fff; box-shadow: 0 1px 12px rgba(0,0,0,.12); }
 .carta-page-break { break-before: page; }
 .carta-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-family: var(--corsiva); letter-spacing: 0.3pt; }

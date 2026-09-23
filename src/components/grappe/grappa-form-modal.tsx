@@ -2,6 +2,7 @@
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { DrawerBody, DrawerFooter, SideDrawer } from "@/components/ui/side-drawer";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n/provider";
 import type { Wine } from "@/types/wine";
@@ -209,19 +210,12 @@ export function GrappaFormModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/30 p-4">
-      <div className="w-full max-w-md rounded-xl2 border border-neutral-200 bg-white p-6 shadow-soft">
-        <div className="mb-4">
-          <h4 className="text-lg font-semibold text-text">{title}</h4>
-          <p className="text-sm text-neutral-500">
-            {t.spirits.form.subtitle}
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <SideDrawer title={title} subtitle={t.spirits.form.subtitle} onClose={onClose}>
+      <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+        <DrawerBody>
           <div className="space-y-1.5">
             <label
-              className="text-sm font-medium text-neutral-700"
+              className="text-[13px] font-semibold text-neutral-700"
               htmlFor="grappa-name"
             >
               {t.spirits.form.name}
@@ -240,7 +234,7 @@ export function GrappaFormModal({
 
           <div className="space-y-1.5">
             <label
-              className="text-sm font-medium text-neutral-700"
+              className="text-[13px] font-semibold text-neutral-700"
               htmlFor="grappa-producer"
             >
               {t.spirits.form.producer}
@@ -258,7 +252,7 @@ export function GrappaFormModal({
 
           <div className="space-y-1.5">
             <label
-              className="text-sm font-medium text-neutral-700"
+              className="text-[13px] font-semibold text-neutral-700"
               htmlFor="grappa-spirit-type"
             >
               {t.spirits.form.type}
@@ -283,7 +277,7 @@ export function GrappaFormModal({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-1.5">
               <label
-                className="text-sm font-medium text-neutral-700"
+                className="text-[13px] font-semibold text-neutral-700"
                 htmlFor="grappa-price-glass"
               >
                 {t.spirits.form.glassPrice}
@@ -308,7 +302,7 @@ export function GrappaFormModal({
 
             <div className="space-y-1.5">
               <label
-                className="text-sm font-medium text-neutral-700"
+                className="text-[13px] font-semibold text-neutral-700"
                 htmlFor="grappa-price"
               >
                 {t.spirits.form.bottlePrice}
@@ -331,7 +325,7 @@ export function GrappaFormModal({
 
             <div className="space-y-1.5">
               <label
-                className="text-sm font-medium text-neutral-700"
+                className="text-[13px] font-semibold text-neutral-700"
                 htmlFor="grappa-quantity"
               >
                 {t.spirits.form.quantity}
@@ -357,26 +351,25 @@ export function GrappaFormModal({
               {error}
             </p>
           ) : null}
-
-          <div className="flex justify-end gap-2 pt-1">
-            <Button
-              variant="secondary"
-              onClick={onClose}
-              type="button"
-              disabled={isSaving}
-            >
-              {t.common.cancel}
-            </Button>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving
-                ? t.common.saving
-                : mode === "create"
-                  ? t.spirits.form.create
-                  : t.common.saveChanges}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </DrawerBody>
+        <DrawerFooter>
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            type="button"
+            disabled={isSaving}
+          >
+            {t.common.cancel}
+          </Button>
+          <Button type="submit" disabled={isSaving}>
+            {isSaving
+              ? t.common.saving
+              : mode === "create"
+                ? t.spirits.form.create
+                : t.common.saveChanges}
+          </Button>
+        </DrawerFooter>
+      </form>
+    </SideDrawer>
   );
 }

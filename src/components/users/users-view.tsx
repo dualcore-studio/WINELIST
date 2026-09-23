@@ -100,18 +100,18 @@ export function UsersView() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-3 py-6 sm:px-4 md:px-6 md:py-10">
-      <h1 className="font-display text-2xl font-semibold tracking-tight text-wine-graphite sm:text-3xl">
+    <div className="h-full w-full max-w-3xl overflow-y-auto px-5 pb-10 pt-7 sm:px-8 md:pt-9 lg:px-10">
+      <h1 className="font-display text-[34px] font-bold leading-none tracking-tight text-text">
         {t.users.title}
       </h1>
-      <p className="mt-2 text-sm leading-relaxed text-neutral-600 sm:text-[15px]">
+      <p className="mt-2 text-sm leading-relaxed text-muted">
         {t.users.description}
       </p>
 
-      <section className="mt-8 rounded-xl border border-neutral-200 bg-white p-4 shadow-soft sm:p-6">
+      <section className="mt-8 rounded-xl border border-line bg-white p-5 shadow-soft sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <h2 className="text-base font-semibold text-wine-graphite">{t.users.listTitle}</h2>
+            <h2 className="text-base font-semibold text-text">{t.users.listTitle}</h2>
             <p className="mt-1 text-sm text-neutral-600">
               {t.users.listDescription}
             </p>
@@ -133,7 +133,7 @@ export function UsersView() {
         ) : users.length === 0 ? (
           <p className="mt-4 text-sm text-neutral-500">{t.users.empty}</p>
         ) : (
-          <ul className="mt-4 divide-y divide-neutral-100 rounded-lg border border-neutral-100">
+          <ul className="mt-4 divide-y divide-line rounded-lg border border-line">
             {users.map((u) => (
               <li
                 key={u.id}
@@ -142,7 +142,7 @@ export function UsersView() {
                 <div className="min-w-0 flex-1">
                   <span className="font-medium text-neutral-800">{u.username}</span>
                   {u.isAdmin ? (
-                    <span className="ml-2 rounded-full bg-brand/10 px-2 py-0.5 text-xs font-semibold text-brand">
+                    <span className="ml-2 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent">
                       {t.users.admin}
                     </span>
                   ) : null}
@@ -155,7 +155,7 @@ export function UsersView() {
                   <button
                     type="button"
                     onClick={() => openEdit(u)}
-                    className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-wine-bordeaux hover:bg-wine-bordeaux/5"
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-accent hover:bg-accent-soft"
                     aria-label={t.common.editItem(u.username)}
                   >
                     <Pencil className="size-3.5" aria-hidden />
@@ -180,7 +180,7 @@ export function UsersView() {
 
       <Link
         href="/wines"
-        className="mt-8 inline-flex text-sm font-semibold text-wine-bordeaux underline-offset-4 hover:underline"
+        className="mt-8 inline-flex text-sm font-semibold text-accent underline-offset-4 hover:underline"
       >
         {t.common.backToWineList}
       </Link>

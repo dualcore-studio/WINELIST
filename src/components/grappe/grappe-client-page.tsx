@@ -115,18 +115,18 @@ export function GrappeDistillatiClientPage() {
   }, [pendingDelete, t]);
 
   return (
-    <div className="box-border flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-auto bg-transparent p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12">
+    <div className="box-border flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden bg-transparent px-5 pb-5 pt-7 sm:px-8 md:pt-9 lg:px-10">
       {/*
         Blocco centrato con larghezza adattata al contenuto più largo (la tabella).
         La barra titolo/pulsanti e la card filtri ereditano la stessa larghezza
         tramite `w-full`, così si proporzionano automaticamente alla tabella.
       */}
       <div className="mx-auto flex min-h-0 w-fit max-w-full min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="w-full min-w-0 shrink-0 space-y-4">
+        <div className="w-full min-w-0 shrink-0 space-y-5">
           <section className="flex w-full items-start justify-between gap-3">
             <div>
-              <h3 className="text-xl font-semibold text-text">{t.spirits.heading}</h3>
-              <p className="mt-1 text-sm text-neutral-600">{t.spirits.description}</p>
+              <h1 className="font-display text-[34px] font-bold leading-none tracking-tight text-text">{t.spirits.heading}</h1>
+              <p className="mt-2 text-sm text-muted">{t.spirits.description}</p>
             </div>
             <div className="flex items-center gap-2">
               <PrintMenu
@@ -145,7 +145,7 @@ export function GrappeDistillatiClientPage() {
               <button
                 type="button"
                 onClick={openCreate}
-                className="inline-flex h-10 items-center rounded-lg bg-[#f2711c] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#d95f10] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2711c]/45"
+                className="inline-flex h-9 items-center rounded-lg bg-accent px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-ring"
               >
                 {t.spirits.add}
               </button>
@@ -171,13 +171,14 @@ export function GrappeDistillatiClientPage() {
           />
         </div>
 
-        <div className="mt-3 flex min-h-0 w-full min-w-0 flex-1 flex-col">
+        <div className="mt-4 flex min-h-0 w-full min-w-0 flex-1 flex-col">
           <GrappaTable
             wines={filteredWines}
             isLoading={isLoading}
             deletingWineId={isDeleting && pendingDelete ? pendingDelete.id : null}
             onEdit={openEdit}
             onDeleteRequest={requestDelete}
+            selectedId={formOpen && selectedWine ? selectedWine.id : null}
             className="min-h-0 flex-1"
           />
         </div>
@@ -194,7 +195,7 @@ export function GrappeDistillatiClientPage() {
 
       {pendingDelete ? (
         <div
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4"
+          className="fixed inset-0 z-[200] flex animate-fade-in items-center justify-center bg-black/25 p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-grappa-title"
@@ -202,8 +203,8 @@ export function GrappeDistillatiClientPage() {
             if (e.target === e.currentTarget) cancelDelete();
           }}
         >
-          <div className="w-full max-w-md rounded-xl2 border border-neutral-200 bg-white p-6 shadow-soft">
-            <h4 id="delete-grappa-title" className="text-lg font-semibold text-text">
+          <div className="w-full max-w-md rounded-2xl border border-line bg-white p-7 shadow-[0_24px_60px_rgba(17,17,17,0.14)]">
+            <h4 id="delete-grappa-title" className="font-display text-2xl font-bold text-text">
               {t.common.confirmDeleteTitle}
             </h4>
             <p className="mt-3 text-sm text-neutral-700">

@@ -7,11 +7,14 @@ import { useI18n } from "@/lib/i18n/provider";
 /** Selettore IT / EN nella barra in alto; la scelta resta salvata (cookie). */
 export function LanguageSwitch({
   className,
-  tone = "dark"
+  tone = "dark",
+  vertical = false
 }: {
   className?: string;
-  /** "dark" sulla barra in alto, "light" su sfondo chiaro (login). */
+  /** "dark" su sfondo scuro, "light" su sfondo chiaro. */
   tone?: "dark" | "light";
+  /** In colonna (barra laterale ridotta). */
+  vertical?: boolean;
 }) {
   const { lang, setLang, t } = useI18n();
   return (
@@ -20,6 +23,7 @@ export function LanguageSwitch({
       aria-label={t.nav.language}
       className={clsx(
         "flex items-center rounded-lg border p-0.5",
+        vertical && "flex-col",
         tone === "dark" ? "border-white/[0.12]" : "border-neutral-200",
         className
       )}
