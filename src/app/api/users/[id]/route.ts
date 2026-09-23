@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { adminDb, findUserByUsername, getAppUserById, listAppUsers } from "@/lib/instant/admin";
+import { getAdminDb, findUserByUsername, getAppUserById, listAppUsers } from "@/lib/instant/admin";
 import { hashPassword } from "@/lib/auth/password";
 import { AUTH_COOKIE_NAME, verifySessionCookie, type SessionPayload } from "@/lib/auth/session";
 
@@ -72,6 +72,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Nessuna modifica da applicare." }, { status: 400 });
   }
 
+  const adminDb = getAdminDb();
   await adminDb.transact([adminDb.tx.appUsers[userId].update(update)]);
 
   const updated = await getAppUserById(userId);
@@ -104,6 +105,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     );
   }
 
+  const adminDb = getAdminDb();
   await adminDb.transact([adminDb.tx.appUsers[userId].delete()]);
   return NextResponse.json({ ok: true });
 }

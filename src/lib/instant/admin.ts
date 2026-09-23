@@ -6,17 +6,23 @@ import { id, init } from "@instantdb/admin";
  * "use client": va bypassato ogni permission check lato client apposta per questo.
  */
 
-const appId = process.env.NEXT_PUBLIC_INSTANT_APP_ID ?? "";
-const adminToken = process.env.INSTANT_APP_ADMIN_TOKEN ?? "";
+let cached: ReturnType<typeof init> | null = null;
 
-if (!appId || appId === "replace_with_your_instant_app_id") {
-  throw new Error("Imposta NEXT_PUBLIC_INSTANT_APP_ID in .env.local.");
-}
-if (!adminToken) {
-  throw new Error("Imposta INSTANT_APP_ADMIN_TOKEN in .env.local (Instant Dashboard → Admin).");
+/** Inizializzazione lazy: le env vengono lette alla prima richiesta, non al build. */
+export function getAdminDb() {
+  if (cached) return cached;
+  const appId = process.env.NEXT_PUBLIC_INSTANT_APP_ID ?? "";
+  const adminToken = process.env.INSTANT_APP_ADMIN_TOKEN ?? "";
+  if (!appId || appId === "replace_with_your_instant_app_id") {
+    throw new Error("Imposta NEXT_PUBLIC_INSTANT_APP_ID in .env.local.");
+  }
+  if (!adminToken) {
+    throw new Error("Imposta INSTANT_APP_ADMIN_TOKEN in .env.local (Instant Dashboard → Admin).");
+  }
+  cached = init({ appId, adminToken });
+  return cached;
 }
 
-export const adminDb = init({ appId, adminToken });
 export { id };
 
 export type AppUserRow = {
@@ -34,7 +40,7 @@ function normalizeRows(raw: unknown): AppUserRow[] {
 }
 
 export async function listAppUsers(): Promise<AppUserRow[]> {
-  const result = await adminDb.query({ appUsers: {} });
+  const result = await getAdminDb().query({ appUsers: {} });
   return normalizeRows((result as { appUsers?: unknown }).appUsers);
 }
 

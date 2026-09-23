@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { adminDb, findUserByUsername, id, listAppUsers } from "@/lib/instant/admin";
+import { getAdminDb, findUserByUsername, id, listAppUsers } from "@/lib/instant/admin";
 import { hashPassword } from "@/lib/auth/password";
 import { AUTH_COOKIE_NAME, verifySessionCookie } from "@/lib/auth/session";
 
@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
   }
 
   const newId = id();
+  const adminDb = getAdminDb();
   await adminDb.transact([
     adminDb.tx.appUsers[newId].update({
       username,
