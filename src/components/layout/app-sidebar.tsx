@@ -7,14 +7,18 @@ import {
   GlassWater,
   LayoutDashboard,
   Settings,
+  Users,
   Wine,
   type LucideIcon
 } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { clsx } from "clsx";
 import { useExtraSections } from "@/components/layout/extra-sections-provider";
+import { LogoutButton } from "@/components/layout/logout-button";
+import { useCurrentUser } from "@/lib/auth/use-current-user";
 import {
   ADMIN_NAV,
+  ADMIN_ONLY_NAV,
   DEFAULT_EXTRA_CATEGORIES,
   MAIN_NAV,
   WINELIST_CATEGORIES,
@@ -27,8 +31,12 @@ const ICON_MAP: Record<SidebarIconName, LucideIcon> = {
   Wine,
   FlaskConical,
   GlassWater,
-  Settings
+  Settings,
+  Users
 };
+
+/** Voci mostrate come solo-icona (area amministrativa compatta, in alto a destra). */
+const COMPACT_ICON_IDS = new Set(["settings", "users"]);
 
 function NavRow({
   item,
@@ -40,7 +48,7 @@ function NavRow({
   onNavigate?: () => void;
 }) {
   const Icon = ICON_MAP[item.icon];
-  const settingsOnlyIcon = item.id === "settings";
+  const settingsOnlyIcon = COMPACT_ICON_IDS.has(item.id);
 
   const base = clsx(
     "flex w-auto shrink-0 items-center rounded-lg py-2 font-semibold leading-tight transition-colors duration-200",
@@ -145,6 +153,12 @@ function useSidebarNavState() {
 
 export function AppSidebarTop() {
   const { primaryLinks, isRouteActive } = useSidebarNavState();
+  const { user } = useCurrentUser();
+
+  const adminLinks = useMemo(
+    () => (user?.isAdmin ? [...ADMIN_NAV, ...ADMIN_ONLY_NAV] : ADMIN_NAV),
+    [user]
+  );
 
   return (
     <header
@@ -170,12 +184,18 @@ export function AppSidebarTop() {
 
         <div className="flex shrink-0 items-center gap-0.5 border-l border-white/[0.1] pl-2 sm:gap-1 sm:pl-3">
           <ul className="flex flex-nowrap items-center gap-0.5">
-            {ADMIN_NAV.map((item) => (
+            {adminLinks.map((item) => (
               <li key={item.id}>
                 <NavRow item={item} active={isRouteActive(item.href)} />
               </li>
             ))}
           </ul>
+          {user ? (
+            <LogoutButton
+              iconOnly
+              className="rounded-lg px-2 text-wine-mist/85 hover:bg-white/[0.05] hover:text-white sm:px-2.5"
+            />
+          ) : null}
         </div>
       </div>
     </header>

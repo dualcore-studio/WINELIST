@@ -8,7 +8,8 @@ export type SidebarIconName =
   | "Wine"
   | "FlaskConical"
   | "GlassWater"
-  | "Settings";
+  | "Settings"
+  | "Users";
 
 export type SidebarNavItem = {
   id: string;
@@ -42,5 +43,15 @@ export const ADMIN_NAV: SidebarNavItem[] = [
     label: "Impostazioni",
     href: "/settings",
     icon: "Settings"
+  }
+];
+
+/** Voci visibili solo agli utenti con isAdmin = true (sessione autenticata). */
+export const ADMIN_ONLY_NAV: SidebarNavItem[] = [
+  {
+    id: "users",
+    label: "Utenti",
+    href: "/users",
+    icon: "Users"
   }
 ];

@@ -18,6 +18,7 @@
     "dedupe:wines": "node scripts/dedupe-wines-by-bin.mjs",
     "seed:page26": "node scripts/seed-page26-california-wines.mjs",
     "seed:distillati": "node scripts/seed-distillati.mjs",
+    "seed:admin": "node scripts/seed-admin-user.mjs",
     "reset-wines:dev": "npm run clear-wines && npm run dev"
   },
   "dependencies": {
