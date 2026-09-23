@@ -3,6 +3,7 @@
 import { Fragment, useMemo } from "react";
 import { Printer, X } from "lucide-react";
 import { useWines } from "@/features/wines/repository";
+import { useI18n } from "@/lib/i18n/provider";
 import { buildCarta, type CartaRow, type CartaSection } from "@/features/print/carta";
 import {
   SPECIAL_SELECTIONS,
@@ -261,13 +262,10 @@ function SpecialSelectionsPage() {
 
 type Scope = "wines" | "spirits";
 
-const SCOPE_LABEL: Record<Scope, string> = {
-  wines: "Carta dei vini",
-  spirits: "Carta dei distillati"
-};
-
 /** Carta dei vini (lista vini) o carta dei distillati (pagina Distillati): ognuna stampa solo la sua sezione. */
 export function CartaView({ scope }: { scope: Scope }) {
+  const { t } = useI18n();
+  const scopeLabel = scope === "wines" ? t.print.menu.cartaWines : t.print.menu.cartaSpirits;
   const { wines, isLoading, error } = useWines(scope === "wines" ? "wines" : "grappeDistillati");
 
   const sections = useMemo(
@@ -280,11 +278,11 @@ export function CartaView({ scope }: { scope: Scope }) {
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div className="carta-toolbar">
         <span>
-          <strong>{SCOPE_LABEL[scope]}</strong> · anteprima di stampa, formato Letter
+          <strong>{scopeLabel}</strong> · {t.print.previewLetter}
         </span>
         <span style={{ display: "flex", gap: 8 }}>
           <button type="button" onClick={() => window.close()}>
-            <X size={16} aria-hidden /> Chiudi
+            <X size={16} aria-hidden /> {t.common.close}
           </button>
           <button
             type="button"
@@ -292,13 +290,13 @@ export function CartaView({ scope }: { scope: Scope }) {
             onClick={() => window.print()}
             disabled={isLoading || Boolean(error)}
           >
-            <Printer size={16} aria-hidden /> Stampa
+            <Printer size={16} aria-hidden /> {t.common.print}
           </button>
         </span>
       </div>
 
       {isLoading ? (
-        <p className="carta-status">Caricamento della carta…</p>
+        <p className="carta-status">{t.print.cartaLoading}</p>
       ) : error ? (
         <p className="carta-status">{error}</p>
       ) : (

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { findUserByUsername } from "@/lib/instant/admin";
 import { verifyPassword } from "@/lib/auth/password";
 import { AUTH_COOKIE_NAME, createSessionCookie, SESSION_MAX_AGE_SECONDS } from "@/lib/auth/session";
+import { apiError } from "@/lib/api-errors";
 
 export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => null)) as
@@ -12,11 +13,11 @@ export async function POST(request: NextRequest) {
   const password = body?.password ?? "";
 
   if (!username || !password) {
-    return NextResponse.json({ error: "Inserisci username e password." }, { status: 400 });
+    return apiError("missing_credentials", 400);
   }
 
   const user = await findUserByUsername(username);
-  const invalid = NextResponse.json({ error: "Credenziali non valide." }, { status: 401 });
+  const invalid = apiError("invalid_credentials", 401);
 
   if (!user || !verifyPassword(password, user.passwordHash)) {
     return invalid;

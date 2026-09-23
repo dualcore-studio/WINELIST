@@ -15,25 +15,12 @@ import {
   updateWine,
   type WineInput
 } from "@/features/wines/repository";
+import { useI18n } from "@/lib/i18n/provider";
 import type { Wine } from "@/types/wine";
 
-type WinesPageProps = {
-  /** Nome della collection InstantDB da usare come storage. Default: "wines". */
-  collection?: string;
-  /** Titolo mostrato in testa alla pagina. Default: "Wine List Manager". */
-  heading?: string;
-  /** Sottotitolo descrittivo. */
-  description?: string;
-  /** Sostantivo usato nei pulsanti/modali (es. "vino", "distillato"). */
-  itemNoun?: string;
-};
-
-export function WinesClientPage({
-  collection = DEFAULT_WINES_COLLECTION,
-  heading = "Wine List Manager",
-  description = "Cerca, filtra e organizza l'elenco vini del ristorante.",
-  itemNoun = "vino"
-}: WinesPageProps) {
+export function WinesClientPage() {
+  const collection = DEFAULT_WINES_COLLECTION;
+  const { t } = useI18n();
   const { wines, isLoading, error } = getWines(collection);
   const [filters, setFilters] = useState<WineFiltersState>(initialWineFilters);
   const [formOpen, setFormOpen] = useState(false);
@@ -77,14 +64,14 @@ export function WinesClientPage({
         }
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : "Salvataggio non riuscito.";
+          err instanceof Error ? err.message : t.common.saveFailed;
         setActionError(message);
         throw err;
       } finally {
         setIsSaving(false);
       }
     },
-    [formMode, selectedWine, collection]
+    [formMode, selectedWine, collection, t]
   );
 
   const requestDelete = useCallback((wine: Wine) => {
@@ -108,12 +95,12 @@ export function WinesClientPage({
       setPendingDelete(null);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Operazione non riuscita.";
+        err instanceof Error ? err.message : t.common.operationFailed;
       setDeleteError(message);
     } finally {
       setIsDeleting(false);
     }
-  }, [pendingDelete]);
+  }, [pendingDelete, t]);
 
   return (
     <div className="box-border flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden bg-transparent p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12">
@@ -121,11 +108,15 @@ export function WinesClientPage({
         <div className="w-full min-w-0 shrink-0 space-y-4">
           <section className="flex items-start justify-between gap-3">
             <div>
-              <h3 className="text-xl font-semibold text-text">{heading}</h3>
-              <p className="mt-1 text-sm text-neutral-600">{description}</p>
+              <h3 className="text-xl font-semibold text-text">{t.wines.heading}</h3>
+              <p className="mt-1 text-sm text-neutral-600">{t.wines.description}</p>
             </div>
             <div className="flex items-center gap-2">
               <PrintMenu
+                cartaHref="/stampa/carta"
+                cartaLabel={t.print.menu.cartaWines}
+                cartaDescription={t.print.menu.cartaWinesDesc}
+                internalDescription={t.print.menu.internalWinesDesc}
                 onPrintInternal={() =>
                   window.open(`/stampa/interna?${filtersToSearchParams(filters)}`, "_blank")
                 }
@@ -136,7 +127,7 @@ export function WinesClientPage({
                 onClick={openCreate}
                 className="inline-flex h-10 items-center rounded-lg bg-[#f2711c] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#d95f10] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2711c]/45"
               >
-                + Aggiungi {itemNoun}
+                {t.wines.add}
               </button>
             </div>
           </section>
@@ -181,7 +172,6 @@ export function WinesClientPage({
         isSaving={isSaving}
         onClose={closeModal}
         onSubmit={handleSubmit}
-        itemNoun={itemNoun}
       />
 
       {pendingDelete ? (
@@ -196,11 +186,10 @@ export function WinesClientPage({
         >
           <div className="w-full max-w-md rounded-xl2 border border-neutral-200 bg-white p-6 shadow-soft">
             <h4 id="delete-wine-title" className="text-lg font-semibold text-text">
-              Conferma eliminazione
+              {t.common.confirmDeleteTitle}
             </h4>
             <p className="mt-3 text-sm text-neutral-700">
-              Vuoi eliminare definitivamente &quot;{pendingDelete.name}&quot;? Il record
-              verrà rimosso dal database e non potrà essere recuperato.
+              {t.common.confirmDeleteText(pendingDelete.name)}
             </p>
             {deleteError ? (
               <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -209,7 +198,7 @@ export function WinesClientPage({
             ) : null}
             <div className="mt-6 flex justify-end gap-2">
               <Button variant="secondary" type="button" onClick={cancelDelete} disabled={isDeleting}>
-                Annulla
+                {t.common.cancel}
               </Button>
               <Button
                 type="button"
@@ -217,7 +206,7 @@ export function WinesClientPage({
                 onClick={() => void confirmDelete()}
                 disabled={isDeleting}
               >
-                {isDeleting ? "Eliminazione..." : "Elimina"}
+                {isDeleting ? t.common.deleting : t.common.delete}
               </Button>
             </div>
           </div>

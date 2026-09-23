@@ -9,6 +9,7 @@ import {
   useState,
   type KeyboardEvent
 } from "react";
+import { useI18n } from "@/lib/i18n/provider";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +34,7 @@ export function SearchableSelect({
   value,
   options,
   onChange,
-  placeholder = "Cerca o seleziona…",
+  placeholder,
   disabled = false,
   allowCustom = false,
   getOptionLabel,
@@ -45,8 +46,14 @@ export function SearchableSelect({
   const baseId = idProp ?? autoId;
   const listId = `${baseId}-listbox`;
 
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState(value);
+  // Il testo di ricerca mostra l'etichetta (tradotta), non il valore salvato.
+  const labelOf = useCallback(
+    (v: string) => (v ? (getOptionLabel ? getOptionLabel(v) : v) : ""),
+    [getOptionLabel]
+  );
+  const [search, setSearch] = useState(() => labelOf(value));
   const [highlight, setHighlight] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const ignoreNextBlurRef = useRef(false);
@@ -66,8 +73,8 @@ export function SearchableSelect({
   }, [options, search, optionLabel]);
 
   useEffect(() => {
-    if (!open) setSearch(value);
-  }, [value, open]);
+    if (!open) setSearch(labelOf(value));
+  }, [value, open, labelOf]);
 
   useEffect(() => {
     if (open) setHighlight(0);
@@ -76,7 +83,7 @@ export function SearchableSelect({
   const pickOption = useCallback(
     (next: string) => {
       onChange(next);
-      setSearch(next);
+      setSearch(labelOf(next));
       setOpen(false);
     },
     [onChange]
@@ -84,28 +91,29 @@ export function SearchableSelect({
 
   const commitFromInput = useCallback(() => {
     const q = search.trim();
+    // Un testo che coincide con un'opzione (valore o etichetta tradotta) salva il valore originale.
+    const byExact = options.find(
+      (o) =>
+        o.toLowerCase() === q.toLowerCase() ||
+        optionLabel(o).toLowerCase() === q.toLowerCase()
+    );
+    if (byExact !== undefined && (byExact || !q)) {
+      pickOption(byExact);
+      return;
+    }
     if (allowCustom) {
       onChange(q);
       setSearch(q);
       setOpen(false);
       return;
     }
-    const byExact = options.find(
-      (o) =>
-        o.toLowerCase() === q.toLowerCase() ||
-        optionLabel(o).toLowerCase() === q.toLowerCase()
-    );
-    if (byExact) {
-      pickOption(byExact);
-      return;
-    }
     if (filtered.length === 1) {
       pickOption(filtered[0]);
       return;
     }
-    setSearch(value);
+    setSearch(labelOf(value));
     setOpen(false);
-  }, [allowCustom, filtered, onChange, optionLabel, options, pickOption, search, value]);
+  }, [allowCustom, filtered, labelOf, onChange, optionLabel, options, pickOption, search, value]);
 
   const displayClosed = getOptionLabel ? optionLabel(value) : value ? optionLabel(value) : "";
 
@@ -114,14 +122,14 @@ export function SearchableSelect({
     if (!open && (e.key === "ArrowDown" || e.key === "Enter")) {
       e.preventDefault();
       setOpen(true);
-      setSearch(value);
+      setSearch(labelOf(value));
       return;
     }
     if (!open) return;
 
     if (e.key === "Escape") {
       e.preventDefault();
-      setSearch(value);
+      setSearch(labelOf(value));
       setOpen(false);
       return;
     }
@@ -171,7 +179,7 @@ export function SearchableSelect({
           aria-labelledby={ariaLabelledBy}
           disabled={disabled}
           value={open ? search : displayClosed}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t.common.searchOrSelect}
           onChange={(e) => {
             setSearch(e.target.value);
             if (!open) setOpen(true);
@@ -179,7 +187,7 @@ export function SearchableSelect({
           onFocus={() => {
             if (disabled) return;
             setOpen(true);
-            setSearch(value);
+            setSearch(labelOf(value));
           }}
           onBlur={() => {
             if (ignoreNextBlurRef.current) {
@@ -242,7 +250,7 @@ export function SearchableSelect({
               }}
               onClick={() => pickOption(search.trim())}
             >
-              Usa &quot;{search.trim()}&quot;
+              {t.common.useCustom(search.trim())}
             </li>
           ) : null}
         </ul>

@@ -1,4 +1,7 @@
 import type { WineFiltersState } from "@/components/wines/wine-filters";
+import { countryLabel, wineTypeLabel } from "@/lib/i18n/format";
+import type { Lang } from "@/lib/i18n/config";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { formatVintage, type Wine } from "@/types/wine";
 
 export const initialWineFilters: WineFiltersState = {
@@ -85,19 +88,20 @@ export function filtersFromSearchParams(
 }
 
 /** Riassunto leggibile dei filtri attivi, per l'intestazione della stampa. */
-export function describeFilters(filters: WineFiltersState): string[] {
+export function describeFilters(filters: WineFiltersState, t: Dictionary, lang: Lang): string[] {
+  const f = t.print.filterSummary;
   const parts: string[] = [];
-  if (filters.binNumber.trim()) parts.push(`Bin: ${filters.binNumber.trim()}`);
-  if (filters.name.trim()) parts.push(`Nome: ${filters.name.trim()}`);
-  if (filters.winery.trim()) parts.push(`Cantina: ${filters.winery.trim()}`);
-  if (filters.categoryText.trim()) parts.push(`Vitigno/Cat.: ${filters.categoryText.trim()}`);
-  if (filters.type) parts.push(`Tipologia: ${filters.type}`);
-  if (filters.country) parts.push(`Nazione: ${filters.country}`);
-  if (filters.region) parts.push(`Regione: ${filters.region}`);
-  if (filters.category) parts.push(`Categoria: ${filters.category}`);
-  if (filters.vintage.trim()) parts.push(`Annata: ${filters.vintage.trim()}`);
-  if (filters.quantityMin.trim()) parts.push(`Q.min: ${filters.quantityMin.trim()}`);
-  if (filters.quantityMax.trim()) parts.push(`Q.max: ${filters.quantityMax.trim()}`);
-  if (filters.onlyAvailable) parts.push("Solo disponibili");
+  if (filters.binNumber.trim()) parts.push(`${f.bin}: ${filters.binNumber.trim()}`);
+  if (filters.name.trim()) parts.push(`${f.name}: ${filters.name.trim()}`);
+  if (filters.winery.trim()) parts.push(`${f.winery}: ${filters.winery.trim()}`);
+  if (filters.categoryText.trim()) parts.push(`${f.grapeCategory}: ${filters.categoryText.trim()}`);
+  if (filters.type) parts.push(`${f.type}: ${wineTypeLabel(filters.type, lang)}`);
+  if (filters.country) parts.push(`${f.country}: ${countryLabel(filters.country, lang)}`);
+  if (filters.region) parts.push(`${f.region}: ${filters.region}`);
+  if (filters.category) parts.push(`${f.category}: ${filters.category}`);
+  if (filters.vintage.trim()) parts.push(`${f.vintage}: ${filters.vintage.trim()}`);
+  if (filters.quantityMin.trim()) parts.push(`${t.common.qtyMin}: ${filters.quantityMin.trim()}`);
+  if (filters.quantityMax.trim()) parts.push(`${t.common.qtyMax}: ${filters.quantityMax.trim()}`);
+  if (filters.onlyAvailable) parts.push(f.onlyAvailable);
   return parts;
 }

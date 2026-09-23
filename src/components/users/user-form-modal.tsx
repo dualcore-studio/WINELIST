@@ -3,6 +3,7 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/lib/i18n/provider";
 import type { AppUser, AppUserInput } from "@/types/app-user";
 
 type Props = {
@@ -25,6 +26,7 @@ const initialState: FormState = { username: "", password: "", isAdmin: false };
 export function UserFormModal({ open, mode, user, isSaving, onClose, onSubmit }: Props) {
   const [form, setForm] = useState<FormState>(initialState);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!open) return;
@@ -38,7 +40,7 @@ export function UserFormModal({ open, mode, user, isSaving, onClose, onSubmit }:
 
   if (!open) return null;
 
-  const title = mode === "create" ? "Aggiungi utente" : "Modifica utente";
+  const title = mode === "create" ? t.users.form.createTitle : t.users.form.editTitle;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,15 +48,15 @@ export function UserFormModal({ open, mode, user, isSaving, onClose, onSubmit }:
 
     const username = form.username.trim();
     if (!username) {
-      setError("Inserisci un username.");
+      setError(t.users.form.errUsername);
       return;
     }
     if (mode === "create" && form.password.length < 8) {
-      setError("Inserisci una password di almeno 8 caratteri.");
+      setError(t.users.form.errPassword);
       return;
     }
     if (mode === "edit" && form.password && form.password.length < 8) {
-      setError("La nuova password deve avere almeno 8 caratteri.");
+      setError(t.users.form.errNewPassword);
       return;
     }
 
@@ -65,7 +67,7 @@ export function UserFormModal({ open, mode, user, isSaving, onClose, onSubmit }:
         isAdmin: form.isAdmin
       });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Operazione non riuscita. Riprova.";
+      const message = err instanceof Error ? err.message : t.common.operationFailed;
       setError(message);
     }
   }
@@ -75,13 +77,13 @@ export function UserFormModal({ open, mode, user, isSaving, onClose, onSubmit }:
       <div className="w-full max-w-md rounded-xl2 border border-neutral-200 bg-white p-6 shadow-soft">
         <div className="mb-4">
           <h4 className="text-lg font-semibold text-text">{title}</h4>
-          <p className="text-sm text-neutral-500">Gestisci le credenziali di accesso.</p>
+          <p className="text-sm text-neutral-500">{t.users.form.subtitle}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-700" htmlFor="user-username">
-              Username
+              {t.users.form.username}
             </label>
             <Input
               id="user-username"
@@ -93,13 +95,13 @@ export function UserFormModal({ open, mode, user, isSaving, onClose, onSubmit }:
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-700" htmlFor="user-password">
-              {mode === "create" ? "Password" : "Nuova password"}
+              {mode === "create" ? t.users.form.password : t.users.form.newPassword}
             </label>
             <Input
               id="user-password"
               type="password"
               autoComplete="new-password"
-              placeholder={mode === "edit" ? "Lascia vuoto per non cambiarla" : undefined}
+              placeholder={mode === "edit" ? t.users.form.keepPassword : undefined}
               value={form.password}
               onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
             />
@@ -112,7 +114,7 @@ export function UserFormModal({ open, mode, user, isSaving, onClose, onSubmit }:
               onChange={(e) => setForm((prev) => ({ ...prev, isAdmin: e.target.checked }))}
               className="size-4 rounded border-neutral-300"
             />
-            Amministratore
+            {t.users.form.isAdmin}
           </label>
 
           {error ? (
@@ -123,10 +125,10 @@ export function UserFormModal({ open, mode, user, isSaving, onClose, onSubmit }:
 
           <div className="flex justify-end gap-2 pt-1">
             <Button variant="secondary" onClick={onClose} type="button" disabled={isSaving}>
-              Annulla
+              {t.common.cancel}
             </Button>
             <Button type="submit" disabled={isSaving}>
-              {isSaving ? "Salvataggio..." : mode === "create" ? "Crea utente" : "Salva modifiche"}
+              {isSaving ? t.common.saving : mode === "create" ? t.users.form.create : t.common.saveChanges}
             </Button>
           </div>
         </form>

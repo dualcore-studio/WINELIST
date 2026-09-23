@@ -6,15 +6,13 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserFormModal } from "@/components/users/user-form-modal";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
+import { readApiError } from "@/lib/i18n/dictionaries";
+import { useI18n } from "@/lib/i18n/provider";
 import type { AppUser, AppUserInput } from "@/types/app-user";
-
-async function parseErrorMessage(res: Response): Promise<string> {
-  const data = (await res.json().catch(() => null)) as { error?: string } | null;
-  return data?.error ?? "Operazione non riuscita. Riprova.";
-}
 
 export function UsersView() {
   const { user: currentUser } = useCurrentUser();
+  const { t } = useI18n();
   const [users, setUsers] = useState<AppUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
@@ -30,17 +28,17 @@ export function UsersView() {
     try {
       const res = await fetch("/api/users");
       if (!res.ok) {
-        setListError(await parseErrorMessage(res));
+        setListError(await readApiError(res, t));
         return;
       }
       const data = (await res.json()) as { users: AppUser[] };
       setUsers(data.users);
     } catch {
-      setListError("Impossibile caricare gli utenti.");
+      setListError(t.users.loadFailed);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void loadUsers();
@@ -75,7 +73,7 @@ export function UsersView() {
             });
 
       if (!res.ok) {
-        throw new Error(await parseErrorMessage(res));
+        throw new Error(await readApiError(res, t));
       }
       setModalOpen(false);
       await loadUsers();
@@ -85,42 +83,42 @@ export function UsersView() {
   }
 
   async function handleDelete(user: AppUser) {
-    if (!window.confirm(`Eliminare l'utente "${user.username}"? L'azione non è reversibile.`)) {
+    if (!window.confirm(t.users.confirmDelete(user.username))) {
       return;
     }
     setListError(null);
     try {
       const res = await fetch(`/api/users/${user.id}`, { method: "DELETE" });
       if (!res.ok) {
-        setListError(await parseErrorMessage(res));
+        setListError(await readApiError(res, t));
         return;
       }
       await loadUsers();
     } catch {
-      setListError("Impossibile eliminare l'utente.");
+      setListError(t.users.deleteFailed);
     }
   }
 
   return (
     <div className="mx-auto w-full max-w-2xl px-3 py-6 sm:px-4 md:px-6 md:py-10">
       <h1 className="font-display text-2xl font-semibold tracking-tight text-wine-graphite sm:text-3xl">
-        Utenti
+        {t.users.title}
       </h1>
       <p className="mt-2 text-sm leading-relaxed text-neutral-600 sm:text-[15px]">
-        Crea, modifica ed elimina gli account che possono accedere all&apos;app.
+        {t.users.description}
       </p>
 
       <section className="mt-8 rounded-xl border border-neutral-200 bg-white p-4 shadow-soft sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <h2 className="text-base font-semibold text-wine-graphite">Elenco utenti</h2>
+            <h2 className="text-base font-semibold text-wine-graphite">{t.users.listTitle}</h2>
             <p className="mt-1 text-sm text-neutral-600">
-              Gli amministratori possono gestire tutti gli utenti, incluso se stessi (tranne l&apos;auto-eliminazione).
+              {t.users.listDescription}
             </p>
           </div>
           <Button onClick={openCreate} className="shrink-0">
             <Plus className="mr-1.5 size-4" aria-hidden />
-            Aggiungi utente
+            {t.users.add}
           </Button>
         </div>
 
@@ -131,9 +129,9 @@ export function UsersView() {
         ) : null}
 
         {isLoading ? (
-          <p className="mt-4 text-sm text-neutral-500">Caricamento...</p>
+          <p className="mt-4 text-sm text-neutral-500">{t.common.loading}</p>
         ) : users.length === 0 ? (
-          <p className="mt-4 text-sm text-neutral-500">Nessun utente configurato.</p>
+          <p className="mt-4 text-sm text-neutral-500">{t.users.empty}</p>
         ) : (
           <ul className="mt-4 divide-y divide-neutral-100 rounded-lg border border-neutral-100">
             {users.map((u) => (
@@ -145,11 +143,11 @@ export function UsersView() {
                   <span className="font-medium text-neutral-800">{u.username}</span>
                   {u.isAdmin ? (
                     <span className="ml-2 rounded-full bg-brand/10 px-2 py-0.5 text-xs font-semibold text-brand">
-                      Admin
+                      {t.users.admin}
                     </span>
                   ) : null}
                   {u.id === currentUser?.id ? (
-                    <span className="ml-2 text-xs text-neutral-400">(tu)</span>
+                    <span className="ml-2 text-xs text-neutral-400">{t.users.you}</span>
                   ) : null}
                 </div>
 
@@ -158,20 +156,20 @@ export function UsersView() {
                     type="button"
                     onClick={() => openEdit(u)}
                     className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-wine-bordeaux hover:bg-wine-bordeaux/5"
-                    aria-label={`Modifica ${u.username}`}
+                    aria-label={t.common.editItem(u.username)}
                   >
                     <Pencil className="size-3.5" aria-hidden />
-                    Modifica
+                    {t.common.edit}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(u)}
                     disabled={u.id === currentUser?.id}
                     className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
-                    aria-label={`Elimina ${u.username}`}
+                    aria-label={t.common.deleteItem(u.username)}
                   >
                     <Trash2 className="size-3.5" aria-hidden />
-                    Elimina
+                    {t.common.delete}
                   </button>
                 </div>
               </li>
@@ -184,7 +182,7 @@ export function UsersView() {
         href="/wines"
         className="mt-8 inline-flex text-sm font-semibold text-wine-bordeaux underline-offset-4 hover:underline"
       >
-        ← Torna alla wine list
+        {t.common.backToWineList}
       </Link>
 
       <UserFormModal

@@ -1,10 +1,12 @@
 "use client";
 
-import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { ITALIAN_REGIONS } from "@/constants/italian-regions";
+import { countryLabel, wineTypeLabel } from "@/lib/i18n/format";
+import { useI18n } from "@/lib/i18n/provider";
 import { formatVintage, type Wine, type WineCategory, type WineType } from "@/types/wine";
 import type { WineInput } from "@/features/wines/repository";
 
@@ -17,12 +19,7 @@ type Props = {
   isSaving: boolean;
   onClose: () => void;
   onSubmit: (input: WineInput) => Promise<void>;
-  /** Sostantivo mostrato nei titoli/CTA (es. "vino", "distillato"). Default: "vino". */
-  itemNoun?: string;
 };
-
-const BIN_DUPLICATE_MESSAGE =
-  "Bin Number già in uso. Scegline uno libero o elimina il vino che lo occupa.";
 
 /** Bin vuoto = non assegnato; nessun vincolo di unicità. Confronto senza maiuscole/spazi ("GB1" = "gb 1"). */
 function binKey(bin: string): string {
@@ -90,18 +87,6 @@ const NATION_OPTIONS: readonly string[] = [NATION_PLACEHOLDER, ...NATIONS];
 const TYPE_OPTIONS: readonly string[] = [TYPE_PLACEHOLDER, ...WINE_TYPES];
 const CATEGORY_OPTIONS: readonly string[] = [CATEGORY_PLACEHOLDER, ...WINE_CATEGORIES];
 
-function nationLabel(value: string): string {
-  return value === NATION_PLACEHOLDER ? "— Seleziona nazione —" : value;
-}
-
-function typeLabel(value: string): string {
-  return value === TYPE_PLACEHOLDER ? "— Seleziona tipologia —" : value;
-}
-
-function categoryLabel(value: string): string {
-  return value === CATEGORY_PLACEHOLDER ? "— Seleziona categoria —" : value;
-}
-
 function isItaly(country: string): boolean {
   return country.trim().toLowerCase() === "italia";
 }
@@ -157,9 +142,9 @@ export function WineFormModal({
   wines,
   isSaving,
   onClose,
-  onSubmit,
-  itemNoun = "vino"
+  onSubmit
 }: Props) {
+  const { t, lang } = useI18n();
   const [form, setForm] = useState<FormState>(initialState);
   const [error, setError] = useState<string | null>(null);
   const binInputRef = useRef<HTMLInputElement>(null);
@@ -190,13 +175,24 @@ export function WineFormModal({
 
   useEffect(() => {
     if (!open || mode !== "create") return;
-    const t = window.setTimeout(() => binInputRef.current?.focus(), 0);
-    return () => window.clearTimeout(t);
+    const timer = window.setTimeout(() => binInputRef.current?.focus(), 0);
+    return () => window.clearTimeout(timer);
   }, [open, mode]);
 
-  const title = useMemo(
-    () => (mode === "create" ? `Aggiungi ${itemNoun}` : `Modifica ${itemNoun}`),
-    [mode, itemNoun]
+  const title = mode === "create" ? t.wines.form.createTitle : t.wines.form.editTitle;
+
+  // Etichette nella lingua scelta; i valori salvati restano in italiano.
+  const nationLabel = useCallback(
+    (value: string) => (value === NATION_PLACEHOLDER ? t.wines.form.selectCountry : countryLabel(value, lang)),
+    [t, lang]
+  );
+  const typeLabel = useCallback(
+    (value: string) => (value === TYPE_PLACEHOLDER ? t.wines.form.selectType : wineTypeLabel(value, lang)),
+    [t, lang]
+  );
+  const categoryLabel = useCallback(
+    (value: string) => (value === CATEGORY_PLACEHOLDER ? t.wines.form.selectCategory : value),
+    [t]
   );
 
   const nationOptions = useMemo(() => nationChoices(form.country), [form.country]);
@@ -223,39 +219,39 @@ export function WineFormModal({
     setError(null);
 
     if (!form.country.trim()) {
-      setError("Seleziona una nazione.");
+      setError(t.wines.form.errCountry);
       return;
     }
     if (!form.type.trim()) {
-      setError("Seleziona una tipologia.");
+      setError(t.wines.form.errType);
       return;
     }
     if (!form.name.trim()) {
-      setError("Compila il nome.");
+      setError(t.wines.form.errName);
       return;
     }
     const vintage = parseVintage(form.vintage);
     if (vintage === undefined) {
-      setError("Inserisci un'annata valida, NV oppure lascia vuoto.");
+      setError(t.wines.form.errVintage);
       return;
     }
     if (Number.isNaN(form.price) || form.price < 0) {
-      setError("Inserisci un prezzo valido.");
+      setError(t.wines.form.errPrice);
       return;
     }
     if (form.pricePerGlass !== "" && (Number.isNaN(form.pricePerGlass) || form.pricePerGlass < 0)) {
-      setError("Inserisci un prezzo al calice valido.");
+      setError(t.wines.form.errGlassPrice);
       return;
     }
     const binResolved = form.binNumber.trim().replace(/\s+/g, " ");
     const excludeId = mode === "edit" && wine ? wine.id : undefined;
     if (isBinNumberTaken(binResolved, wines, excludeId)) {
-      setError(BIN_DUPLICATE_MESSAGE);
+      setError(t.wines.form.binTaken);
       return;
     }
     const quantity = form.isAvailable ? form.quantity : 0;
     if (form.isAvailable && (Number.isNaN(quantity) || quantity < 0)) {
-      setError("Inserisci una quantità valida (minimo 0).");
+      setError(t.wines.form.errQuantity);
       return;
     }
 
@@ -277,7 +273,7 @@ export function WineFormModal({
       onClose();
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Operazione non riuscita. Riprova.";
+        err instanceof Error ? err.message : t.common.operationFailed;
       setError(message);
     }
   }
@@ -287,29 +283,27 @@ export function WineFormModal({
       <div className="w-full max-w-2xl rounded-xl2 border border-neutral-200 bg-white p-6 shadow-soft">
         <div className="mb-4">
           <h4 className="text-lg font-semibold text-text">{title}</h4>
-          <p className="text-sm text-neutral-500">
-            Gestisci i dati del {itemNoun} selezionato.
-          </p>
+          <p className="text-sm text-neutral-500">{t.wines.form.subtitle}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-neutral-700" htmlFor="wine-bin">
-                Bin Number
+                {t.wines.form.binLabel}
               </label>
               <Input
                 ref={binInputRef}
                 id="wine-bin"
                 type="text"
-                placeholder="es. 23, GB 1, HB 2a"
+                placeholder={t.wines.form.binPlaceholder}
                 value={form.binNumber}
                 onChange={(e) => setForm((prev) => ({ ...prev, binNumber: e.target.value }))}
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-neutral-700" htmlFor="wine-type">
-                Tipologia
+                {t.wines.col.type}
               </label>
               <SearchableSelect
                 id="wine-type"
@@ -320,13 +314,13 @@ export function WineFormModal({
                   setForm((prev) => ({ ...prev, type: type as WineType | "" }))
                 }
                 allowCustom
-                placeholder="Cerca tipologia…"
+                placeholder={t.wines.form.searchType}
                 aria-required
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-neutral-700" htmlFor="wine-category">
-                Categoria
+                {t.wines.col.category}
               </label>
               <SearchableSelect
                 id="wine-category"
@@ -337,7 +331,7 @@ export function WineFormModal({
                   setForm((prev) => ({ ...prev, category: category as WineCategory | "" }))
                 }
                 allowCustom
-                placeholder="Cerca categoria…"
+                placeholder={t.wines.form.searchCategory}
                 aria-required
               />
             </div>
@@ -346,7 +340,7 @@ export function WineFormModal({
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-neutral-700" htmlFor="wine-country">
-                Nazione
+                {t.wines.col.country}
               </label>
               <SearchableSelect
                 id="wine-country"
@@ -361,13 +355,13 @@ export function WineFormModal({
                   }));
                 }}
                 allowCustom
-                placeholder="Cerca nazione…"
+                placeholder={t.wines.form.searchCountry}
                 aria-required
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-neutral-700" htmlFor="wine-region">
-                Regione
+                {t.wines.col.region}
               </label>
               {hasCountry ? (
                 <SearchableSelect
@@ -376,7 +370,7 @@ export function WineFormModal({
                   options={regionOptions}
                   onChange={(region) => setForm((prev) => ({ ...prev, region }))}
                   allowCustom
-                  placeholder="Cerca regione…"
+                  placeholder={t.wines.form.searchRegion}
                   aria-required
                 />
               ) : (
@@ -384,7 +378,7 @@ export function WineFormModal({
                   id="wine-region"
                   className="flex h-10 items-center rounded-lg border border-dashed border-neutral-200 bg-neutral-50 px-3 text-sm text-neutral-500"
                 >
-                  Seleziona prima una nazione
+                  {t.wines.form.selectCountryFirst}
                 </p>
               )}
             </div>
@@ -392,27 +386,26 @@ export function WineFormModal({
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-700" htmlFor="wine-grape">
-              Vitigno
+              {t.wines.col.grape}
             </label>
             <Input
               id="wine-grape"
               value={form.grape}
               onChange={(e) => setForm((prev) => ({ ...prev, grape: e.target.value }))}
-              placeholder="es. Sangiovese, Chardonnay…"
+              placeholder={t.wines.form.grapePlaceholder}
             />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-700">Cantina</label>
+              <label className="text-sm font-medium text-neutral-700">{t.wines.col.winery}</label>
               <Input
                 value={form.winery}
                 onChange={(e) => setForm((prev) => ({ ...prev, winery: e.target.value }))}
-                required
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-700">Nome vino</label>
+              <label className="text-sm font-medium text-neutral-700">{t.wines.col.name}</label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
@@ -435,23 +428,23 @@ export function WineFormModal({
               }}
               className="h-4 w-4 rounded border-neutral-300"
             />
-            Disponibile
+            {t.wines.form.available}
           </label>
 
           <div
             className={`grid gap-3 ${form.isAvailable ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}
           >
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-700">Annata</label>
+              <label className="text-sm font-medium text-neutral-700">{t.wines.col.vintage}</label>
               <Input
                 type="text"
-                placeholder="es. 2021 o NV"
+                placeholder={t.wines.form.vintagePlaceholder}
                 value={form.vintage}
                 onChange={(e) => setForm((prev) => ({ ...prev, vintage: e.target.value }))}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-700">Prezzo</label>
+              <label className="text-sm font-medium text-neutral-700">{t.wines.col.price}</label>
               <Input
                 type="number"
                 min={0}
@@ -465,7 +458,7 @@ export function WineFormModal({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-700">Prezzo calice</label>
+              <label className="text-sm font-medium text-neutral-700">{t.wines.col.glassPrice}</label>
               <Input
                 type="number"
                 min={0}
@@ -485,7 +478,7 @@ export function WineFormModal({
             {form.isAvailable ? (
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-neutral-700" htmlFor="wine-quantity">
-                  Quantità
+                  {t.wines.form.quantity}
                 </label>
                 <Input
                   id="wine-quantity"
@@ -511,14 +504,14 @@ export function WineFormModal({
 
           <div className="flex justify-end gap-2 pt-1">
             <Button variant="secondary" onClick={onClose} type="button" disabled={isSaving}>
-              Annulla
+              {t.common.cancel}
             </Button>
             <Button type="submit" disabled={isSaving}>
               {isSaving
-                ? "Salvataggio..."
+                ? t.common.saving
                 : mode === "create"
-                  ? `Crea ${itemNoun}`
-                  : "Salva modifiche"}
+                  ? t.wines.form.create
+                  : t.common.saveChanges}
             </Button>
           </div>
         </form>

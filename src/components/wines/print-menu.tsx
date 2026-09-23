@@ -2,28 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BookOpen, ChevronDown, ClipboardList, Printer } from "lucide-react";
+import { useI18n } from "@/lib/i18n/provider";
 
 type Props = {
   /** Carta per il cliente: pagina da aprire, titolo e descrizione della voce. */
-  cartaHref?: string;
-  cartaLabel?: string;
-  cartaDescription?: string;
+  cartaHref: string;
+  cartaLabel: string;
+  cartaDescription: string;
   /** Stampa ad uso interno della lista filtrata. */
   onPrintInternal: () => void;
   /** Descrizione della voce "Uso interno" (cambia tra vini e distillati). */
-  internalDescription?: string;
+  internalDescription: string;
   disabled?: boolean;
 };
 
 /** Pulsante "Stampa" con le due stampe della sezione: carta per il cliente e lista interna. */
 export function PrintMenu({
-  cartaHref = "/stampa/carta",
-  cartaLabel = "Carta dei vini",
-  cartaDescription = "Per il cliente: vini disponibili, formato Letter",
+  cartaHref,
+  cartaLabel,
+  cartaDescription,
   onPrintInternal,
-  internalDescription = "Lista filtrata con tutte le colonne, quantità incluse",
+  internalDescription,
   disabled = false
 }: Props) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -57,7 +59,7 @@ export function PrintMenu({
         className="inline-flex h-10 items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-800 shadow-sm transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400/60 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Printer className="size-4" strokeWidth={2} aria-hidden />
-        Stampa
+        {t.common.print}
         <ChevronDown className="size-4 text-neutral-500" strokeWidth={2} aria-hidden />
       </button>
       {open ? (
@@ -91,7 +93,7 @@ export function PrintMenu({
           >
             <ClipboardList className="mt-0.5 size-4 shrink-0 text-neutral-600" aria-hidden />
             <span>
-              <span className="block text-sm font-semibold text-neutral-800">Uso interno</span>
+              <span className="block text-sm font-semibold text-neutral-800">{t.print.menu.internal}</span>
               <span className="block text-xs text-neutral-500">{internalDescription}</span>
             </span>
           </button>

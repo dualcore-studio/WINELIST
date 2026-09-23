@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 import { SPIRIT_TYPE_SUGGESTIONS } from "@/components/grappe/grappa-form-modal";
 import type { Wine } from "@/types/wine";
@@ -49,6 +50,7 @@ export function GrappaFilters({
   onFiltersChange,
   onReset
 }: Props) {
+  const { t } = useI18n();
   const field = "min-w-0 flex-1 px-2 text-sm";
 
   const selectBase =
@@ -86,25 +88,25 @@ export function GrappaFilters({
     }
 
     const options = [
-      ...parents.map((p) => ({ value: p, label: `${p} (tutte)` })),
+      ...parents.map((p) => ({ value: p, label: t.spirits.filter.allOf(p) })),
       ...leaves.map((v) => ({ value: v, label: v }))
     ];
     return options.sort((a, b) =>
       a.label.localeCompare(b.label, "it", { sensitivity: "base" })
     );
-  }, [wines]);
+  }, [wines, t]);
 
   return (
     <div className="w-full rounded-[12px] border border-neutral-200 bg-white p-4 shadow-soft">
       <div className="flex w-full flex-nowrap items-center gap-2">
         <Input
-          placeholder="Nome distillato"
+          placeholder={t.spirits.col.name}
           value={filters.name}
           onChange={(e) => onFiltersChange({ ...filters, name: e.target.value })}
           className={field}
         />
         <Input
-          placeholder="Produttore"
+          placeholder={t.spirits.col.producer}
           value={filters.winery}
           onChange={(e) =>
             onFiltersChange({ ...filters, winery: e.target.value })
@@ -118,7 +120,7 @@ export function GrappaFilters({
           }
           className={cn(selectBase, "h-10")}
         >
-          <option value="">Tipologia</option>
+          <option value="">{t.spirits.col.type}</option>
           {spiritTypeOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
@@ -126,7 +128,7 @@ export function GrappaFilters({
           ))}
         </select>
         <Input
-          placeholder="Prezzo bicch. max"
+          placeholder={t.spirits.filter.glassMax}
           type="number"
           min={0}
           step="0.5"
@@ -138,7 +140,7 @@ export function GrappaFilters({
           className={cn(field, "max-w-[11rem] shrink-0 no-number-spin")}
         />
         <Input
-          placeholder="Prezzo bott. max"
+          placeholder={t.spirits.filter.bottleMax}
           type="number"
           min={0}
           step="0.5"
@@ -150,7 +152,7 @@ export function GrappaFilters({
           className={cn(field, "max-w-[11rem] shrink-0 no-number-spin")}
         />
         <Input
-          placeholder="Q.min"
+          placeholder={t.common.qtyMin}
           value={filters.quantityMin}
           onChange={(e) =>
             onFiltersChange({ ...filters, quantityMin: e.target.value })
@@ -158,7 +160,7 @@ export function GrappaFilters({
           className={cn(field, "max-w-[4rem] shrink-0")}
         />
         <Input
-          placeholder="Q.max"
+          placeholder={t.common.qtyMax}
           value={filters.quantityMax}
           onChange={(e) =>
             onFiltersChange({ ...filters, quantityMax: e.target.value })
@@ -170,8 +172,8 @@ export function GrappaFilters({
           onClick={onReset}
           style={{ backgroundColor: "#dc2626", width: 40, height: 40, padding: 0 }}
           className="ml-2 box-border inline-flex aspect-square shrink-0 items-center justify-center rounded-lg !text-white shadow-sm transition-colors hover:!bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/40"
-          aria-label="Reimposta filtri"
-          title="Reimposta filtri"
+          aria-label={t.common.resetFilters}
+          title={t.common.resetFilters}
         >
           <RotateCcw className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
         </button>

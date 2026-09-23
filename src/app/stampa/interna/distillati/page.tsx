@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { getServerI18n } from "@/lib/i18n/server";
 import { InternalSpiritsPrintView } from "@/components/print/internal-view";
 import { spiritFiltersFromSearchParams } from "@/features/grappe/filters";
 
-export const metadata: Metadata = {
-  title: "Distillati – uso interno"
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerI18n();
+  return { title: t.print.internal.spiritsTitle };
+}
 
 type Props = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

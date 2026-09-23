@@ -11,6 +11,7 @@ import { GrappaFormModal } from "@/components/grappe/grappa-form-modal";
 import { GrappaTable } from "@/components/grappe/grappa-table";
 import { filterSpirits, spiritFiltersToSearchParams } from "@/features/grappe/filters";
 import { PrintMenu } from "@/components/wines/print-menu";
+import { useI18n } from "@/lib/i18n/provider";
 import {
   createWine,
   deleteWine,
@@ -29,11 +30,9 @@ import type { Wine } from "@/types/wine";
  */
 
 const GRAPPE_COLLECTION = "grappeDistillati";
-const HEADING = "Distillati";
-const DESCRIPTION = "Cerca, filtra e organizza l'elenco dei distillati.";
-const ITEM_NOUN = "distillato";
 
 export function GrappeDistillatiClientPage() {
+  const { t } = useI18n();
   const { wines, isLoading, error } = getWines(GRAPPE_COLLECTION);
   const [filters, setFilters] = useState<GrappaFiltersState>(initialGrappaFilters);
   const [formOpen, setFormOpen] = useState(false);
@@ -77,14 +76,14 @@ export function GrappeDistillatiClientPage() {
         }
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : "Salvataggio non riuscito.";
+          err instanceof Error ? err.message : t.common.saveFailed;
         setActionError(message);
         throw err;
       } finally {
         setIsSaving(false);
       }
     },
-    [formMode, selectedWine]
+    [formMode, selectedWine, t]
   );
 
   const requestDelete = useCallback((wine: Wine) => {
@@ -108,12 +107,12 @@ export function GrappeDistillatiClientPage() {
       setPendingDelete(null);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Operazione non riuscita.";
+        err instanceof Error ? err.message : t.common.operationFailed;
       setDeleteError(message);
     } finally {
       setIsDeleting(false);
     }
-  }, [pendingDelete]);
+  }, [pendingDelete, t]);
 
   return (
     <div className="box-border flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-auto bg-transparent p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12">
@@ -126,21 +125,21 @@ export function GrappeDistillatiClientPage() {
         <div className="w-full min-w-0 shrink-0 space-y-4">
           <section className="flex w-full items-start justify-between gap-3">
             <div>
-              <h3 className="text-xl font-semibold text-text">{HEADING}</h3>
-              <p className="mt-1 text-sm text-neutral-600">{DESCRIPTION}</p>
+              <h3 className="text-xl font-semibold text-text">{t.spirits.heading}</h3>
+              <p className="mt-1 text-sm text-neutral-600">{t.spirits.description}</p>
             </div>
             <div className="flex items-center gap-2">
               <PrintMenu
                 cartaHref="/stampa/carta/distillati"
-                cartaLabel="Carta dei distillati"
-                cartaDescription="Per il cliente: distillati disponibili, formato Letter"
+                cartaLabel={t.print.menu.cartaSpirits}
+                cartaDescription={t.print.menu.cartaSpiritsDesc}
                 onPrintInternal={() =>
                   window.open(
                     `/stampa/interna/distillati?${spiritFiltersToSearchParams(filters)}`,
                     "_blank"
                   )
                 }
-                internalDescription="Distillati filtrati con prezzi e quantità"
+                internalDescription={t.print.menu.internalSpiritsDesc}
                 disabled={isLoading || filteredWines.length === 0}
               />
               <button
@@ -148,7 +147,7 @@ export function GrappeDistillatiClientPage() {
                 onClick={openCreate}
                 className="inline-flex h-10 items-center rounded-lg bg-[#f2711c] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#d95f10] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2711c]/45"
               >
-                + Aggiungi {ITEM_NOUN}
+                {t.spirits.add}
               </button>
             </div>
           </section>
@@ -205,11 +204,10 @@ export function GrappeDistillatiClientPage() {
         >
           <div className="w-full max-w-md rounded-xl2 border border-neutral-200 bg-white p-6 shadow-soft">
             <h4 id="delete-grappa-title" className="text-lg font-semibold text-text">
-              Conferma eliminazione
+              {t.common.confirmDeleteTitle}
             </h4>
             <p className="mt-3 text-sm text-neutral-700">
-              Vuoi eliminare definitivamente &quot;{pendingDelete.name}&quot;? Il record
-              verrà rimosso dal database e non potrà essere recuperato.
+              {t.common.confirmDeleteText(pendingDelete.name)}
             </p>
             {deleteError ? (
               <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -218,7 +216,7 @@ export function GrappeDistillatiClientPage() {
             ) : null}
             <div className="mt-6 flex justify-end gap-2">
               <Button variant="secondary" type="button" onClick={cancelDelete} disabled={isDeleting}>
-                Annulla
+                {t.common.cancel}
               </Button>
               <Button
                 type="button"
@@ -226,7 +224,7 @@ export function GrappeDistillatiClientPage() {
                 onClick={() => void confirmDelete()}
                 disabled={isDeleting}
               >
-                {isDeleting ? "Eliminazione..." : "Elimina"}
+                {isDeleting ? t.common.deleting : t.common.delete}
               </Button>
             </div>
           </div>

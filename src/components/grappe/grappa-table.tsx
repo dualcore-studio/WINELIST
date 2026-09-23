@@ -1,6 +1,9 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { TableScrollArea } from "@/components/ui/table-scroll-area";
-import { cn, formatPriceEur } from "@/lib/utils";
+import { formatPrice } from "@/lib/i18n/format";
+import type { Lang } from "@/lib/i18n/config";
+import { useI18n } from "@/lib/i18n/provider";
+import { cn } from "@/lib/utils";
 import type { Wine } from "@/types/wine";
 
 type Props = {
@@ -32,10 +35,10 @@ const thBase =
 const rowZebra =
   "odd:bg-white even:bg-neutral-100 hover:bg-neutral-200/90 [&>td]:border-t [&>td]:border-neutral-100";
 
-function formatGlassPrice(value: number | undefined): string {
+function formatGlassPrice(value: number | undefined, lang: Lang): string {
   if (value === undefined || value === null) return "—";
   if (!Number.isFinite(Number(value))) return "—";
-  return formatPriceEur(Number(value));
+  return formatPrice(Number(value), lang);
 }
 
 /** Soglia "scorte basse" coerente con la winelist: sotto 6 bottiglie il numero diventa rosso. */
@@ -53,6 +56,7 @@ export function GrappaTable({
   onDeleteRequest,
   className
 }: Props) {
+  const { t, lang } = useI18n();
   if (isLoading) {
     return (
       <div className={cn(tableRoot, className)}>
@@ -63,7 +67,7 @@ export function GrappaTable({
           )}
         >
           <p className="text-[15px] text-neutral-600">
-            Caricamento distillati da InstantDB...
+            {t.spirits.loading}
           </p>
         </div>
       </div>
@@ -80,7 +84,7 @@ export function GrappaTable({
           )}
         >
           <p className="text-[15px] text-neutral-600">
-            Nessun distillato trovato con i filtri correnti.
+            {t.spirits.empty}
           </p>
         </div>
       </div>
@@ -99,13 +103,13 @@ export function GrappaTable({
             >
               <thead>
                 <tr>
-                  <th className={cn(thBase, "text-left")}>Nome distillato</th>
-                  <th className={cn(thBase, "text-left")}>Produttore</th>
-                  <th className={cn(thBase, "text-left")}>Tipologia</th>
-                  <th className={cn(thBase, "text-right")}>Prezzo bicchiere</th>
-                  <th className={cn(thBase, "text-right")}>Prezzo bottiglia</th>
-                  <th className={cn(thBase, "w-[3rem] text-right")}>Qtà</th>
-                  <th className={cn(thBase, "text-center")}>Azioni</th>
+                  <th className={cn(thBase, "text-left")}>{t.spirits.col.name}</th>
+                  <th className={cn(thBase, "text-left")}>{t.spirits.col.producer}</th>
+                  <th className={cn(thBase, "text-left")}>{t.spirits.col.type}</th>
+                  <th className={cn(thBase, "text-right")}>{t.spirits.col.glassPrice}</th>
+                  <th className={cn(thBase, "text-right")}>{t.spirits.col.bottlePrice}</th>
+                  <th className={cn(thBase, "w-[3rem] text-right")}>{t.common.qty}</th>
+                  <th className={cn(thBase, "text-center")}>{t.common.actions}</th>
                 </tr>
               </thead>
               <tbody className="relative z-0 [&_tr:first-child>td]:border-t-0">
@@ -145,7 +149,7 @@ export function GrappaTable({
                         "bg-inherit text-right tabular-nums text-neutral-800"
                       )}
                     >
-                      {formatGlassPrice(wine.pricePerGlass)}
+                      {formatGlassPrice(wine.pricePerGlass, lang)}
                     </td>
                     <td
                       className={cn(
@@ -154,7 +158,8 @@ export function GrappaTable({
                         "bg-inherit text-right tabular-nums text-neutral-800"
                       )}
                     >
-                      {formatPriceEur(wine.price)}
+                      {/* 1 = segnaposto dei distillati venduti solo al bicchiere */}
+                      {wine.price > 1 ? formatPrice(wine.price, lang) : "—"}
                     </td>
                     <td
                       className={cn(
@@ -183,7 +188,7 @@ export function GrappaTable({
                         <button
                           type="button"
                           className="rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800 disabled:pointer-events-none disabled:opacity-40"
-                          aria-label={`Modifica ${wine.name}`}
+                          aria-label={t.common.editItem(wine.name)}
                           onClick={() => onEdit(wine)}
                           disabled={deletingWineId === wine.id}
                         >
@@ -192,7 +197,7 @@ export function GrappaTable({
                         <button
                           type="button"
                           className="rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-red-700 disabled:pointer-events-none disabled:opacity-40"
-                          aria-label={`Elimina ${wine.name}`}
+                          aria-label={t.common.deleteItem(wine.name)}
                           onClick={() => onDeleteRequest(wine)}
                           disabled={deletingWineId === wine.id}
                         >

@@ -14,7 +14,9 @@ import {
 import { useCallback, useMemo } from "react";
 import { clsx } from "clsx";
 import { useExtraSections } from "@/components/layout/extra-sections-provider";
+import { LanguageSwitch } from "@/components/layout/language-switch";
 import { LogoutButton } from "@/components/layout/logout-button";
+import { useI18n } from "@/lib/i18n/provider";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
 import {
   ADMIN_NAV,
@@ -35,6 +37,14 @@ const ICON_MAP: Record<SidebarIconName, LucideIcon> = {
   Users
 };
 
+/** Etichette tradotte delle voci fisse; le categorie extra create dall'utente restano col loro nome. */
+const NAV_LABEL_KEYS = {
+  winelist: "wineList",
+  "grappe-distillati": "spirits",
+  settings: "settings",
+  users: "users"
+} as const;
+
 /** Voci mostrate come solo-icona (area amministrativa compatta, in alto a destra). */
 const COMPACT_ICON_IDS = new Set(["settings", "users"]);
 
@@ -47,8 +57,11 @@ function NavRow({
   active: boolean;
   onNavigate?: () => void;
 }) {
+  const { t } = useI18n();
   const Icon = ICON_MAP[item.icon];
   const settingsOnlyIcon = COMPACT_ICON_IDS.has(item.id);
+  const labelKey = NAV_LABEL_KEYS[item.id as keyof typeof NAV_LABEL_KEYS];
+  const label = labelKey ? t.nav[labelKey] : item.label;
 
   const base = clsx(
     "flex w-auto shrink-0 items-center rounded-lg py-2 font-semibold leading-tight transition-colors duration-200",
@@ -71,7 +84,7 @@ function NavRow({
         href={item.href}
         onClick={onNavigate}
         className={clsx(base, interactive)}
-        aria-label={item.label}
+        aria-label={label}
         aria-current={active ? "page" : undefined}
       >
         <Icon className="size-4 shrink-0 opacity-95 sm:size-[1.05rem]" strokeWidth={1.75} aria-hidden />
@@ -89,14 +102,14 @@ function NavRow({
       >
         <Icon className="size-4 shrink-0 opacity-95 sm:size-[1.05rem]" strokeWidth={1.75} aria-hidden />
         <span className="min-w-0 max-w-[5.5rem] truncate tracking-wide sm:max-w-[8rem] md:max-w-[12rem] md:overflow-visible lg:max-w-none">
-          {item.label}
+          {label}
         </span>
       </Link>
     );
   }
 
   return (
-    <span className={clsx(base, interactive)} title="Sezione in arrivo">
+    <span className={clsx(base, interactive)} title={t.nav.comingSoon}>
       <Icon className="size-4 shrink-0 sm:size-[1.05rem]" strokeWidth={1.75} aria-hidden />
       <span className="min-w-0 max-w-[5.5rem] truncate tracking-wide sm:max-w-[8rem] md:max-w-[12rem] md:overflow-visible lg:max-w-none">
         {item.label}
@@ -154,6 +167,7 @@ function useSidebarNavState() {
 export function AppSidebarTop() {
   const { primaryLinks, isRouteActive } = useSidebarNavState();
   const { user } = useCurrentUser();
+  const { t } = useI18n();
 
   const adminLinks = useMemo(
     () => (user?.isAdmin ? [...ADMIN_NAV, ...ADMIN_ONLY_NAV] : ADMIN_NAV),
@@ -163,7 +177,7 @@ export function AppSidebarTop() {
   return (
     <header
       className="sticky top-0 z-[115] w-full shrink-0 border-b border-white/[0.06] bg-gradient-to-b from-wine-graphite to-wine-bordeauxMuted shadow-[0_4px_24px_rgba(0,0,0,0.12)]"
-      aria-label="Navigazione principale"
+      aria-label={t.nav.mainNavigation}
     >
       <div className="flex min-w-0 items-center gap-1.5 px-2 py-2 sm:gap-3 sm:px-4">
         <div className="flex min-w-0 shrink-0 items-center border-r border-white/[0.1] pr-3 sm:pr-4">
@@ -183,6 +197,7 @@ export function AppSidebarTop() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-0.5 border-l border-white/[0.1] pl-2 sm:gap-1 sm:pl-3">
+          <LanguageSwitch className="mr-1" />
           <ul className="flex flex-nowrap items-center gap-0.5">
             {adminLinks.map((item) => (
               <li key={item.id}>

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { AUTH_COOKIE_NAME, verifySessionCookie } from "@/lib/auth/session";
+import { apiError } from "@/lib/api-errors";
 
 const PUBLIC_PATHS = ["/login", "/api/auth/login", "/api/auth/logout", "/api/auth/me"];
 
@@ -24,7 +25,7 @@ export function proxy(request: NextRequest) {
 
   if (!session) {
     if (isApi) {
-      return NextResponse.json({ error: "Non autenticato." }, { status: 401 });
+      return apiError("unauthenticated", 401);
     }
     const url = new URL("/login", request.url);
     url.searchParams.set("from", pathname);
@@ -33,7 +34,7 @@ export function proxy(request: NextRequest) {
 
   if (requiresAdmin(pathname) && !session.isAdmin) {
     if (isApi) {
-      return NextResponse.json({ error: "Permessi insufficienti." }, { status: 403 });
+      return apiError("forbidden", 403);
     }
     return NextResponse.redirect(new URL("/wines", request.url));
   }

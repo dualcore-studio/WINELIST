@@ -1,4 +1,5 @@
 import { initialGrappaFilters, type GrappaFiltersState } from "@/components/grappe/grappa-filters";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Wine } from "@/types/wine";
 
 /** Applica i filtri della pagina Distillati (stessa logica per tabella e stampa interna). */
@@ -63,14 +64,15 @@ export function spiritFiltersFromSearchParams(
 }
 
 /** Riassunto leggibile dei filtri attivi, per l'intestazione della stampa. */
-export function describeSpiritFilters(filters: GrappaFiltersState): string[] {
+export function describeSpiritFilters(filters: GrappaFiltersState, t: Dictionary): string[] {
+  const f = t.print.filterSummary;
   const parts: string[] = [];
-  if (filters.name.trim()) parts.push(`Nome: ${filters.name.trim()}`);
-  if (filters.winery.trim()) parts.push(`Produttore: ${filters.winery.trim()}`);
-  if (filters.spiritType) parts.push(`Tipologia: ${filters.spiritType}`);
-  if (filters.pricePerGlassMax.trim()) parts.push(`Prezzo bicch. max: ${filters.pricePerGlassMax.trim()}`);
-  if (filters.priceMax.trim()) parts.push(`Prezzo bott. max: ${filters.priceMax.trim()}`);
-  if (filters.quantityMin.trim()) parts.push(`Q.min: ${filters.quantityMin.trim()}`);
-  if (filters.quantityMax.trim()) parts.push(`Q.max: ${filters.quantityMax.trim()}`);
+  if (filters.name.trim()) parts.push(`${f.name}: ${filters.name.trim()}`);
+  if (filters.winery.trim()) parts.push(`${f.producer}: ${filters.winery.trim()}`);
+  if (filters.spiritType) parts.push(`${f.type}: ${filters.spiritType}`);
+  if (filters.pricePerGlassMax.trim()) parts.push(`${f.glassMax}: ${filters.pricePerGlassMax.trim()}`);
+  if (filters.priceMax.trim()) parts.push(`${f.bottleMax}: ${filters.priceMax.trim()}`);
+  if (filters.quantityMin.trim()) parts.push(`${t.common.qtyMin}: ${filters.quantityMin.trim()}`);
+  if (filters.quantityMax.trim()) parts.push(`${t.common.qtyMax}: ${filters.quantityMax.trim()}`);
   return parts;
 }

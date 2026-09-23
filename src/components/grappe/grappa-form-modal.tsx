@@ -1,8 +1,9 @@
 "use client";
 
-import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/lib/i18n/provider";
 import type { Wine } from "@/types/wine";
 import type { WineInput } from "@/features/wines/repository";
 
@@ -79,6 +80,7 @@ export function GrappaFormModal({
   onClose,
   onSubmit
 }: Props) {
+  const { t } = useI18n();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [error, setError] = useState<string | null>(null);
   const firstFieldRef = useRef<HTMLInputElement>(null);
@@ -107,14 +109,11 @@ export function GrappaFormModal({
 
   useEffect(() => {
     if (!open) return;
-    const t = window.setTimeout(() => firstFieldRef.current?.focus(), 0);
-    return () => window.clearTimeout(t);
+    const timer = window.setTimeout(() => firstFieldRef.current?.focus(), 0);
+    return () => window.clearTimeout(timer);
   }, [open]);
 
-  const title = useMemo(
-    () => (mode === "create" ? "Aggiungi distillato" : "Modifica distillato"),
-    [mode]
-  );
+  const title = mode === "create" ? t.spirits.form.createTitle : t.spirits.form.editTitle;
 
   if (!open) return null;
 
@@ -135,11 +134,11 @@ export function GrappaFormModal({
       quantityRaw === "" ? 0 : Math.trunc(Number(quantityRaw));
 
     if (!name) {
-      setError("Inserisci il nome del distillato.");
+      setError(t.spirits.form.errName);
       return;
     }
     if (!winery) {
-      setError("Inserisci il produttore.");
+      setError(t.spirits.form.errProducer);
       return;
     }
     if (
@@ -147,18 +146,18 @@ export function GrappaFormModal({
       Number.isNaN(priceValue) ||
       priceValue < 0
     ) {
-      setError("Inserisci un prezzo bottiglia valido (minimo 0).");
+      setError(t.spirits.form.errBottlePrice);
       return;
     }
     if (
       pricePerGlassValue !== undefined &&
       (Number.isNaN(pricePerGlassValue) || pricePerGlassValue < 0)
     ) {
-      setError("Inserisci un prezzo al bicchiere valido (minimo 0).");
+      setError(t.spirits.form.errGlassPrice);
       return;
     }
     if (Number.isNaN(quantityValue) || quantityValue < 0) {
-      setError("Inserisci una quantità valida (minimo 0).");
+      setError(t.spirits.form.errQuantity);
       return;
     }
 
@@ -204,7 +203,7 @@ export function GrappaFormModal({
       onClose();
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Operazione non riuscita. Riprova.";
+        err instanceof Error ? err.message : t.common.operationFailed;
       setError(message);
     }
   }
@@ -215,7 +214,7 @@ export function GrappaFormModal({
         <div className="mb-4">
           <h4 className="text-lg font-semibold text-text">{title}</h4>
           <p className="text-sm text-neutral-500">
-            Inserisci i dati del distillato.
+            {t.spirits.form.subtitle}
           </p>
         </div>
 
@@ -225,7 +224,7 @@ export function GrappaFormModal({
               className="text-sm font-medium text-neutral-700"
               htmlFor="grappa-name"
             >
-              Nome Distillato
+              {t.spirits.form.name}
             </label>
             <Input
               id="grappa-name"
@@ -234,7 +233,7 @@ export function GrappaFormModal({
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, name: e.target.value }))
               }
-              placeholder="es. Grappa di Barolo"
+              placeholder={t.spirits.form.namePlaceholder}
               required
             />
           </div>
@@ -244,7 +243,7 @@ export function GrappaFormModal({
               className="text-sm font-medium text-neutral-700"
               htmlFor="grappa-producer"
             >
-              Produttore
+              {t.spirits.form.producer}
             </label>
             <Input
               id="grappa-producer"
@@ -252,7 +251,7 @@ export function GrappaFormModal({
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, winery: e.target.value }))
               }
-              placeholder="es. Nonino"
+              placeholder={t.spirits.form.producerPlaceholder}
               required
             />
           </div>
@@ -262,7 +261,7 @@ export function GrappaFormModal({
               className="text-sm font-medium text-neutral-700"
               htmlFor="grappa-spirit-type"
             >
-              Tipologia
+              {t.spirits.form.type}
             </label>
             <Input
               id="grappa-spirit-type"
@@ -271,7 +270,7 @@ export function GrappaFormModal({
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, spiritType: e.target.value }))
               }
-              placeholder="es. Grappa, Cognac, Whisky..."
+              placeholder={t.spirits.form.typePlaceholder}
               autoComplete="off"
             />
             <datalist id="grappa-spirit-type-options">
@@ -287,7 +286,7 @@ export function GrappaFormModal({
                 className="text-sm font-medium text-neutral-700"
                 htmlFor="grappa-price-glass"
               >
-                Prezzo al Bicchiere
+                {t.spirits.form.glassPrice}
               </label>
               <Input
                 id="grappa-price-glass"
@@ -303,7 +302,7 @@ export function GrappaFormModal({
                     pricePerGlass: e.target.value
                   }))
                 }
-                placeholder="es. 8"
+                placeholder="8"
               />
             </div>
 
@@ -312,7 +311,7 @@ export function GrappaFormModal({
                 className="text-sm font-medium text-neutral-700"
                 htmlFor="grappa-price"
               >
-                Prezzo Bottiglia
+                {t.spirits.form.bottlePrice}
               </label>
               <Input
                 id="grappa-price"
@@ -325,7 +324,7 @@ export function GrappaFormModal({
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, price: e.target.value }))
                 }
-                placeholder="es. 45"
+                placeholder="45"
                 required
               />
             </div>
@@ -335,7 +334,7 @@ export function GrappaFormModal({
                 className="text-sm font-medium text-neutral-700"
                 htmlFor="grappa-quantity"
               >
-                Quantità
+                {t.spirits.form.quantity}
               </label>
               <Input
                 id="grappa-quantity"
@@ -348,7 +347,7 @@ export function GrappaFormModal({
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, quantity: e.target.value }))
                 }
-                placeholder="es. 6"
+                placeholder="6"
               />
             </div>
           </div>
@@ -366,14 +365,14 @@ export function GrappaFormModal({
               type="button"
               disabled={isSaving}
             >
-              Annulla
+              {t.common.cancel}
             </Button>
             <Button type="submit" disabled={isSaving}>
               {isSaving
-                ? "Salvataggio..."
+                ? t.common.saving
                 : mode === "create"
-                  ? "Crea distillato"
-                  : "Salva modifiche"}
+                  ? t.spirits.form.create
+                  : t.common.saveChanges}
             </Button>
           </div>
         </form>

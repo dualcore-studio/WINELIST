@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/layout/app-shell";
+import { I18nProvider } from "@/lib/i18n/provider";
+import { getServerI18n } from "@/lib/i18n/server";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -22,11 +24,14 @@ export const metadata: Metadata = {
   description: "Wine list admin"
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const { lang } = await getServerI18n();
   return (
-    <html lang="it" className={`${dmSans.variable} ${displaySerif.variable}`}>
+    <html lang={lang} className={`${dmSans.variable} ${displaySerif.variable}`}>
       <body className="min-h-dvh antialiased">
-        <AppShell>{children}</AppShell>
+        <I18nProvider initialLang={lang}>
+          <AppShell>{children}</AppShell>
+        </I18nProvider>
       </body>
     </html>
   );

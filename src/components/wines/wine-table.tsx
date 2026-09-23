@@ -1,6 +1,8 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { TableScrollArea } from "@/components/ui/table-scroll-area";
-import { cn, formatPriceEur } from "@/lib/utils";
+import { countryLabel, formatPrice, wineTypeLabel } from "@/lib/i18n/format";
+import { useI18n } from "@/lib/i18n/provider";
+import { cn } from "@/lib/utils";
 import { formatVintage, type Wine } from "@/types/wine";
 
 type Props = {
@@ -58,11 +60,12 @@ export function WineTable({
   onDeleteRequest,
   className
 }: Props) {
+  const { t, lang } = useI18n();
   if (isLoading) {
     return (
       <div className={cn(tableRoot, className)}>
         <div className={cn(messageCardShell, "flex min-h-0 flex-1 items-center justify-center p-7")}>
-          <p className="text-[15px] text-neutral-600">Caricamento vini da InstantDB...</p>
+          <p className="text-[15px] text-neutral-600">{t.wines.loading}</p>
         </div>
       </div>
     );
@@ -72,9 +75,7 @@ export function WineTable({
     return (
       <div className={cn(tableRoot, className)}>
         <div className={cn(messageCardShell, "flex min-h-0 flex-1 items-center justify-center p-7")}>
-          <p className="text-[15px] text-neutral-600">
-            Nessun vino trovato con i filtri correnti.
-          </p>
+          <p className="text-[15px] text-neutral-600">{t.wines.empty}</p>
         </div>
       </div>
     );
@@ -92,17 +93,17 @@ export function WineTable({
             >
               <thead>
                 <tr>
-                  <th className={cn(thBase, "w-[3.5rem] text-right")}>Bin</th>
-                  <th className={cn(thBase, "text-left")}>Nome vino</th>
-                  <th className={cn(thBase, "text-left")}>Cantina</th>
-                  <th className={cn(thBase, "text-left")}>Categoria</th>
-                  <th className={cn(thBase, "w-[4rem] text-right")}>Annata</th>
-                  <th className={cn(thBase, "text-left")}>Tipologia</th>
-                  <th className={cn(thBase, "text-left")}>Nazione</th>
-                  <th className={cn(thBase, "text-left")}>Regione</th>
-                  <th className={cn(thBase, "w-[4.5rem] text-right")}>Prezzo</th>
-                  <th className={cn(thBase, "w-[3rem] text-right")}>Qtà</th>
-                  <th className={cn(thBase, "w-[4.5rem] text-center")}>Azioni</th>
+                  <th className={cn(thBase, "w-[3.5rem] text-right")}>{t.wines.col.bin}</th>
+                  <th className={cn(thBase, "text-left")}>{t.wines.col.name}</th>
+                  <th className={cn(thBase, "text-left")}>{t.wines.col.winery}</th>
+                  <th className={cn(thBase, "text-left")}>{t.wines.col.category}</th>
+                  <th className={cn(thBase, "w-[4rem] text-right")}>{t.wines.col.vintage}</th>
+                  <th className={cn(thBase, "text-left")}>{t.wines.col.type}</th>
+                  <th className={cn(thBase, "text-left")}>{t.wines.col.country}</th>
+                  <th className={cn(thBase, "text-left")}>{t.wines.col.region}</th>
+                  <th className={cn(thBase, "w-[4.5rem] text-right")}>{t.wines.col.price}</th>
+                  <th className={cn(thBase, "w-[3rem] text-right")}>{t.common.qty}</th>
+                  <th className={cn(thBase, "w-[4.5rem] text-center")}>{t.common.actions}</th>
                 </tr>
               </thead>
               <tbody className="relative z-0 [&_tr:first-child>td]:border-t-0">
@@ -146,10 +147,10 @@ export function WineTable({
                       {formatVintage(wine.vintage) || "—"}
                     </td>
                     <td className={cn(cellPad, cellWrap, "bg-inherit text-left")}>
-                      {wine.type}
+                      {wineTypeLabel(wine.type, lang)}
                     </td>
                     <td className={cn(cellPad, cellWrap, "bg-inherit text-left")}>
-                      {wine.country}
+                      {countryLabel(wine.country, lang)}
                     </td>
                     <td className={cn(cellPad, cellWrap, "bg-inherit text-left")}>
                       {wine.region}
@@ -161,7 +162,7 @@ export function WineTable({
                         "bg-inherit text-right tabular-nums text-neutral-800"
                       )}
                     >
-                      {formatPriceEur(wine.price)}
+                      {formatPrice(wine.price, lang)}
                     </td>
                     <td className={cn(cellPad, cellNowrap, "bg-inherit text-right")}>
                       <span
@@ -178,7 +179,7 @@ export function WineTable({
                         <button
                           type="button"
                           className="rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800 disabled:pointer-events-none disabled:opacity-40"
-                          aria-label={`Modifica ${wine.name}`}
+                          aria-label={t.common.editItem(wine.name)}
                           onClick={() => onEdit(wine)}
                           disabled={deletingWineId === wine.id}
                         >
@@ -187,7 +188,7 @@ export function WineTable({
                         <button
                           type="button"
                           className="rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-red-700 disabled:pointer-events-none disabled:opacity-40"
-                          aria-label={`Elimina ${wine.name}`}
+                          aria-label={t.common.deleteItem(wine.name)}
                           onClick={() => onDeleteRequest(wine)}
                           disabled={deletingWineId === wine.id}
                         >

@@ -4,6 +4,9 @@ import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LanguageSwitch } from "@/components/layout/language-switch";
+import { readApiError } from "@/lib/i18n/dictionaries";
+import { useI18n } from "@/lib/i18n/provider";
 
 type Props = {
   redirectTo: string;
@@ -11,6 +14,7 @@ type Props = {
 
 export function LoginView({ redirectTo }: Props) {
   const router = useRouter();
+  const { t } = useI18n();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -27,15 +31,14 @@ export function LoginView({ redirectTo }: Props) {
         body: JSON.stringify({ username, password })
       });
       if (!res.ok) {
-        const data = (await res.json().catch(() => null)) as { error?: string } | null;
-        setError(data?.error ?? "Accesso non riuscito. Riprova.");
+        setError(await readApiError(res, t));
         setIsSubmitting(false);
         return;
       }
       router.push(redirectTo);
       router.refresh();
     } catch {
-      setError("Accesso non riuscito. Riprova.");
+      setError(t.login.failed);
       setIsSubmitting(false);
     }
   }
@@ -43,15 +46,18 @@ export function LoginView({ redirectTo }: Props) {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-paper p-4">
       <div className="w-full max-w-sm rounded-xl2 border border-neutral-200 bg-white p-6 shadow-soft">
-        <div className="mb-4">
-          <h1 className="font-display text-xl font-semibold text-text">Wine List Manager</h1>
-          <p className="mt-1 text-sm text-neutral-500">Accedi con le tue credenziali.</p>
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <h1 className="font-display text-xl font-semibold text-text">Wine List Manager</h1>
+            <p className="mt-1 text-sm text-neutral-500">{t.login.subtitle}</p>
+          </div>
+          <LanguageSwitch tone="light" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-700" htmlFor="login-username">
-              Username
+              {t.login.username}
             </label>
             <Input
               id="login-username"
@@ -65,7 +71,7 @@ export function LoginView({ redirectTo }: Props) {
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-700" htmlFor="login-password">
-              Password
+              {t.login.password}
             </label>
             <Input
               id="login-password"
@@ -84,7 +90,7 @@ export function LoginView({ redirectTo }: Props) {
           ) : null}
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Accesso..." : "Accedi"}
+            {isSubmitting ? t.login.submitting : t.login.submit}
           </Button>
         </form>
       </div>

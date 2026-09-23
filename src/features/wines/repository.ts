@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { db, id, isInstantConfigured } from "@/lib/instant/client";
+import { useI18n } from "@/lib/i18n/provider";
 import { compareBins, type Wine, type WineCategory, type WineType } from "@/types/wine";
 
 const WINE_TYPES: readonly WineType[] = [
@@ -174,6 +175,7 @@ function resolveCollectionTag(record: InstantWineRecord): string {
 }
 
 export function useWines(collection: string = DEFAULT_WINES_COLLECTION): UseWinesResult {
+  const { t } = useI18n();
   if (!isInstantConfigured || !db) {
     return {
       wines: [],
@@ -200,7 +202,7 @@ export function useWines(collection: string = DEFAULT_WINES_COLLECTION): UseWine
   return {
     wines,
     isLoading,
-    error: error ? "Impossibile caricare i dati da InstantDB." : null
+    error: error ? t.common.loadFailed : null
   };
 }
 

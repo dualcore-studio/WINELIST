@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { countryLabel, wineTypeLabel } from "@/lib/i18n/format";
+import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 import type { Wine } from "@/types/wine";
 
@@ -30,6 +32,7 @@ type Props = {
 };
 
 export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props) {
+  const { t, lang } = useI18n();
   const regions = useMemo(
     () => {
       const source = filters.country
@@ -76,19 +79,19 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
           Bin · Nome vino · Cantina · Categoria · Vitigno · Annata · Tipologia · Nazione · Regione
         */}
         <Input
-          placeholder="Bin"
+          placeholder={t.wines.col.bin}
           value={filters.binNumber}
           onChange={(e) => onFiltersChange({ ...filters, binNumber: e.target.value })}
           className={cn(field, "max-w-[4.5rem] shrink-0")}
         />
         <Input
-          placeholder="Nome vino"
+          placeholder={t.wines.col.name}
           value={filters.name}
           onChange={(e) => onFiltersChange({ ...filters, name: e.target.value })}
           className={field}
         />
         <Input
-          placeholder="Cantina"
+          placeholder={t.wines.col.winery}
           value={filters.winery}
           onChange={(e) => onFiltersChange({ ...filters, winery: e.target.value })}
           className={field}
@@ -98,7 +101,7 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
           onChange={(e) => onFiltersChange({ ...filters, category: e.target.value })}
           className={cn(selectBase, "h-10")}
         >
-          <option value="">Categoria</option>
+          <option value="">{t.wines.col.category}</option>
           {categories.map((category) => (
             <option key={category} value={category}>
               {category}
@@ -106,13 +109,13 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
           ))}
         </select>
         <Input
-          placeholder="Vitigno"
+          placeholder={t.wines.col.grape}
           value={filters.categoryText}
           onChange={(e) => onFiltersChange({ ...filters, categoryText: e.target.value })}
           className={field}
         />
         <Input
-          placeholder="Annata"
+          placeholder={t.wines.col.vintage}
           value={filters.vintage}
           onChange={(e) => onFiltersChange({ ...filters, vintage: e.target.value })}
           className={cn(field, "max-w-[4.5rem] shrink-0")}
@@ -122,10 +125,10 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
           onChange={(e) => onFiltersChange({ ...filters, type: e.target.value })}
           className={cn(selectBase, "h-10")}
         >
-          <option value="">Tipologia</option>
+          <option value="">{t.wines.col.type}</option>
           {types.map((type) => (
             <option key={type} value={type}>
-              {type}
+              {wineTypeLabel(type, lang)}
             </option>
           ))}
         </select>
@@ -147,10 +150,10 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
           }}
           className={cn(selectBase, "h-10")}
         >
-          <option value="">Nazione</option>
+          <option value="">{t.wines.col.country}</option>
           {countries.map((country) => (
             <option key={country} value={country}>
-              {country}
+              {countryLabel(country, lang)}
             </option>
           ))}
         </select>
@@ -159,7 +162,7 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
           onChange={(e) => onFiltersChange({ ...filters, region: e.target.value })}
           className={cn(selectBase, "h-10")}
         >
-          <option value="">Regione</option>
+          <option value="">{t.wines.col.region}</option>
           {regions.map((region) => (
             <option key={region} value={region}>
               {region}
@@ -167,13 +170,13 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
           ))}
         </select>
         <Input
-          placeholder="Q.min"
+          placeholder={t.common.qtyMin}
           value={filters.quantityMin}
           onChange={(e) => onFiltersChange({ ...filters, quantityMin: e.target.value })}
           className={cn(field, "max-w-[4rem] shrink-0")}
         />
         <Input
-          placeholder="Q.max"
+          placeholder={t.common.qtyMax}
           value={filters.quantityMax}
           onChange={(e) => onFiltersChange({ ...filters, quantityMax: e.target.value })}
           className={cn(field, "max-w-[4rem] shrink-0")}
@@ -185,15 +188,15 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
             onChange={(e) => onFiltersChange({ ...filters, onlyAvailable: e.target.checked })}
             className="h-4 w-4 shrink-0 rounded border-neutral-300"
           />
-          Solo disp.
+          {t.wines.onlyAvailable}
         </label>
         <button
           type="button"
           onClick={onReset}
           style={{ backgroundColor: "#dc2626", width: 40, height: 40, padding: 0 }}
           className="ml-2 box-border inline-flex aspect-square shrink-0 items-center justify-center rounded-lg !text-white shadow-sm transition-colors hover:!bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/40"
-          aria-label="Reimposta filtri"
-          title="Reimposta filtri"
+          aria-label={t.common.resetFilters}
+          title={t.common.resetFilters}
         >
           <RotateCcw className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
         </button>

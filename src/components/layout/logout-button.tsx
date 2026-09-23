@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
+import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 
 export function LogoutButton({ className, iconOnly = false }: Props) {
   const router = useRouter();
+  const { t } = useI18n();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   async function handleLogout() {
@@ -33,11 +35,11 @@ export function LogoutButton({ className, iconOnly = false }: Props) {
         "inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:opacity-60",
         className
       )}
-      title="Esci"
-      aria-label="Esci"
+      title={t.nav.logout}
+      aria-label={t.nav.logout}
     >
       <LogOut className="size-4" aria-hidden />
-      {iconOnly ? null : "Esci"}
+      {iconOnly ? null : t.nav.logout}
     </button>
   );
 }

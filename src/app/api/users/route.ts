@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getAdminDb, findUserByUsername, id, listAppUsers } from "@/lib/instant/admin";
 import { hashPassword } from "@/lib/auth/password";
 import { AUTH_COOKIE_NAME, verifySessionCookie } from "@/lib/auth/session";
+import { apiError } from "@/lib/api-errors";
 
 function requireAdmin(request: NextRequest) {
   const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
@@ -12,7 +13,7 @@ function requireAdmin(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   if (!requireAdmin(request)) {
-    return NextResponse.json({ error: "Permessi insufficienti." }, { status: 403 });
+    return apiError("forbidden", 403);
   }
 
   const users = await listAppUsers();
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   if (!requireAdmin(request)) {
-    return NextResponse.json({ error: "Permessi insufficienti." }, { status: 403 });
+    return apiError("forbidden", 403);
   }
 
   const body = (await request.json().catch(() => null)) as
@@ -37,14 +38,14 @@ export async function POST(request: NextRequest) {
   const isAdmin = Boolean(body?.isAdmin);
 
   if (!username || !password) {
-    return NextResponse.json({ error: "Username e password sono obbligatori." }, { status: 400 });
+    return apiError("username_password_required", 400);
   }
   if (password.length < 8) {
-    return NextResponse.json({ error: "La password deve avere almeno 8 caratteri." }, { status: 400 });
+    return apiError("password_too_short", 400);
   }
 
   if (await findUserByUsername(username)) {
-    return NextResponse.json({ error: "Username già in uso." }, { status: 409 });
+    return apiError("username_taken", 409);
   }
 
   const newId = id();

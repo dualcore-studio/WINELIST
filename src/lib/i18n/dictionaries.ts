@@ -1,0 +1,525 @@
+import type { Lang } from "@/lib/i18n/config";
+
+/**
+ * Testi dell'interfaccia. L'italiano è il riferimento: il dizionario inglese ha lo stesso tipo,
+ * quindi una chiave mancante è un errore di compilazione. I testi con parametri sono funzioni.
+ */
+const it = {
+  common: {
+    cancel: "Annulla",
+    save: "Salva",
+    saving: "Salvataggio...",
+    saveChanges: "Salva modifiche",
+    edit: "Modifica",
+    delete: "Elimina",
+    deleting: "Eliminazione...",
+    loading: "Caricamento...",
+    close: "Chiudi",
+    print: "Stampa",
+    actions: "Azioni",
+    operationFailed: "Operazione non riuscita. Riprova.",
+    loadFailed: "Impossibile caricare i dati da InstantDB.",
+    saveFailed: "Salvataggio non riuscito.",
+    resetFilters: "Reimposta filtri",
+    backToWineList: "← Torna alla wine list",
+    confirmDeleteTitle: "Conferma eliminazione",
+    confirmDeleteText: (name: string) =>
+      `Vuoi eliminare definitivamente "${name}"? Il record verrà rimosso dal database e non potrà essere recuperato.`,
+    editItem: (name: string) => `Modifica ${name}`,
+    deleteItem: (name: string) => `Elimina ${name}`,
+    useCustom: (value: string) => `Usa "${value}"`,
+    searchOrSelect: "Cerca o seleziona…",
+    qty: "Qtà",
+    qtyMin: "Q.min",
+    qtyMax: "Q.max"
+  },
+  nav: {
+    mainNavigation: "Navigazione principale",
+    wineList: "Wine List",
+    spirits: "Distillati",
+    settings: "Impostazioni",
+    users: "Utenti",
+    logout: "Esci",
+    comingSoon: "Sezione in arrivo",
+    language: "Lingua"
+  },
+  wines: {
+    heading: "Wine List Manager",
+    description: "Cerca, filtra e organizza l'elenco vini del ristorante.",
+    add: "+ Aggiungi vino",
+    loading: "Caricamento vini da InstantDB...",
+    empty: "Nessun vino trovato con i filtri correnti.",
+    col: {
+      bin: "Bin",
+      name: "Nome vino",
+      winery: "Cantina",
+      category: "Categoria",
+      grape: "Vitigno",
+      vintage: "Annata",
+      type: "Tipologia",
+      country: "Nazione",
+      region: "Regione",
+      price: "Prezzo",
+      glassPrice: "Prezzo calice"
+    },
+    onlyAvailable: "Solo disp.",
+    form: {
+      createTitle: "Aggiungi vino",
+      editTitle: "Modifica vino",
+      subtitle: "Gestisci i dati del vino selezionato.",
+      binLabel: "Bin Number",
+      binPlaceholder: "es. 23, GB 1, HB 2a",
+      binTaken: "Bin Number già in uso. Scegline uno libero o elimina il vino che lo occupa.",
+      selectCountry: "— Seleziona nazione —",
+      selectType: "— Seleziona tipologia —",
+      selectCategory: "— Seleziona categoria —",
+      searchType: "Cerca tipologia…",
+      searchCategory: "Cerca categoria…",
+      searchCountry: "Cerca nazione…",
+      searchRegion: "Cerca regione…",
+      selectCountryFirst: "Seleziona prima una nazione",
+      grapePlaceholder: "es. Sangiovese, Chardonnay…",
+      vintagePlaceholder: "es. 2021 o NV",
+      available: "Disponibile",
+      quantity: "Quantità",
+      create: "Crea vino",
+      errCountry: "Seleziona una nazione.",
+      errType: "Seleziona una tipologia.",
+      errName: "Compila il nome.",
+      errVintage: "Inserisci un'annata valida, NV oppure lascia vuoto.",
+      errPrice: "Inserisci un prezzo valido.",
+      errGlassPrice: "Inserisci un prezzo al calice valido.",
+      errQuantity: "Inserisci una quantità valida (minimo 0)."
+    }
+  },
+  spirits: {
+    heading: "Distillati",
+    description: "Cerca, filtra e organizza l'elenco dei distillati.",
+    add: "+ Aggiungi distillato",
+    loading: "Caricamento distillati da InstantDB...",
+    empty: "Nessun distillato trovato con i filtri correnti.",
+    col: {
+      name: "Nome distillato",
+      producer: "Produttore",
+      type: "Tipologia",
+      glassPrice: "Prezzo bicchiere",
+      bottlePrice: "Prezzo bottiglia"
+    },
+    filter: {
+      glassMax: "Prezzo bicch. max",
+      bottleMax: "Prezzo bott. max",
+      allOf: (family: string) => `${family} (tutte)`
+    },
+    form: {
+      createTitle: "Aggiungi distillato",
+      editTitle: "Modifica distillato",
+      subtitle: "Inserisci i dati del distillato.",
+      name: "Nome Distillato",
+      namePlaceholder: "es. Grappa di Barolo",
+      producer: "Produttore",
+      producerPlaceholder: "es. Nonino",
+      type: "Tipologia",
+      typePlaceholder: "es. Grappa, Cognac, Whisky...",
+      glassPrice: "Prezzo al Bicchiere",
+      bottlePrice: "Prezzo Bottiglia",
+      quantity: "Quantità",
+      create: "Crea distillato",
+      errName: "Inserisci il nome del distillato.",
+      errProducer: "Inserisci il produttore.",
+      errBottlePrice: "Inserisci un prezzo bottiglia valido (minimo 0).",
+      errGlassPrice: "Inserisci un prezzo al bicchiere valido (minimo 0).",
+      errQuantity: "Inserisci una quantità valida (minimo 0)."
+    }
+  },
+  print: {
+    menu: {
+      cartaWines: "Carta dei vini",
+      cartaWinesDesc: "Per il cliente: vini disponibili, formato Letter",
+      cartaSpirits: "Carta dei distillati",
+      cartaSpiritsDesc: "Per il cliente: distillati disponibili, formato Letter",
+      internal: "Uso interno",
+      internalWinesDesc: "Lista filtrata con tutte le colonne, quantità incluse",
+      internalSpiritsDesc: "Distillati filtrati con prezzi e quantità"
+    },
+    previewLetter: "anteprima di stampa, formato Letter",
+    previewLandscape: "anteprima, Letter orizzontale",
+    cartaLoading: "Caricamento della carta…",
+    internal: {
+      toolbarTitle: "Stampa uso interno",
+      winesTitle: "Lista vini · uso interno",
+      spiritsTitle: "Distillati · uso interno",
+      printedAt: (when: string) => `Stampata il ${when}`,
+      wineCount: (n: number) => `${n} ${n === 1 ? "vino" : "vini"}`,
+      spiritCount: (n: number) => `${n} ${n === 1 ? "distillato" : "distillati"}`,
+      filters: "Filtri:",
+      noFilters: "nessuno",
+      noItems: "Nessun elemento con i filtri correnti.",
+      wine: "Vino",
+      spirit: "Distillato",
+      grapeCategory: "Vitigno · Cat.",
+      glass: "Calice",
+      bottle: "Bottiglia",
+      count: "Conteggio",
+      soldOut: "esaurito",
+      labels: "Etichette",
+      bottles: "Bottiglie totali",
+      stockValue: "Valore magazzino (prezzi di carta)",
+      lowStock: (n: number) => `Quantità in grassetto: sotto ${n} bottiglie.`,
+      orderByBin: "Ordine per bin.",
+      orderByCarta: "Ordine della carta."
+    },
+    filterSummary: {
+      bin: "Bin",
+      name: "Nome",
+      winery: "Cantina",
+      grapeCategory: "Vitigno/Cat.",
+      type: "Tipologia",
+      country: "Nazione",
+      region: "Regione",
+      category: "Categoria",
+      vintage: "Annata",
+      onlyAvailable: "Solo disponibili",
+      producer: "Produttore",
+      glassMax: "Prezzo bicch. max",
+      bottleMax: "Prezzo bott. max"
+    }
+  },
+  login: {
+    subtitle: "Accedi con le tue credenziali.",
+    username: "Username",
+    password: "Password",
+    submit: "Accedi",
+    submitting: "Accesso...",
+    failed: "Accesso non riuscito. Riprova."
+  },
+  users: {
+    title: "Utenti",
+    description: "Crea, modifica ed elimina gli account che possono accedere all'app.",
+    listTitle: "Elenco utenti",
+    listDescription:
+      "Gli amministratori possono gestire tutti gli utenti, incluso se stessi (tranne l'auto-eliminazione).",
+    add: "Aggiungi utente",
+    empty: "Nessun utente configurato.",
+    you: "(tu)",
+    admin: "Admin",
+    loadFailed: "Impossibile caricare gli utenti.",
+    deleteFailed: "Impossibile eliminare l'utente.",
+    confirmDelete: (username: string) => `Eliminare l'utente "${username}"? L'azione non è reversibile.`,
+    form: {
+      createTitle: "Aggiungi utente",
+      editTitle: "Modifica utente",
+      subtitle: "Gestisci le credenziali di accesso.",
+      username: "Username",
+      password: "Password",
+      newPassword: "Nuova password",
+      keepPassword: "Lascia vuoto per non cambiarla",
+      isAdmin: "Amministratore",
+      create: "Crea utente",
+      errUsername: "Inserisci un username.",
+      errPassword: "Inserisci una password di almeno 8 caratteri.",
+      errNewPassword: "La nuova password deve avere almeno 8 caratteri."
+    }
+  },
+  settings: {
+    title: "Impostazioni",
+    description: 'Gestisci le categorie che compaiono nella barra di navigazione accanto a "Winelist".',
+    sectionTitle: "Categorie winelist",
+    sectionDescription:
+      "Aggiungi nuove categorie o elimina quelle esistenti. Le voci compaiono subito nel menu in alto e sono salvate in InstantDB (stesso elenco su Vercel e su ogni dispositivo).",
+    reset: "Ripristina default",
+    resetTitle: "Ripristina: nessuna categoria extra (solo Wine List e Distillati fissi)",
+    resetConfirm: "Vuoi ripristinare le categorie predefinite? Le categorie correnti verranno sostituite.",
+    newName: "Nome nuova categoria",
+    newPlaceholder: "Es. Port and Sherry",
+    add: "Aggiungi categoria",
+    empty: "Nessuna categoria configurata.",
+    categoryName: (label: string) => `Nome categoria ${label}`,
+    confirmEdit: "Conferma modifica",
+    confirm: "Conferma",
+    cancelEdit: "Annulla modifica",
+    rename: "Modifica nome"
+  },
+  /** Errori delle API, per codice (il server manda anche il testo italiano come ripiego). */
+  apiErrors: {
+    missing_credentials: "Inserisci username e password.",
+    invalid_credentials: "Credenziali non valide.",
+    forbidden: "Permessi insufficienti.",
+    unauthenticated: "Non autenticato.",
+    user_not_found: "Utente non trovato.",
+    invalid_body: "Corpo richiesta non valido.",
+    username_password_required: "Username e password sono obbligatori.",
+    password_too_short: "La password deve avere almeno 8 caratteri.",
+    invalid_username: "Username non valido.",
+    username_taken: "Username già in uso.",
+    last_admin_demote: "Non puoi rimuovere i permessi all'unico amministratore rimasto.",
+    nothing_to_update: "Nessuna modifica da applicare.",
+    cannot_delete_self: "Non puoi eliminare il tuo stesso account.",
+    last_admin_delete: "Non puoi eliminare l'unico amministratore rimasto."
+  }
+};
+
+export type Dictionary = typeof it;
+
+const en: Dictionary = {
+  common: {
+    cancel: "Cancel",
+    save: "Save",
+    saving: "Saving...",
+    saveChanges: "Save changes",
+    edit: "Edit",
+    delete: "Delete",
+    deleting: "Deleting...",
+    loading: "Loading...",
+    close: "Close",
+    print: "Print",
+    actions: "Actions",
+    operationFailed: "Something went wrong. Please try again.",
+    loadFailed: "Could not load data from InstantDB.",
+    saveFailed: "Could not save.",
+    resetFilters: "Reset filters",
+    backToWineList: "← Back to the wine list",
+    confirmDeleteTitle: "Confirm deletion",
+    confirmDeleteText: (name: string) =>
+      `Permanently delete "${name}"? The record will be removed from the database and cannot be recovered.`,
+    editItem: (name: string) => `Edit ${name}`,
+    deleteItem: (name: string) => `Delete ${name}`,
+    useCustom: (value: string) => `Use "${value}"`,
+    searchOrSelect: "Search or select…",
+    qty: "Qty",
+    qtyMin: "Min qty",
+    qtyMax: "Max qty"
+  },
+  nav: {
+    mainNavigation: "Main navigation",
+    wineList: "Wine List",
+    spirits: "Spirits",
+    settings: "Settings",
+    users: "Users",
+    logout: "Log out",
+    comingSoon: "Coming soon",
+    language: "Language"
+  },
+  wines: {
+    heading: "Wine List Manager",
+    description: "Search, filter and organize the restaurant's wine list.",
+    add: "+ Add wine",
+    loading: "Loading wines from InstantDB...",
+    empty: "No wines match the current filters.",
+    col: {
+      bin: "Bin",
+      name: "Wine",
+      winery: "Winery",
+      category: "Category",
+      grape: "Grape",
+      vintage: "Vintage",
+      type: "Type",
+      country: "Country",
+      region: "Region",
+      price: "Price",
+      glassPrice: "Glass price"
+    },
+    onlyAvailable: "In stock",
+    form: {
+      createTitle: "Add wine",
+      editTitle: "Edit wine",
+      subtitle: "Manage the details of the selected wine.",
+      binLabel: "Bin Number",
+      binPlaceholder: "e.g. 23, GB 1, HB 2a",
+      binTaken: "This Bin Number is already taken. Pick a free one or delete the wine that uses it.",
+      selectCountry: "— Select country —",
+      selectType: "— Select type —",
+      selectCategory: "— Select category —",
+      searchType: "Search type…",
+      searchCategory: "Search category…",
+      searchCountry: "Search country…",
+      searchRegion: "Search region…",
+      selectCountryFirst: "Select a country first",
+      grapePlaceholder: "e.g. Sangiovese, Chardonnay…",
+      vintagePlaceholder: "e.g. 2021 or NV",
+      available: "Available",
+      quantity: "Quantity",
+      create: "Create wine",
+      errCountry: "Select a country.",
+      errType: "Select a type.",
+      errName: "Enter the name.",
+      errVintage: "Enter a valid vintage, NV, or leave it empty.",
+      errPrice: "Enter a valid price.",
+      errGlassPrice: "Enter a valid glass price.",
+      errQuantity: "Enter a valid quantity (0 or more)."
+    }
+  },
+  spirits: {
+    heading: "Spirits",
+    description: "Search, filter and organize the spirits list.",
+    add: "+ Add spirit",
+    loading: "Loading spirits from InstantDB...",
+    empty: "No spirits match the current filters.",
+    col: {
+      name: "Spirit",
+      producer: "Producer",
+      type: "Type",
+      glassPrice: "Glass price",
+      bottlePrice: "Bottle price"
+    },
+    filter: {
+      glassMax: "Max glass price",
+      bottleMax: "Max bottle price",
+      allOf: (family: string) => `${family} (all)`
+    },
+    form: {
+      createTitle: "Add spirit",
+      editTitle: "Edit spirit",
+      subtitle: "Enter the spirit's details.",
+      name: "Spirit name",
+      namePlaceholder: "e.g. Grappa di Barolo",
+      producer: "Producer",
+      producerPlaceholder: "e.g. Nonino",
+      type: "Type",
+      typePlaceholder: "e.g. Grappa, Cognac, Whisky...",
+      glassPrice: "Glass price",
+      bottlePrice: "Bottle price",
+      quantity: "Quantity",
+      create: "Create spirit",
+      errName: "Enter the spirit's name.",
+      errProducer: "Enter the producer.",
+      errBottlePrice: "Enter a valid bottle price (0 or more).",
+      errGlassPrice: "Enter a valid glass price (0 or more).",
+      errQuantity: "Enter a valid quantity (0 or more)."
+    }
+  },
+  print: {
+    menu: {
+      cartaWines: "Wine list",
+      cartaWinesDesc: "For guests: wines in stock, Letter size",
+      cartaSpirits: "Spirits list",
+      cartaSpiritsDesc: "For guests: spirits in stock, Letter size",
+      internal: "Internal use",
+      internalWinesDesc: "Filtered list with every column, quantities included",
+      internalSpiritsDesc: "Filtered spirits with prices and quantities"
+    },
+    previewLetter: "print preview, Letter size",
+    previewLandscape: "preview, Letter landscape",
+    cartaLoading: "Loading the list…",
+    internal: {
+      toolbarTitle: "Internal print",
+      winesTitle: "Wine list · internal use",
+      spiritsTitle: "Spirits · internal use",
+      printedAt: (when: string) => `Printed on ${when}`,
+      wineCount: (n: number) => `${n} ${n === 1 ? "wine" : "wines"}`,
+      spiritCount: (n: number) => `${n} ${n === 1 ? "spirit" : "spirits"}`,
+      filters: "Filters:",
+      noFilters: "none",
+      noItems: "Nothing matches the current filters.",
+      wine: "Wine",
+      spirit: "Spirit",
+      grapeCategory: "Grape · Cat.",
+      glass: "Glass",
+      bottle: "Bottle",
+      count: "Count",
+      soldOut: "sold out",
+      labels: "Labels",
+      bottles: "Total bottles",
+      stockValue: "Stock value (list prices)",
+      lowStock: (n: number) => `Bold quantities: fewer than ${n} bottles.`,
+      orderByBin: "Sorted by bin.",
+      orderByCarta: "Sorted as on the list."
+    },
+    filterSummary: {
+      bin: "Bin",
+      name: "Name",
+      winery: "Winery",
+      grapeCategory: "Grape/Cat.",
+      type: "Type",
+      country: "Country",
+      region: "Region",
+      category: "Category",
+      vintage: "Vintage",
+      onlyAvailable: "In stock only",
+      producer: "Producer",
+      glassMax: "Max glass price",
+      bottleMax: "Max bottle price"
+    }
+  },
+  login: {
+    subtitle: "Sign in with your credentials.",
+    username: "Username",
+    password: "Password",
+    submit: "Sign in",
+    submitting: "Signing in...",
+    failed: "Sign-in failed. Please try again."
+  },
+  users: {
+    title: "Users",
+    description: "Create, edit and delete the accounts that can access the app.",
+    listTitle: "User list",
+    listDescription: "Admins can manage every user, themselves included (except deleting their own account).",
+    add: "Add user",
+    empty: "No users yet.",
+    you: "(you)",
+    admin: "Admin",
+    loadFailed: "Could not load users.",
+    deleteFailed: "Could not delete the user.",
+    confirmDelete: (username: string) => `Delete user "${username}"? This cannot be undone.`,
+    form: {
+      createTitle: "Add user",
+      editTitle: "Edit user",
+      subtitle: "Manage sign-in credentials.",
+      username: "Username",
+      password: "Password",
+      newPassword: "New password",
+      keepPassword: "Leave empty to keep it",
+      isAdmin: "Admin",
+      create: "Create user",
+      errUsername: "Enter a username.",
+      errPassword: "Enter a password of at least 8 characters.",
+      errNewPassword: "The new password must be at least 8 characters."
+    }
+  },
+  settings: {
+    title: "Settings",
+    description: 'Manage the categories shown in the navigation bar next to "Winelist".',
+    sectionTitle: "Wine list categories",
+    sectionDescription:
+      "Add new categories or delete existing ones. They appear in the top menu right away and are saved in InstantDB (same list on Vercel and on every device).",
+    reset: "Restore defaults",
+    resetTitle: "Restore: no extra categories (only the fixed Wine List and Spirits)",
+    resetConfirm: "Restore the default categories? The current categories will be replaced.",
+    newName: "New category name",
+    newPlaceholder: "e.g. Port and Sherry",
+    add: "Add category",
+    empty: "No categories yet.",
+    categoryName: (label: string) => `Category name ${label}`,
+    confirmEdit: "Confirm edit",
+    confirm: "Confirm",
+    cancelEdit: "Cancel edit",
+    rename: "Rename"
+  },
+  apiErrors: {
+    missing_credentials: "Enter username and password.",
+    invalid_credentials: "Invalid credentials.",
+    forbidden: "You don't have permission to do this.",
+    unauthenticated: "Not signed in.",
+    user_not_found: "User not found.",
+    invalid_body: "Invalid request.",
+    username_password_required: "Username and password are required.",
+    password_too_short: "The password must be at least 8 characters.",
+    invalid_username: "Invalid username.",
+    username_taken: "Username already taken.",
+    last_admin_demote: "You can't remove admin rights from the only remaining admin.",
+    nothing_to_update: "Nothing to update.",
+    cannot_delete_self: "You can't delete your own account.",
+    last_admin_delete: "You can't delete the only remaining admin."
+  }
+};
+
+export const dictionaries: Record<Lang, Dictionary> = { it, en };
+
+export type ApiErrorCode = keyof Dictionary["apiErrors"];
+
+/** Messaggio d'errore di una risposta API nella lingua scelta (codice → testo, altrimenti testo del server). */
+export async function readApiError(res: Response, t: Dictionary): Promise<string> {
+  const data = (await res.json().catch(() => null)) as { error?: string; code?: string } | null;
+  const code = data?.code as ApiErrorCode | undefined;
+  if (code && code in t.apiErrors) return t.apiErrors[code];
+  return data?.error ?? t.common.operationFailed;
+}
