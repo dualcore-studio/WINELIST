@@ -53,3 +53,13 @@ body {
     -moz-appearance: textfield;
   }
 }
+
+/* Scrollbar nativa nascosta nelle tabelle: la sostituisce TableScrollArea, disegnata sopra le righe. */
+@layer components {
+  .table-scroll {
+    scrollbar-width: none;
+  }
+  .table-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}

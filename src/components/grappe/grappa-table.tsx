@@ -1,4 +1,5 @@
 import { Pencil, Trash2 } from "lucide-react";
+import { TableScrollArea } from "@/components/ui/table-scroll-area";
 import { cn, formatPriceEur } from "@/lib/utils";
 import type { Wine } from "@/types/wine";
 
@@ -19,7 +20,7 @@ const messageCardShell =
 
 /** Card tabella: larghezza piena del wrapper, coerente con la card filtri. */
 const tableCardShell =
-  "flex w-full min-w-0 min-h-0 flex-col rounded-[12px] border border-neutral-200 bg-white shadow-soft";
+  "flex w-full min-w-0 min-h-0 flex-col overflow-hidden rounded-[12px] border border-neutral-200 bg-white shadow-soft";
 
 const cellPad = "px-3 py-2.5 md:px-4 md:py-3";
 
@@ -90,7 +91,7 @@ export function GrappaTable({
     <div className={cn(tableRoot, className)}>
       <div className="flex h-full min-h-0 w-full flex-col">
         <div className={tableCardShell}>
-          <div className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain [-webkit-overflow-scrolling:touch]">
+          <TableScrollArea>
             <table
               className={cn(
                 "w-full table-auto border-separate border-spacing-0 text-[13px] leading-snug text-neutral-800 md:text-[14px]"
@@ -203,7 +204,7 @@ export function GrappaTable({
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScrollArea>
         </div>
       </div>
     </div>
