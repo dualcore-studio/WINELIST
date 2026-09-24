@@ -1,16 +1,15 @@
 import type { Lang } from "@/lib/i18n/config";
 
 /**
- * Prezzo in dollari (il ristorante è negli USA): "$1,500" / "$12.50" in inglese,
- * "1.500 $" / "12,50 $" in italiano.
+ * Prezzo in dollari (il ristorante è negli USA), simbolo davanti e staccato da uno spazio
+ * non divisibile: "$ 1,500" / "$ 12.50" in inglese, "$ 1.500" / "$ 12,50" in italiano.
  */
 export function formatPrice(value: number, lang: Lang): string {
   const n = Number(value);
   const safe = Number.isFinite(n) && n >= 0 ? n : 0;
   const hasCents = Math.round(safe * 100) % 100 !== 0;
   const options = { minimumFractionDigits: hasCents ? 2 : 0, maximumFractionDigits: 2 };
-  if (lang === "en") return `$${safe.toLocaleString("en-US", options)}`;
-  return `${safe.toLocaleString("it-IT", options)} $`;
+  return `$\u00A0${safe.toLocaleString(lang === "en" ? "en-US" : "it-IT", options)}`;
 }
 
 /** Data e ora nella lingua scelta (per le intestazioni di stampa). */
