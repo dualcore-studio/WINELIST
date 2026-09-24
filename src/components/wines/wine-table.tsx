@@ -96,7 +96,7 @@ export function WineTable({
             >
               <thead>
                 <tr>
-                  <th className={cn(thBase, "w-[3.5rem] text-right")}>{t.wines.col.bin}</th>
+                  <th className={cn(thBase, "w-[3.5rem] text-center")}>{t.wines.col.bin}</th>
                   <th className={cn(thBase, "text-left")}>{t.wines.col.name}</th>
                   <th className={cn(thBase, "text-left")}>{t.wines.col.winery}</th>
                   <th className={cn(thBase, "text-left")}>{t.wines.col.category}</th>
@@ -120,7 +120,7 @@ export function WineTable({
                       className={cn(
                         cellPad,
                         cellNowrap,
-                        "bg-inherit text-right tabular-nums text-neutral-800"
+                        "bg-inherit text-center tabular-nums text-neutral-800"
                       )}
                     >
                       {wine.binNumber || "—"}
