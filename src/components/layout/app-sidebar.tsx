@@ -197,11 +197,13 @@ export function AppSidebar() {
   );
 
   return (
-    <div className="relative h-dvh w-[68px] shrink-0">
+    // Lo spazio riservato alla barra cambia subito (la pagina si stringe e la tabella resta tutta visibile);
+    // l'animazione è solo sulla barra, così la tabella non viene ricalcolata a ogni fotogramma.
+    <div className={clsx("relative h-dvh shrink-0", collapsed ? "w-[68px]" : "w-[216px]")}>
       <aside
         className={clsx(
-          "absolute inset-y-0 left-0 z-50 flex flex-col overflow-hidden bg-accent transition-[width,box-shadow] duration-200 ease-out",
-          collapsed ? "w-[68px]" : "w-[216px] shadow-drawer"
+          "absolute inset-y-0 left-0 z-50 flex flex-col overflow-hidden bg-accent transition-[width] duration-200 ease-out",
+          collapsed ? "w-[68px]" : "w-[216px]"
         )}
         aria-label={t.nav.mainNavigation}
         onMouseEnter={() => scheduleExpanded(true)}
@@ -211,11 +213,14 @@ export function AppSidebar() {
           if (!e.currentTarget.contains(e.relatedTarget as Node | null)) scheduleExpanded(false);
         }}
       >
-        <div className="flex h-[84px] shrink-0 items-center gap-2.5 pl-[18px] pr-3">
-          <span
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-accent"
-            title={collapsed ? "Wine List Manager" : undefined}
-          >
+        {/* Per ora "/" porta alla wine list; diventerà la home/dashboard. */}
+        <Link
+          href="/"
+          className="flex h-[84px] shrink-0 items-center gap-2.5 pl-[18px] pr-3 transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/40"
+          aria-label="Wine List Manager"
+          title={collapsed ? "Wine List Manager" : undefined}
+        >
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-accent">
             <Wine className="size-[18px]" strokeWidth={1.75} aria-hidden />
           </span>
           {collapsed ? null : (
@@ -223,7 +228,7 @@ export function AppSidebar() {
               Wine List Manager
             </span>
           )}
-        </div>
+        </Link>
 
         <nav className={clsx("min-h-0 flex-1 overflow-y-auto", collapsed ? "px-2.5" : "px-3")}>
           <ul className="space-y-0.5">
