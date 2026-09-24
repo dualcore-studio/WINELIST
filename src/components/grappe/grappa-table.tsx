@@ -35,7 +35,7 @@ const cellNowrap = "whitespace-nowrap";
 const cellWrap = "break-words [overflow-wrap:anywhere]";
 
 const thBase =
-  "sticky top-0 z-30 whitespace-nowrap border-b border-line bg-white px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-neutral-500 md:px-4";
+  "sticky top-0 z-30 whitespace-nowrap border-b border-accent bg-accent px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-white md:px-4";
 
 const rowZebra =
   "cursor-pointer bg-white transition-colors hover:bg-canvas [&>td]:border-t [&>td]:border-line/70";

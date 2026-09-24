@@ -48,7 +48,7 @@ const cellWrap = "break-words [overflow-wrap:anywhere]";
 
 /** Sticky su ogni th rispetto al contenitore overflow-y-auto; border-separate abilita sticky sulle celle. */
 const thBase =
-  "sticky top-0 z-30 whitespace-nowrap border-b border-line bg-white px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-neutral-500 md:px-4";
+  "sticky top-0 z-30 whitespace-nowrap border-b border-accent bg-accent px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-white md:px-4";
 
 /** Zebra solido su ogni tr (niente alpha) così non si interrompe su lunghe liste. */
 const rowZebra =

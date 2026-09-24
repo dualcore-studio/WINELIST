@@ -3,17 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  createLucideIcon,
   FlaskConical,
   GlassWater,
   LayoutDashboard,
-  PanelLeftClose,
-  PanelLeftOpen,
   Settings,
   Users,
   Wine,
   type LucideIcon
 } from "lucide-react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { useExtraSections } from "@/components/layout/extra-sections-provider";
 import { LanguageSwitch } from "@/components/layout/language-switch";
@@ -30,9 +29,22 @@ import {
   type SidebarNavItem
 } from "@/lib/sidebar-nav";
 
+/** Bottiglia di vino (non presente in questa versione di lucide), stesso tratto delle altre icone. */
+const WineBottle = createLucideIcon("wine-bottle", [
+  [
+    "path",
+    {
+      d: "M10 3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a6 6 0 0 0 1.2 3.6l.6.8A6 6 0 0 1 17 13v8a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-8a6 6 0 0 1 1.2-3.6l.6-.8A6 6 0 0 0 10 5z",
+      key: "body"
+    }
+  ],
+  ["path", { d: "M17 13h-4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h4", key: "label" }]
+]);
+
 const ICON_MAP: Record<SidebarIconName, LucideIcon> = {
   LayoutDashboard,
   Wine,
+  WineBottle,
   FlaskConical,
   GlassWater,
   Settings,
@@ -70,12 +82,12 @@ function NavRow({
   );
   const state = item.href
     ? active
-      ? "bg-accent-soft text-accent"
-      : "text-neutral-600 hover:bg-canvas hover:text-text"
-    : "cursor-not-allowed text-neutral-300";
+      ? "bg-white/[0.16] text-white"
+      : "text-white/75 hover:bg-white/10 hover:text-white"
+    : "cursor-not-allowed text-white/35";
   const icon = (
     <Icon
-      className={clsx("size-[18px] shrink-0", active ? "text-accent" : "text-neutral-400 group-hover:text-neutral-600")}
+      className={clsx("size-[18px] shrink-0", active ? "text-white" : "text-white/60 group-hover:text-white")}
       strokeWidth={1.75}
       aria-hidden
     />
@@ -151,96 +163,101 @@ function useSidebarNavState() {
   return { primaryLinks, isRouteActive };
 }
 
-/** Barra laterale sinistra richiudibile: aperta mostra le etichette, chiusa solo le icone. */
-export function AppSidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+/** Ritardi di apertura/chiusura al passaggio del mouse: evitano aperture accidentali attraversando la barra. */
+const HOVER_OPEN_DELAY_MS = 120;
+const HOVER_CLOSE_DELAY_MS = 200;
+
+/**
+ * Barra laterale a scomparsa automatica: ridotta mostra solo le icone, si allarga al passaggio
+ * del mouse (o al focus da tastiera) sovrapponendosi al contenuto, senza spostare la pagina.
+ */
+export function AppSidebar() {
   const { primaryLinks, isRouteActive } = useSidebarNavState();
   const { user } = useCurrentUser();
   const { t } = useI18n();
+  const [expanded, setExpanded] = useState(false);
+  const collapsed = !expanded;
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const scheduleExpanded = useCallback((next: boolean) => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setExpanded(next), next ? HOVER_OPEN_DELAY_MS : HOVER_CLOSE_DELAY_MS);
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    []
+  );
 
   const adminLinks = useMemo(
     () => (user?.isAdmin ? [...ADMIN_NAV, ...ADMIN_ONLY_NAV] : ADMIN_NAV),
     [user]
   );
 
-  const ToggleIcon = collapsed ? PanelLeftOpen : PanelLeftClose;
-  const toggleLabel = collapsed ? t.nav.expandMenu : t.nav.collapseMenu;
-  const toggleButton = (
-    <button
-      type="button"
-      onClick={onToggle}
-      className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-canvas hover:text-text"
-      aria-label={toggleLabel}
-      aria-expanded={!collapsed}
-      title={toggleLabel}
-    >
-      <ToggleIcon className="size-[18px]" strokeWidth={1.75} aria-hidden />
-    </button>
-  );
-
   return (
-    <aside
-      className={clsx(
-        "flex h-dvh shrink-0 flex-col border-r border-line bg-white transition-[width] duration-200 ease-out",
-        collapsed ? "w-[68px]" : "w-[216px]"
-      )}
-      aria-label={t.nav.mainNavigation}
-    >
-      {collapsed ? (
-        <div className="flex flex-col items-center gap-3 pb-5 pt-6">
+    <div className="relative h-dvh w-[68px] shrink-0">
+      <aside
+        className={clsx(
+          "absolute inset-y-0 left-0 z-50 flex flex-col overflow-hidden bg-accent transition-[width,box-shadow] duration-200 ease-out",
+          collapsed ? "w-[68px]" : "w-[216px] shadow-drawer"
+        )}
+        aria-label={t.nav.mainNavigation}
+        onMouseEnter={() => scheduleExpanded(true)}
+        onMouseLeave={() => scheduleExpanded(false)}
+        onFocus={() => scheduleExpanded(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) scheduleExpanded(false);
+        }}
+      >
+        <div className="flex h-[84px] shrink-0 items-center gap-2.5 pl-[18px] pr-3">
           <span
-            className="flex size-8 items-center justify-center rounded-lg bg-accent text-white"
-            title="Wine List Manager"
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-accent"
+            title={collapsed ? "Wine List Manager" : undefined}
           >
             <Wine className="size-[18px]" strokeWidth={1.75} aria-hidden />
           </span>
-          {toggleButton}
-        </div>
-      ) : (
-        <div className="flex items-start gap-2.5 pb-6 pl-5 pr-3 pt-6">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent text-white">
-            <Wine className="size-[18px]" strokeWidth={1.75} aria-hidden />
-          </span>
-          <span className="min-w-0 flex-1 font-display text-[19px] font-bold leading-[1.05] tracking-tight text-text">
-            Wine List Manager
-          </span>
-          {toggleButton}
-        </div>
-      )}
-
-      <nav className={clsx("min-h-0 flex-1 overflow-y-auto", collapsed ? "px-2.5" : "px-3")}>
-        <ul className="space-y-0.5">
-          {primaryLinks.map((item) => (
-            <li key={item.id}>
-              <NavRow item={item} active={isRouteActive(item.href)} collapsed={collapsed} />
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      <div className={clsx("space-y-0.5 border-t border-line py-3", collapsed ? "px-2.5" : "px-3")}>
-        <ul className="space-y-0.5">
-          {adminLinks.map((item) => (
-            <li key={item.id}>
-              <NavRow item={item} active={isRouteActive(item.href)} collapsed={collapsed} />
-            </li>
-          ))}
-        </ul>
-        {user ? (
-          <LogoutButton variant="sidebar" iconOnly={collapsed} />
-        ) : null}
-        {collapsed ? (
-          <div className="flex justify-center pt-2">
-            <LanguageSwitch tone="light" vertical />
-          </div>
-        ) : (
-          <div className="flex items-center justify-between px-3 pt-2">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
-              {t.nav.language}
+          {collapsed ? null : (
+            <span className="min-w-0 flex-1 whitespace-nowrap font-display text-[19px] font-bold leading-[1.05] tracking-tight text-white">
+              Wine List Manager
             </span>
-            <LanguageSwitch tone="light" />
-          </div>
-        )}
-      </div>
-    </aside>
+          )}
+        </div>
+
+        <nav className={clsx("min-h-0 flex-1 overflow-y-auto", collapsed ? "px-2.5" : "px-3")}>
+          <ul className="space-y-0.5">
+            {primaryLinks.map((item) => (
+              <li key={item.id}>
+                <NavRow item={item} active={isRouteActive(item.href)} collapsed={collapsed} />
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className={clsx("space-y-0.5 border-t border-white/15 py-3", collapsed ? "px-2.5" : "px-3")}>
+          <ul className="space-y-0.5">
+            {adminLinks.map((item) => (
+              <li key={item.id}>
+                <NavRow item={item} active={isRouteActive(item.href)} collapsed={collapsed} />
+              </li>
+            ))}
+          </ul>
+          {user ? <LogoutButton variant="sidebar" iconOnly={collapsed} /> : null}
+          {collapsed ? (
+            <div className="flex justify-center pt-2">
+              <LanguageSwitch tone="dark" vertical />
+            </div>
+          ) : (
+            <div className="flex items-center justify-between px-3 pt-2">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-white/60">
+                {t.nav.language}
+              </span>
+              <LanguageSwitch tone="dark" />
+            </div>
+          )}
+        </div>
+      </aside>
+    </div>
   );
 }

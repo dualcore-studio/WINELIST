@@ -3,8 +3,6 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import { I18nProvider } from "@/lib/i18n/provider";
-import { cookies } from "next/headers";
-import { SIDEBAR_COOKIE } from "@/lib/i18n/config";
 import { getServerI18n } from "@/lib/i18n/server";
 import "./globals.css";
 
@@ -28,12 +26,11 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const { lang } = await getServerI18n();
-  const sidebarOpen = (await cookies()).get(SIDEBAR_COOKIE)?.value === "open";
   return (
     <html lang={lang} className={`${dmSans.variable} ${displaySerif.variable}`}>
       <body className="min-h-dvh antialiased">
         <I18nProvider initialLang={lang}>
-          <AppShell initialSidebarCollapsed={!sidebarOpen}>{children}</AppShell>
+          <AppShell>{children}</AppShell>
         </I18nProvider>
       </body>
     </html>

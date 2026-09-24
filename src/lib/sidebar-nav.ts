@@ -6,6 +6,7 @@
 export type SidebarIconName =
   | "LayoutDashboard"
   | "Wine"
+  | "WineBottle"
   | "FlaskConical"
   | "GlassWater"
   | "Settings"
@@ -24,7 +25,7 @@ export const MAIN_NAV: SidebarNavItem[] = [];
 
 /** Voci principali (link a pagine dedicate, non rimovibili dall'utente). */
 export const WINELIST_CATEGORIES: SidebarNavItem[] = [
-  { id: "winelist", label: "Wine List", href: "/wines", icon: "Wine" },
+  { id: "winelist", label: "Wine List", href: "/wines", icon: "WineBottle" },
   {
     id: "grappe-distillati",
     label: "Distillati",

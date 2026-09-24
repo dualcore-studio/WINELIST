@@ -36,7 +36,7 @@ export function LogoutButton({ className, iconOnly = false, variant = "default" 
       className={cn(
         variant === "sidebar"
           ? cn(
-              "group flex w-full items-center rounded-lg py-2 text-[13.5px] font-medium text-neutral-600 transition-colors hover:bg-canvas hover:text-text disabled:opacity-60",
+              "group flex w-full items-center rounded-lg py-2 text-[13.5px] font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-60",
               iconOnly ? "justify-center px-0" : "gap-3 px-3"
             )
           : "inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:opacity-60",
@@ -46,7 +46,7 @@ export function LogoutButton({ className, iconOnly = false, variant = "default" 
       aria-label={t.nav.logout}
     >
       <LogOut
-        className={variant === "sidebar" ? "size-[18px] text-neutral-400 group-hover:text-neutral-600" : "size-4"}
+        className={variant === "sidebar" ? "size-[18px] text-white/60 group-hover:text-white" : "size-4"}
         strokeWidth={variant === "sidebar" ? 1.75 : 2}
         aria-hidden
       />
