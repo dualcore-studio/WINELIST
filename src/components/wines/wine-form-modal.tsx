@@ -8,7 +8,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { ITALIAN_REGIONS } from "@/constants/italian-regions";
 import { countryLabel, wineTypeLabel } from "@/lib/i18n/format";
 import { useI18n } from "@/lib/i18n/provider";
-import { formatVintage, type Wine, type WineCategory, type WineType } from "@/types/wine";
+import { binKey, formatVintage, type Wine, type WineCategory, type WineType } from "@/types/wine";
 import type { WineInput } from "@/features/wines/repository";
 
 type Props = {
@@ -21,11 +21,6 @@ type Props = {
   onClose: () => void;
   onSubmit: (input: WineInput) => Promise<void>;
 };
-
-/** Bin vuoto = non assegnato; nessun vincolo di unicità. Confronto senza maiuscole/spazi ("GB1" = "gb 1"). */
-function binKey(bin: string): string {
-  return bin.replace(/\s+/g, "").toLowerCase();
-}
 
 function isBinNumberTaken(bin: string, wines: Wine[], excludeWineId?: string): boolean {
   const key = binKey(bin);

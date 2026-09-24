@@ -111,7 +111,7 @@ export function WinesClientPage() {
               <h1 className="font-display text-[34px] font-bold leading-none tracking-tight text-text">{t.wines.heading}</h1>
               <p className="mt-2 text-sm text-muted">{t.wines.description}</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <PrintMenu
                 cartaHref="/stampa/carta"
                 cartaLabel={t.print.menu.cartaWines}
@@ -125,7 +125,7 @@ export function WinesClientPage() {
               <button
                 type="button"
                 onClick={openCreate}
-                className="inline-flex h-9 items-center rounded-lg bg-accent px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-ring"
+                className="inline-flex h-9 items-center whitespace-nowrap rounded-lg bg-accent px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-ring"
               >
                 {t.wines.add}
               </button>

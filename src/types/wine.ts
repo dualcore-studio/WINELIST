@@ -59,3 +59,8 @@ export function compareBins(a: string, b: string): number {
   if (!b) return -1;
   return a.localeCompare(b, "en", { numeric: true, sensitivity: "base" });
 }
+
+/** Bin vuoto = non assegnato; nessun vincolo di unicità. Confronto senza maiuscole/spazi ("GB1" = "gb 1"). */
+export function binKey(bin: string): string {
+  return bin.replace(/\s+/g, "").toLowerCase();
+}

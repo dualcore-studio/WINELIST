@@ -90,6 +90,28 @@ const it = {
       errPrice: "Inserisci un prezzo valido.",
       errGlassPrice: "Inserisci un prezzo al calice valido.",
       errQuantity: "Inserisci una quantità valida (minimo 0)."
+    },
+    bins: {
+      title: "Bin number",
+      description:
+        "Svuota tutti i bin per riassegnarli da capo. Prima del reset viene salvato un backup, che puoi ripristinare da qui.",
+      assigned: (count: number) => `${count} vini hanno un bin assegnato.`,
+      lastBackup: (date: string, count: number) => `Ultimo backup: ${date} · ${count} bin`,
+      noBackup: "Nessun backup disponibile.",
+      reset: "Svuota tutti i bin",
+      restore: "Ripristina bin",
+      resetTitle: "Svuotare tutti i bin?",
+      resetText: (count: number) =>
+        `Il bin verrà tolto da ${count} vini. Prima viene salvato un backup: potrai rimetterli com'erano con «Ripristina bin».`,
+      resetReplacesBackup: (date: string) =>
+        `Il backup del ${date} verrà sostituito da quello nuovo e non potrà più essere ripristinato.`,
+      resetConfirm: "Svuota bin",
+      resetting: "Svuotamento...",
+      restoreTitle: "Ripristinare i bin?",
+      restoreText: (date: string) =>
+        `I vini torneranno ai bin salvati il ${date}. I bin assegnati dopo il reset verranno sovrascritti se in conflitto.`,
+      restoreConfirm: "Ripristina",
+      restoring: "Ripristino..."
     }
   },
   spirits: {
@@ -222,22 +244,7 @@ const it = {
   },
   settings: {
     title: "Impostazioni",
-    description: 'Gestisci le categorie che compaiono nella barra di navigazione accanto a "Winelist".',
-    sectionTitle: "Categorie winelist",
-    sectionDescription:
-      "Aggiungi nuove categorie o elimina quelle esistenti. Le voci compaiono subito nel menu in alto e sono salvate in InstantDB (stesso elenco su Vercel e su ogni dispositivo).",
-    reset: "Ripristina default",
-    resetTitle: "Ripristina: nessuna categoria extra (solo Wine List e Distillati fissi)",
-    resetConfirm: "Vuoi ripristinare le categorie predefinite? Le categorie correnti verranno sostituite.",
-    newName: "Nome nuova categoria",
-    newPlaceholder: "Es. Port and Sherry",
-    add: "Aggiungi categoria",
-    empty: "Nessuna categoria configurata.",
-    categoryName: (label: string) => `Nome categoria ${label}`,
-    confirmEdit: "Conferma modifica",
-    confirm: "Conferma",
-    cancelEdit: "Annulla modifica",
-    rename: "Modifica nome"
+    description: "Operazioni di manutenzione della wine list."
   },
   /** Errori delle API, per codice (il server manda anche il testo italiano come ripiego). */
   apiErrors: {
@@ -346,6 +353,28 @@ const en: Dictionary = {
       errPrice: "Enter a valid price.",
       errGlassPrice: "Enter a valid glass price.",
       errQuantity: "Enter a valid quantity (0 or more)."
+    },
+    bins: {
+      title: "Bin numbers",
+      description:
+        "Clear every bin to reassign them from scratch. A backup is saved before the reset, and you can restore it from here.",
+      assigned: (count: number) => `${count} wines have a bin assigned.`,
+      lastBackup: (date: string, count: number) => `Last backup: ${date} · ${count} bins`,
+      noBackup: "No backup available.",
+      reset: "Clear all bins",
+      restore: "Restore bins",
+      resetTitle: "Clear all bins?",
+      resetText: (count: number) =>
+        `The bin will be removed from ${count} wines. A backup is saved first: you can put them back with "Restore bins".`,
+      resetReplacesBackup: (date: string) =>
+        `The backup from ${date} will be replaced by the new one and can no longer be restored.`,
+      resetConfirm: "Clear bins",
+      resetting: "Clearing...",
+      restoreTitle: "Restore bins?",
+      restoreText: (date: string) =>
+        `Wines will go back to the bins saved on ${date}. Bins assigned after the reset will be overwritten if they conflict.`,
+      restoreConfirm: "Restore",
+      restoring: "Restoring..."
     }
   },
   spirits: {
@@ -477,22 +506,7 @@ const en: Dictionary = {
   },
   settings: {
     title: "Settings",
-    description: 'Manage the categories shown in the navigation bar next to "Winelist".',
-    sectionTitle: "Wine list categories",
-    sectionDescription:
-      "Add new categories or delete existing ones. They appear in the top menu right away and are saved in InstantDB (same list on Vercel and on every device).",
-    reset: "Restore defaults",
-    resetTitle: "Restore: no extra categories (only the fixed Wine List and Spirits)",
-    resetConfirm: "Restore the default categories? The current categories will be replaced.",
-    newName: "New category name",
-    newPlaceholder: "e.g. Port and Sherry",
-    add: "Add category",
-    empty: "No categories yet.",
-    categoryName: (label: string) => `Category name ${label}`,
-    confirmEdit: "Confirm edit",
-    confirm: "Confirm",
-    cancelEdit: "Cancel edit",
-    rename: "Rename"
+    description: "Maintenance tasks for the wine list."
   },
   apiErrors: {
     missing_credentials: "Enter username and password.",
