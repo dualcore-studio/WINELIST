@@ -120,7 +120,7 @@ export function WineTable({
                       className={cn(
                         cellPad,
                         cellNowrap,
-                        "bg-inherit text-right font-mono text-[12px] text-neutral-700"
+                        "bg-inherit text-right tabular-nums text-neutral-800"
                       )}
                     >
                       {wine.binNumber || "—"}
