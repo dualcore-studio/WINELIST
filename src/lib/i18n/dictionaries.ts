@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Lang } from "@/lib/i18n/config";
 
 /**
@@ -95,14 +96,19 @@ const it = {
       title: "Bin number",
       description:
         "Svuota tutti i bin per riassegnarli da capo. Prima del reset viene salvato un backup, che puoi ripristinare da qui.",
-      assigned: (count: number) => `${count} vini hanno un bin assegnato.`,
+      assigned: (withBin: ReactNode, total: ReactNode) => [
+        withBin,
+        " elementi hanno un bin assegnato su un totale di ",
+        total,
+        " elementi (vini e distillati)."
+      ],
       lastBackup: (date: string, count: number) => `Ultimo backup: ${date} · ${count} bin`,
       noBackup: "Nessun backup disponibile.",
       reset: "Svuota tutti i bin",
       restore: "Ripristina bin",
       resetTitle: "Svuotare tutti i bin?",
       resetText: (count: number) =>
-        `Il bin verrà tolto da ${count} vini. Prima viene salvato un backup: potrai rimetterli com'erano con «Ripristina bin».`,
+        `Il bin verrà tolto da ${count} elementi. Prima viene salvato un backup: potrai rimetterli com'erano con «Ripristina bin».`,
       resetReplacesBackup: (date: string) =>
         `Il backup del ${date} verrà sostituito da quello nuovo e non potrà più essere ripristinato.`,
       resetConfirm: "Svuota bin",
@@ -358,14 +364,19 @@ const en: Dictionary = {
       title: "Bin numbers",
       description:
         "Clear every bin to reassign them from scratch. A backup is saved before the reset, and you can restore it from here.",
-      assigned: (count: number) => `${count} wines have a bin assigned.`,
+      assigned: (withBin: ReactNode, total: ReactNode) => [
+        withBin,
+        " items have a bin assigned out of a total of ",
+        total,
+        " items (wines and spirits)."
+      ],
       lastBackup: (date: string, count: number) => `Last backup: ${date} · ${count} bins`,
       noBackup: "No backup available.",
       reset: "Clear all bins",
       restore: "Restore bins",
       resetTitle: "Clear all bins?",
       resetText: (count: number) =>
-        `The bin will be removed from ${count} wines. A backup is saved first: you can put them back with "Restore bins".`,
+        `The bin will be removed from ${count} items. A backup is saved first: you can put them back with "Restore bins".`,
       resetReplacesBackup: (date: string) =>
         `The backup from ${date} will be replaced by the new one and can no longer be restored.`,
       resetConfirm: "Clear bins",

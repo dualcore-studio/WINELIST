@@ -167,6 +167,9 @@ function baseWinePayload(input: WineInput) {
  *  I record esistenti senza tag sono considerati appartenenti a DEFAULT_WINES_COLLECTION. */
 export const DEFAULT_WINES_COLLECTION = "wines";
 
+/** Collection dei distillati (stessa entità `wines`, tag storico). */
+export const SPIRITS_COLLECTION = "grappeDistillati";
+
 /** Restituisce la collection di appartenenza del record: i record legacy senza tag
  *  sono trattati come winelist. */
 function resolveCollectionTag(record: InstantWineRecord): string {

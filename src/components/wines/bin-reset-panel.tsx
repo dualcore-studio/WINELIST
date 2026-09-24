@@ -1,23 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Eraser, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { resetAllBins, restoreBins, useBinBackups } from "@/features/wines/bin-backup";
-import { DEFAULT_WINES_COLLECTION, getWines } from "@/features/wines/repository";
+import { DEFAULT_WINES_COLLECTION, getWines, SPIRITS_COLLECTION } from "@/features/wines/repository";
 import { formatDateTime } from "@/lib/i18n/format";
 import { useI18n } from "@/lib/i18n/provider";
 
 type PendingAction = "reset" | "restore" | null;
 
-/** Riquadro delle Impostazioni: svuota tutti i bin della wine list salvandone un backup, o ripristina l'ultimo backup. */
+/**
+ * Riquadro delle Impostazioni: svuota tutti i bin (vini e distillati) salvandone un backup,
+ * o ripristina l'ultimo backup. Il backup resta registrato sotto la collection dei vini.
+ */
 export function BinResetPanel() {
   const collection = DEFAULT_WINES_COLLECTION;
   const { t, lang } = useI18n();
-  const { wines, isLoading } = getWines(collection);
+  const winesQuery = getWines(collection);
+  const spiritsQuery = getWines(SPIRITS_COLLECTION);
+  const isLoading = winesQuery.isLoading || spiritsQuery.isLoading;
+  const items = useMemo(
+    () => [...winesQuery.wines, ...spiritsQuery.wines],
+    [winesQuery.wines, spiritsQuery.wines]
+  );
   const backups = useBinBackups(collection);
   const latestBackup = backups[0] ?? null;
-  const binCount = wines.filter((w) => w.binNumber).length;
+  const binCount = items.filter((w) => w.binNumber).length;
 
   const [pending, setPending] = useState<PendingAction>(null);
   const [isWorking, setIsWorking] = useState(false);
@@ -39,8 +48,8 @@ export function BinResetPanel() {
     setError(null);
     setIsWorking(true);
     try {
-      if (pending === "reset") await resetAllBins(wines, collection, backups);
-      else if (pending === "restore" && latestBackup) await restoreBins(latestBackup, wines);
+      if (pending === "reset") await resetAllBins(items, collection, backups);
+      else if (pending === "restore" && latestBackup) await restoreBins(latestBackup, items);
       setPending(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : t.common.operationFailed);
@@ -55,7 +64,14 @@ export function BinResetPanel() {
       <p className="mt-1 text-sm text-neutral-600">{t.wines.bins.description}</p>
 
       <div className="mt-4 space-y-1 text-sm text-neutral-700">
-        <p>{isLoading ? t.common.loading : t.wines.bins.assigned(binCount)}</p>
+        <p>
+          {isLoading
+            ? t.common.loading
+            : t.wines.bins.assigned(
+                <strong key="withBin">{binCount}</strong>,
+                <strong key="total">{items.length}</strong>
+              )}
+        </p>
         <p>{latestBackup ? t.wines.bins.lastBackup(backupDate, backupCount) : t.wines.bins.noBackup}</p>
       </div>
 

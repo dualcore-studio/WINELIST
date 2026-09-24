@@ -16,6 +16,7 @@ import {
   createWine,
   deleteWine,
   getWines,
+  SPIRITS_COLLECTION,
   updateWine,
   type WineInput
 } from "@/features/wines/repository";
@@ -29,7 +30,7 @@ import type { Wine } from "@/types/wine";
  * (tag storico mantenuto per non perdere eventuali record già salvati).
  */
 
-const GRAPPE_COLLECTION = "grappeDistillati";
+const GRAPPE_COLLECTION = SPIRITS_COLLECTION;
 
 export function GrappeDistillatiClientPage() {
   const { t } = useI18n();
