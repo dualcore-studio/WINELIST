@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { RotateCcw } from "lucide-react";
+import { FilterSelect } from "@/components/ui/filter-select";
 import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 import { SPIRIT_TYPE_SUGGESTIONS } from "@/components/grappe/grappa-form-modal";
@@ -51,9 +52,6 @@ export function GrappaFilters({
 }: Props) {
   const { t } = useI18n();
   const field = "h-9 w-40 min-w-[8rem] flex-auto rounded-full border border-line bg-white px-3.5 text-[13px] text-text outline-none transition-colors placeholder:text-neutral-500 hover:border-neutral-300 focus:border-accent/40 focus:ring-2 focus:ring-accent-ring";
-
-  const selectBase =
-  "h-9 w-auto max-w-[11rem] flex-none cursor-pointer truncate rounded-full border border-line bg-white pl-3.5 pr-2 text-[13px] text-text outline-none transition-colors hover:border-neutral-300 focus:border-accent/40 focus:ring-2 focus:ring-accent-ring";
 
   // Costruisce la lista delle tipologie disponibili: unione dei suggerimenti
   // predefiniti e delle tipologie effettivamente presenti nei dati, più i
@@ -112,20 +110,12 @@ export function GrappaFilters({
           }
           className={field}
         />
-        <select
+        <FilterSelect
           value={filters.spiritType}
-          onChange={(e) =>
-            onFiltersChange({ ...filters, spiritType: e.target.value })
-          }
-          className={selectBase}
-        >
-          <option value="">{t.spirits.col.type}</option>
-          {spiritTypeOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          onChange={(spiritType) => onFiltersChange({ ...filters, spiritType })}
+          placeholder={t.spirits.col.type}
+          options={spiritTypeOptions}
+        />
         <input
           placeholder={t.spirits.filter.glassMax}
           type="number"

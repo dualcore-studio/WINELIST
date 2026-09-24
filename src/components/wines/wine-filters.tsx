@@ -1,12 +1,10 @@
 import { useMemo } from "react";
 import { RotateCcw } from "lucide-react";
+import { FilterSelect } from "@/components/ui/filter-select";
 import { countryLabel, wineTypeLabel } from "@/lib/i18n/format";
 import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 import type { Wine } from "@/types/wine";
-
-const selectBase =
-  "h-9 w-auto max-w-[11rem] flex-none cursor-pointer truncate rounded-full border border-line bg-white pl-3.5 pr-2 text-[13px] text-text outline-none transition-colors hover:border-neutral-300 focus:border-accent/40 focus:ring-2 focus:ring-accent-ring";
 
 export type WineFiltersState = {
   binNumber: string;
@@ -95,18 +93,12 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
           onChange={(e) => onFiltersChange({ ...filters, winery: e.target.value })}
           className={field}
         />
-        <select
+        <FilterSelect
           value={filters.category}
-          onChange={(e) => onFiltersChange({ ...filters, category: e.target.value })}
-          className={selectBase}
-        >
-          <option value="">{t.wines.col.category}</option>
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
+          onChange={(category) => onFiltersChange({ ...filters, category })}
+          placeholder={t.wines.col.category}
+          options={categories.map((category) => ({ value: category, label: category }))}
+        />
         <input
           placeholder={t.wines.col.grape}
           value={filters.categoryText}
@@ -119,22 +111,15 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
           onChange={(e) => onFiltersChange({ ...filters, vintage: e.target.value })}
           className={cn(field, "!w-[5.5rem] !min-w-0 flex-none")}
         />
-        <select
+        <FilterSelect
           value={filters.type}
-          onChange={(e) => onFiltersChange({ ...filters, type: e.target.value })}
-          className={selectBase}
-        >
-          <option value="">{t.wines.col.type}</option>
-          {types.map((type) => (
-            <option key={type} value={type}>
-              {wineTypeLabel(type, lang)}
-            </option>
-          ))}
-        </select>
-        <select
+          onChange={(type) => onFiltersChange({ ...filters, type })}
+          placeholder={t.wines.col.type}
+          options={types.map((type) => ({ value: type, label: wineTypeLabel(type, lang) }))}
+        />
+        <FilterSelect
           value={filters.country}
-          onChange={(e) => {
-            const nextCountry = e.target.value;
+          onChange={(nextCountry) => {
             const resetRegion =
               filters.region &&
               nextCountry &&
@@ -147,27 +132,15 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
               region: resetRegion ? "" : filters.region
             });
           }}
-          className={selectBase}
-        >
-          <option value="">{t.wines.col.country}</option>
-          {countries.map((country) => (
-            <option key={country} value={country}>
-              {countryLabel(country, lang)}
-            </option>
-          ))}
-        </select>
-        <select
+          placeholder={t.wines.col.country}
+          options={countries.map((country) => ({ value: country, label: countryLabel(country, lang) }))}
+        />
+        <FilterSelect
           value={filters.region}
-          onChange={(e) => onFiltersChange({ ...filters, region: e.target.value })}
-          className={selectBase}
-        >
-          <option value="">{t.wines.col.region}</option>
-          {regions.map((region) => (
-            <option key={region} value={region}>
-              {region}
-            </option>
-          ))}
-        </select>
+          onChange={(region) => onFiltersChange({ ...filters, region })}
+          placeholder={t.wines.col.region}
+          options={regions.map((region) => ({ value: region, label: region }))}
+        />
         <input
           placeholder={t.common.qtyMin}
           value={filters.quantityMin}
