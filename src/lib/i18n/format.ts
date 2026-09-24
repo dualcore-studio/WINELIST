@@ -9,15 +9,18 @@ import type { Lang } from "@/lib/i18n/config";
 const PRICE_LOCALE: Record<Currency, string> = { USD: "en-US", EUR: "de-DE" };
 
 /**
- * Prezzo con il simbolo della valuta scelta nelle Impostazioni, dopo il numero e staccato da uno
- * spazio non divisibile: "1,500 $" / "12.50 $" col dollaro, "1.500 €" / "12,50 €" con l'euro.
+ * Prezzo con il simbolo della valuta scelta nelle Impostazioni, secondo l'uso di ciascuna:
+ * dollaro davanti e attaccato ("$1,500" / "$12.50"), euro dopo il numero con uno spazio
+ * non divisibile ("1.500 €" / "12,50 €").
  */
 export function formatPrice(value: number, currency: Currency): string {
   const n = Number(value);
   const safe = Number.isFinite(n) && n >= 0 ? n : 0;
   const hasCents = Math.round(safe * 100) % 100 !== 0;
   const options = { minimumFractionDigits: hasCents ? 2 : 0, maximumFractionDigits: 2 };
-  return `${safe.toLocaleString(PRICE_LOCALE[currency], options)}\u00A0${CURRENCY_SYMBOL[currency]}`;
+  const amount = safe.toLocaleString(PRICE_LOCALE[currency], options);
+  const symbol = CURRENCY_SYMBOL[currency];
+  return currency === "USD" ? `${symbol}${amount}` : `${amount}\u00A0${symbol}`;
 }
 
 /** Data e ora nella lingua scelta (per le intestazioni di stampa). */
