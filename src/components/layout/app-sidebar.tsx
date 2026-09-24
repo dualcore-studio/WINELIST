@@ -77,7 +77,7 @@ function NavRow({
   const label = labelKey ? t.nav[labelKey] : item.label;
 
   const base = clsx(
-    "group flex w-full items-center rounded-lg py-2 text-[13.5px] font-medium transition-colors",
+    "group flex h-9 w-full items-center rounded-lg text-[13.5px] font-medium transition-colors",
     collapsed ? "justify-center px-0" : "gap-3 px-3"
   );
   const state = item.href
@@ -244,18 +244,18 @@ export function AppSidebar() {
             ))}
           </ul>
           {user ? <LogoutButton variant="sidebar" iconOnly={collapsed} /> : null}
-          {collapsed ? (
-            <div className="flex justify-center pt-2">
+          {/* IT/EN sempre in colonna e nella stessa posizione: aprendo la barra non si sposta nulla
+              (prima, passando in orizzontale, il blocco si accorciava e "Esci" finiva sotto il mouse). */}
+          <div className="flex items-center gap-1.5 pt-2">
+            <div className={clsx("flex w-12 shrink-0 justify-center", !collapsed && "-ml-0.5")}>
               <LanguageSwitch tone="dark" vertical />
             </div>
-          ) : (
-            <div className="flex items-center justify-between px-3 pt-2">
+            {collapsed ? null : (
               <span className="text-[11px] font-semibold uppercase tracking-wider text-white/60">
                 {t.nav.language}
               </span>
-              <LanguageSwitch tone="dark" />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </aside>
     </div>
