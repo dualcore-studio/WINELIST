@@ -167,6 +167,10 @@ function useSidebarNavState() {
 const HOVER_OPEN_DELAY_MS = 120;
 const HOVER_CLOSE_DELAY_MS = 200;
 
+/** Larghezze della barra (classi letterali per Tailwind): ridotta = solo icone, aperta = con etichette. */
+const WIDTH_COLLAPSED = "w-[68px]";
+const WIDTH_EXPANDED = "w-[176px]";
+
 /**
  * Barra laterale a scomparsa automatica: ridotta mostra solo le icone, si allarga al passaggio
  * del mouse (o al focus da tastiera) sovrapponendosi al contenuto, senza spostare la pagina.
@@ -199,11 +203,11 @@ export function AppSidebar() {
   return (
     // Lo spazio riservato alla barra cambia subito (la pagina si stringe e la tabella resta tutta visibile);
     // l'animazione è solo sulla barra, così la tabella non viene ricalcolata a ogni fotogramma.
-    <div className={clsx("relative h-dvh shrink-0", collapsed ? "w-[68px]" : "w-[216px]")}>
+    <div className={clsx("relative h-dvh shrink-0", collapsed ? WIDTH_COLLAPSED : WIDTH_EXPANDED)}>
       <aside
         className={clsx(
           "absolute inset-y-0 left-0 z-50 flex flex-col overflow-hidden bg-accent transition-[width] duration-200 ease-out",
-          collapsed ? "w-[68px]" : "w-[216px]"
+          collapsed ? WIDTH_COLLAPSED : WIDTH_EXPANDED
         )}
         aria-label={t.nav.mainNavigation}
         onMouseEnter={() => scheduleExpanded(true)}
@@ -216,16 +220,18 @@ export function AppSidebar() {
         {/* Per ora "/" porta alla wine list; diventerà la home/dashboard. */}
         <Link
           href="/"
-          className="flex h-[84px] shrink-0 items-center gap-2.5 pl-[18px] pr-3 transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/40"
+          className="flex h-[84px] shrink-0 items-center gap-3 pl-[14px] pr-3 transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/40"
           aria-label="Wine List Manager"
           title={collapsed ? "Wine List Manager" : undefined}
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-accent">
-            <Wine className="size-[18px]" strokeWidth={1.75} aria-hidden />
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-accent shadow-sm">
+            <Wine className="size-[22px]" strokeWidth={1.75} aria-hidden />
           </span>
           {collapsed ? null : (
             <span className="min-w-0 flex-1 whitespace-nowrap font-display text-[19px] font-bold leading-[1.05] tracking-tight text-white">
-              Wine List Manager
+              Wine List
+              <br />
+              Manager
             </span>
           )}
         </Link>
