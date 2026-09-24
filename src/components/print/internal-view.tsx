@@ -8,6 +8,8 @@ import { describeSpiritFilters, filterSpirits } from "@/features/grappe/filters"
 import { describeFilters, filterWines } from "@/features/wines/filters";
 import { useWines } from "@/features/wines/repository";
 import type { Lang } from "@/lib/i18n/config";
+import type { Currency } from "@/lib/currency";
+import { useCurrency } from "@/features/settings/currency";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { countryLabel, formatDateTime, formatPrice, wineTypeLabel } from "@/lib/i18n/format";
 import { useI18n } from "@/lib/i18n/provider";
@@ -91,11 +93,11 @@ function grapeAndCategory(wine: Wine): string {
 const dash = (v: string) => v || "—";
 
 /** Prezzo in dollari nella lingua scelta; vuoto se assente o segnaposto (≤ 0). */
-function money(value: number | undefined, lang: Lang): string {
-  return value !== undefined && Number.isFinite(value) && value > 0 ? formatPrice(value, lang) : "";
+function money(value: number | undefined, currency: Currency): string {
+  return value !== undefined && Number.isFinite(value) && value > 0 ? formatPrice(value, currency) : "";
 }
 
-function wineColumns(t: Dictionary, lang: Lang): Column[] {
+function wineColumns(t: Dictionary, lang: Lang, currency: Currency): Column[] {
   const c = t.wines.col;
   return [
     { label: c.bin, width: "5%", value: (w) => dash(w.binNumber) },
@@ -106,13 +108,13 @@ function wineColumns(t: Dictionary, lang: Lang): Column[] {
     { label: c.type, width: "7%", value: (w) => wineTypeLabel(w.type, lang) },
     { label: c.country, width: "7%", value: (w) => dash(countryLabel(w.country, lang)) },
     { label: c.region, width: "10%", value: (w) => dash(w.region) },
-    { label: c.price, width: "6%", numeric: true, value: (w) => dash(money(w.price, lang)) },
-    { label: t.print.internal.glass, width: "5%", numeric: true, value: (w) => dash(money(w.pricePerGlass, lang)) }
+    { label: c.price, width: "6%", numeric: true, value: (w) => dash(money(w.price, currency)) },
+    { label: t.print.internal.glass, width: "5%", numeric: true, value: (w) => dash(money(w.pricePerGlass, currency)) }
   ];
 }
 
 /** I distillati non hanno bottiglia a listino (prezzo segnaposto 1): mostrata solo se > 1. */
-function spiritColumns(t: Dictionary, lang: Lang): Column[] {
+function spiritColumns(t: Dictionary, currency: Currency): Column[] {
   return [
     { label: t.print.internal.spirit, width: "30%", bold: true, value: (w) => w.name },
     {
@@ -121,12 +123,12 @@ function spiritColumns(t: Dictionary, lang: Lang): Column[] {
       value: (w) => (w.winery.trim().toLowerCase() === "other" ? "—" : dash(w.winery))
     },
     { label: t.spirits.col.type, width: "16%", value: (w) => dash(w.spiritType ?? "") },
-    { label: t.print.internal.glass, width: "8%", numeric: true, value: (w) => dash(money(w.pricePerGlass, lang)) },
+    { label: t.print.internal.glass, width: "8%", numeric: true, value: (w) => dash(money(w.pricePerGlass, currency)) },
     {
       label: t.print.internal.bottle,
       width: "8%",
       numeric: true,
-      value: (w) => dash(w.price > 1 ? money(w.price, lang) : "")
+      value: (w) => dash(w.price > 1 ? money(w.price, currency) : "")
     }
   ];
 }
@@ -156,6 +158,7 @@ function InternalPrintLayout({
   footnote
 }: LayoutProps) {
   const { t, lang } = useI18n();
+  const currency = useCurrency();
   const ti = t.print.internal;
   const totals = useMemo(() => {
     let bottles = 0;
@@ -267,7 +270,7 @@ function InternalPrintLayout({
             </span>
             {showValue ? (
               <span>
-                {ti.stockValue} <b>{formatPrice(totals.value, lang)}</b>
+                {ti.stockValue} <b>{formatPrice(totals.value, currency)}</b>
               </span>
             ) : null}
           </div>
@@ -282,6 +285,7 @@ function InternalPrintLayout({
 
 export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
   const { t, lang } = useI18n();
+  const currency = useCurrency();
   const { wines, isLoading, error } = useWines("wines");
   const items = useMemo(() => filterWines(wines, filters), [wines, filters]);
   return (
@@ -289,7 +293,7 @@ export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
       title={t.print.internal.winesTitle}
       countLabel={t.print.internal.wineCount}
       items={items}
-      columns={wineColumns(t, lang)}
+      columns={wineColumns(t, lang, currency)}
       filterParts={describeFilters(filters, t, lang)}
       isLoading={isLoading}
       error={error}
@@ -300,7 +304,8 @@ export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
 }
 
 export function InternalSpiritsPrintView({ filters }: { filters: GrappaFiltersState }) {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
+  const currency = useCurrency();
   const { wines, isLoading, error } = useWines("grappeDistillati");
   const items = useMemo(() => filterSpirits(wines, filters), [wines, filters]);
   return (
@@ -308,7 +313,7 @@ export function InternalSpiritsPrintView({ filters }: { filters: GrappaFiltersSt
       title={t.print.internal.spiritsTitle}
       countLabel={t.print.internal.spiritCount}
       items={items}
-      columns={spiritColumns(t, lang)}
+      columns={spiritColumns(t, currency)}
       filterParts={describeSpiritFilters(filters, t)}
       isLoading={isLoading}
       error={error}

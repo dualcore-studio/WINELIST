@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CurrencyPanel } from "@/components/settings/currency-panel";
 import { BinResetPanel } from "@/components/wines/bin-reset-panel";
 import { useI18n } from "@/lib/i18n/provider";
 
@@ -16,6 +17,7 @@ export function SettingsView() {
         {tr.settings.description}
       </p>
 
+      <CurrencyPanel />
       <BinResetPanel />
 
       <Link

@@ -2,6 +2,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { TableScrollArea } from "@/components/ui/table-scroll-area";
 import { countryLabel, formatPrice, wineTypeLabel } from "@/lib/i18n/format";
 import { useI18n } from "@/lib/i18n/provider";
+import { useCurrency } from "@/features/settings/currency";
 import { cn } from "@/lib/utils";
 import { formatVintage, type Wine } from "@/types/wine";
 
@@ -64,6 +65,7 @@ export function WineTable({
   className
 }: Props) {
   const { t, lang } = useI18n();
+  const currency = useCurrency();
   if (isLoading) {
     return (
       <div className={cn(tableRoot, className)}>
@@ -169,7 +171,7 @@ export function WineTable({
                         "bg-inherit text-right tabular-nums text-neutral-800"
                       )}
                     >
-                      {formatPrice(wine.price, lang)}
+                      {formatPrice(wine.price, currency)}
                     </td>
                     <td className={cn(cellPad, cellNowrap, "bg-inherit text-right")}>
                       <span

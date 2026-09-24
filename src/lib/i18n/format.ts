@@ -1,15 +1,23 @@
+import { CURRENCY_SYMBOL, type Currency } from "@/lib/currency";
 import type { Lang } from "@/lib/i18n/config";
 
 /**
- * Prezzo in dollari (il ristorante è negli USA), simbolo dopo il numero e staccato da uno spazio
- * non divisibile: "1,500 $" / "12.50 $" in inglese, "1500 $" / "12,50 $" in italiano.
+ * Separatori dei numeri secondo la valuta, indipendenti dalla lingua: il dollaro usa il formato USA
+ * (1,000 · 12.50), l'euro quello europeo (1.000 · 12,50). "de-DE" mette il punto già da 1.000,
+ * mentre "it-IT" lo ometterebbe fino a 10.000.
  */
-export function formatPrice(value: number, lang: Lang): string {
+const PRICE_LOCALE: Record<Currency, string> = { USD: "en-US", EUR: "de-DE" };
+
+/**
+ * Prezzo con il simbolo della valuta scelta nelle Impostazioni, dopo il numero e staccato da uno
+ * spazio non divisibile: "1,500 $" / "12.50 $" col dollaro, "1.500 €" / "12,50 €" con l'euro.
+ */
+export function formatPrice(value: number, currency: Currency): string {
   const n = Number(value);
   const safe = Number.isFinite(n) && n >= 0 ? n : 0;
   const hasCents = Math.round(safe * 100) % 100 !== 0;
   const options = { minimumFractionDigits: hasCents ? 2 : 0, maximumFractionDigits: 2 };
-  return `${safe.toLocaleString(lang === "en" ? "en-US" : "it-IT", options)}\u00A0$`;
+  return `${safe.toLocaleString(PRICE_LOCALE[currency], options)}\u00A0${CURRENCY_SYMBOL[currency]}`;
 }
 
 /** Data e ora nella lingua scelta (per le intestazioni di stampa). */

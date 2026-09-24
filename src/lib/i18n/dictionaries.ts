@@ -250,7 +250,14 @@ const it = {
   },
   settings: {
     title: "Impostazioni",
-    description: "Operazioni di manutenzione della wine list."
+    description: "Preferenze e operazioni di manutenzione della wine list.",
+    currency: {
+      title: "Valuta",
+      description:
+        "Simbolo mostrato accanto ai prezzi nelle tabelle e nella stampa interna. I prezzi non vengono convertiti: cambia solo il simbolo.",
+      usd: "Dollaro",
+      eur: "Euro"
+    }
   },
   /** Errori delle API, per codice (il server manda anche il testo italiano come ripiego). */
   apiErrors: {
@@ -517,7 +524,14 @@ const en: Dictionary = {
   },
   settings: {
     title: "Settings",
-    description: "Maintenance tasks for the wine list."
+    description: "Preferences and maintenance tasks for the wine list.",
+    currency: {
+      title: "Currency",
+      description:
+        "Symbol shown next to prices in the tables and the internal print. Prices are not converted: only the symbol changes.",
+      usd: "Dollar",
+      eur: "Euro"
+    }
   },
   apiErrors: {
     missing_credentials: "Enter username and password.",

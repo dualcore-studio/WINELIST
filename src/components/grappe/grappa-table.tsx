@@ -1,7 +1,8 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { TableScrollArea } from "@/components/ui/table-scroll-area";
 import { formatPrice } from "@/lib/i18n/format";
-import type { Lang } from "@/lib/i18n/config";
+import type { Currency } from "@/lib/currency";
+import { useCurrency } from "@/features/settings/currency";
 import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 import type { Wine } from "@/types/wine";
@@ -40,10 +41,10 @@ const thBase =
 const rowZebra =
   "cursor-pointer bg-white transition-colors hover:bg-canvas [&>td]:border-t [&>td]:border-line/70";
 
-function formatGlassPrice(value: number | undefined, lang: Lang): string {
+function formatGlassPrice(value: number | undefined, currency: Currency): string {
   if (value === undefined || value === null) return "—";
   if (!Number.isFinite(Number(value))) return "—";
-  return formatPrice(Number(value), lang);
+  return formatPrice(Number(value), currency);
 }
 
 /** Soglia "scorte basse" coerente con la winelist: sotto 6 bottiglie il numero diventa rosso. */
@@ -62,7 +63,8 @@ export function GrappaTable({
   selectedId = null,
   className
 }: Props) {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
+  const currency = useCurrency();
   if (isLoading) {
     return (
       <div className={cn(tableRoot, className)}>
@@ -159,7 +161,7 @@ export function GrappaTable({
                         "bg-inherit text-right tabular-nums text-neutral-800"
                       )}
                     >
-                      {formatGlassPrice(wine.pricePerGlass, lang)}
+                      {formatGlassPrice(wine.pricePerGlass, currency)}
                     </td>
                     <td
                       className={cn(
@@ -169,7 +171,7 @@ export function GrappaTable({
                       )}
                     >
                       {/* 1 = segnaposto dei distillati venduti solo al bicchiere */}
-                      {wine.price > 1 ? formatPrice(wine.price, lang) : "—"}
+                      {wine.price > 1 ? formatPrice(wine.price, currency) : "—"}
                     </td>
                     <td
                       className={cn(
