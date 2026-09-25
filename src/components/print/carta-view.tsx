@@ -1,7 +1,7 @@
 "use client";
 
-import { Fragment, useMemo } from "react";
-import { Printer, X } from "lucide-react";
+import { useMemo } from "react";
+import { PagedPreview, type FlowBlock, type FlowItem, type FlowTable } from "@/components/print/paged-preview";
 import { useWines } from "@/features/wines/repository";
 import { useI18n } from "@/lib/i18n/provider";
 import { buildCarta, type CartaRow, type CartaSection } from "@/features/print/carta";
@@ -13,46 +13,19 @@ import {
 
 /**
  * Carta dei vini per il cliente: impaginazione ricalcata sul Word del ristorante
- * (US Letter, Monotype Corsiva / Lucida Handwriting, numero di pagina in basso).
+ * (US Letter di serie, Monotype Corsiva / Lucida Handwriting, numero di pagina in basso).
  * I font sono quelli installati sul PC del ristorante; altrove si usa un corsivo di ripiego.
  */
 
 const CSS = `
-@page {
-  size: letter;
-  margin: 0.69in 0.44in 0.5in 0.44in;
-  @bottom-center {
-    content: counter(page);
-    font-family: Calibri, Carlito, "Segoe UI", sans-serif;
-    font-size: 11pt;
-    color: #000;
-  }
-}
-html, body { background: #fff !important; }
-.carta-root {
+.carta-doc {
   --corsiva: "Monotype Corsiva", "MonotypeCorsiva", "Apple Chancery", "URW Chancery L", cursive;
   --lucida: "Lucida Handwriting", "Lucida Calligraphy", "Apple Chancery", cursive;
   --calibri: Calibri, Carlito, "Segoe UI", Arial, sans-serif;
   color: #000;
-  background: #fff;
-  min-height: 100dvh;
 }
-.carta-toolbar {
-  position: sticky; top: 0; z-index: 10;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 10px 16px; border-bottom: 1px solid #e5e5e5; background: #fafafa;
-  font-family: system-ui, sans-serif; font-size: 14px; color: #333;
-}
-.carta-toolbar button {
-  display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px;
-  border-radius: 8px; border: 1px solid #d4d4d4; background: #fff; font-weight: 600; cursor: pointer;
-}
-.carta-toolbar .primary { background: #8e2f45; border-color: #8e2f45; color: #fff; }
-.carta-sheet { width: 8.5in; margin: 24px auto; padding: 0.69in 0.44in 0.5in; background: #fff; box-shadow: 0 1px 12px rgba(0,0,0,.12); }
-.carta-page-break { break-before: page; }
 .carta-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-family: var(--corsiva); letter-spacing: 0.3pt; }
 .carta-table td, .carta-table th { padding: 0.5pt 2pt; vertical-align: middle; font-weight: normal; }
-.carta-table tr { break-inside: avoid; }
 .carta-table .carta-title { font-family: var(--lucida); font-size: 18pt; text-align: center; padding: 4pt 0 6pt !important; }
 .carta-table .carta-title.small { font-size: 16pt; }
 .carta-table .carta-title.country-style { font-family: var(--calibri); font-style: italic; font-size: 20pt; }
@@ -67,20 +40,14 @@ html, body { background: #fff !important; }
 .carta-item .bin { white-space: nowrap; }
 .carta-item .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .carta-item .size { text-align: center; white-space: nowrap; }
-.carta-region-row, .carta-country-row, .carta-producer-row { break-after: avoid; }
-.carta-table tr.carta-new-page { break-before: page; }
 .carta-special { text-align: center; font-family: var(--corsiva); }
 .carta-special h2 { font-size: 22pt; font-weight: normal; margin: 0; }
-.carta-special .wine { margin-top: 10pt; break-inside: avoid; }
+.carta-special .wine { margin-top: 10pt; }
 .carta-special .wine h3 { font-size: 18pt; font-weight: bold; margin: 0 0 4pt; }
 .carta-special .wine p { font-size: 12pt; font-style: italic; margin: 0; line-height: 1.15; }
 .carta-special .prices { display: flex; justify-content: center; gap: 1.2in; margin-top: 3pt; font-size: 12pt; font-style: italic; line-height: 1.15; }
 .carta-special .prices span { display: flex; flex-direction: column; }
-.carta-status { font-family: system-ui, sans-serif; padding: 48px; text-align: center; color: #555; }
-@media print {
-  .carta-toolbar { display: none; }
-  .carta-sheet { width: auto; margin: 0; padding: 0; box-shadow: none; }
-}
+.carta-page-number { font-family: Calibri, Carlito, "Segoe UI", sans-serif; font-size: 11pt; color: #000; }
 `;
 
 /** Larghezze colonne dal Word (Bin ≈ 11%, prezzi ≈ 8% ciascuno). */
@@ -124,17 +91,7 @@ function priceCells(section: CartaSection, row: Extract<CartaRow, { kind: "item"
   }
 }
 
-function Row({
-  section,
-  row,
-  colCount,
-  newPage = false
-}: {
-  section: CartaSection;
-  row: CartaRow;
-  colCount: number;
-  newPage?: boolean;
-}) {
+function Row({ section, row, colCount }: { section: CartaSection; row: CartaRow; colCount: number }) {
   if (row.kind === "item") {
     const cells = priceCells(section, row);
     return (
@@ -159,7 +116,7 @@ function Row({
     subtitle: "carta-subtitle"
   }[row.kind];
   return (
-    <tr className={`${cls}-row ${newPage ? "carta-new-page" : ""}`}>
+    <tr className={`${cls}-row`}>
       <td colSpan={colCount} className={cls}>
         {row.label}
       </td>
@@ -167,7 +124,8 @@ function Row({
   );
 }
 
-function SectionTable({ section }: { section: CartaSection }) {
+/** Una sezione della carta come tabella impaginabile: l'intestazione si ripete sulle pagine seguenti. */
+function sectionTable(section: CartaSection): FlowTable {
   const cols = colgroup(section);
   const priceLabels = labels(section);
   const isGlassPage = section.key === "GLASS" || section.key === "GLASS_SPUMANTE";
@@ -180,14 +138,20 @@ function SectionTable({ section }: { section: CartaSection }) {
   const showLabels =
     section.key !== "GLASS_SPUMANTE" && section.key !== "WA_WHITE" && !section.countryStyleTitle;
 
-  return (
-    <table className={`carta-table ${section.breakBefore ? "carta-page-break" : ""}`}>
+  return {
+    kind: "table",
+    key: section.key,
+    className: "carta-table",
+    breakBefore: section.breakBefore,
+    colgroup: (
       <colgroup>
         {cols.map((w, i) => (
           <col key={i} style={w === "auto" ? undefined : { width: w }} />
         ))}
       </colgroup>
-      <thead>
+    ),
+    head: (
+      <>
         <tr>
           <th colSpan={cols.length} className={titleClass}>
             {section.title}
@@ -204,21 +168,17 @@ function SectionTable({ section }: { section: CartaSection }) {
             ))}
           </tr>
         ) : null}
-      </thead>
-      <tbody>
-        {section.rows.map((row, i) => (
-          <Row
-            key={row.kind === "item" ? row.id : `${row.kind}-${i}`}
-            section={section}
-            row={row}
-            colCount={cols.length}
-            // Negli spumanti ogni nazione dopo la prima inizia su una nuova pagina, come nel Word.
-            newPage={row.kind === "country" && i > 0}
-          />
-        ))}
-      </tbody>
-    </table>
-  );
+      </>
+    ),
+    rows: section.rows.map((row, i) => ({
+      key: row.kind === "item" ? row.id : `${row.kind}-${i}`,
+      node: <Row section={section} row={row} colCount={cols.length} />,
+      // Negli spumanti ogni nazione dopo la prima inizia su una nuova pagina, come nel Word.
+      breakBefore: row.kind === "country" && i > 0,
+      // Nazioni, regioni e produttori non restano soli in fondo alla pagina.
+      keepWithNext: row.kind !== "item"
+    }))
+  };
 }
 
 function renderLine(line: string) {
@@ -233,32 +193,52 @@ function renderLine(line: string) {
   return line;
 }
 
-function SpecialSelectionsPage() {
-  return (
-    <section className="carta-special carta-page-break">
-      <h2>{SPECIAL_SELECTIONS_HEADING}</h2>
-      <h2>{SPECIAL_SELECTIONS_SUBHEADING}</h2>
-      {SPECIAL_SELECTIONS.map((wine) => (
-        <div key={wine.title} className="wine">
-          <h3>{wine.title}</h3>
-          {wine.lines.map((line) => (
-            <p key={line}>{renderLine(line)}</p>
-          ))}
-          <div className="prices">
-            <span>
-              <i>Glass</i>
-              {wine.glass}
-            </span>
-            <span>
-              <i>Bottle</i>
-              {wine.bottle}
-            </span>
-          </div>
+/** Pagina "Special selections": titolo e schede dei vini, ognuna indivisibile. */
+function specialSelectionBlocks(): FlowBlock[] {
+  return [
+    {
+      kind: "block",
+      key: "special-heading",
+      breakBefore: true,
+      keepWithNext: true,
+      node: (
+        <div className="carta-special">
+          <h2>{SPECIAL_SELECTIONS_HEADING}</h2>
+          <h2>{SPECIAL_SELECTIONS_SUBHEADING}</h2>
         </div>
-      ))}
-    </section>
-  );
+      )
+    },
+    ...SPECIAL_SELECTIONS.map(
+      (wine): FlowBlock => ({
+        kind: "block",
+        key: `special-${wine.title}`,
+        node: (
+          <div className="carta-special">
+            <div className="wine">
+              <h3>{wine.title}</h3>
+              {wine.lines.map((line) => (
+                <p key={line}>{renderLine(line)}</p>
+              ))}
+              <div className="prices">
+                <span>
+                  <i>Glass</i>
+                  {wine.glass}
+                </span>
+                <span>
+                  <i>Bottle</i>
+                  {wine.bottle}
+                </span>
+              </div>
+            </div>
+          </div>
+        )
+      })
+    )
+  ];
 }
+
+/** Margini del Word del ristorante, in pollici. */
+const CARTA_MARGINS = { top: 0.69, right: 0.44, bottom: 0.5, left: 0.44 };
 
 type Scope = "wines" | "spirits";
 
@@ -268,47 +248,26 @@ export function CartaView({ scope }: { scope: Scope }) {
   const scopeLabel = scope === "wines" ? t.print.menu.cartaWines : t.print.menu.cartaSpirits;
   const { wines, isLoading, error } = useWines(scope === "wines" ? "wines" : "grappeDistillati");
 
-  const sections = useMemo(
-    () => (scope === "wines" ? buildCarta(wines, []) : buildCarta([], wines)),
-    [wines, scope]
-  );
+  const items = useMemo(() => {
+    const sections = scope === "wines" ? buildCarta(wines, []) : buildCarta([], wines);
+    return sections.flatMap((section): FlowItem[] =>
+      section.key === "HALF" ? [sectionTable(section), ...specialSelectionBlocks()] : [sectionTable(section)]
+    );
+  }, [wines, scope]);
 
   return (
-    <div className="carta-root">
-      <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <div className="carta-toolbar">
-        <span>
-          <strong>{scopeLabel}</strong> · {t.print.previewLetter}
-        </span>
-        <span style={{ display: "flex", gap: 8 }}>
-          <button type="button" onClick={() => window.close()}>
-            <X size={16} aria-hidden /> {t.common.close}
-          </button>
-          <button
-            type="button"
-            className="primary"
-            onClick={() => window.print()}
-            disabled={isLoading || Boolean(error)}
-          >
-            <Printer size={16} aria-hidden /> {t.common.print}
-          </button>
-        </span>
-      </div>
-
-      {isLoading ? (
-        <p className="carta-status">{t.print.cartaLoading}</p>
-      ) : error ? (
-        <p className="carta-status">{error}</p>
-      ) : (
-        <div className="carta-sheet">
-          {sections.map((section) => (
-            <Fragment key={section.key}>
-              <SectionTable section={section} />
-              {section.key === "HALF" ? <SpecialSelectionsPage /> : null}
-            </Fragment>
-          ))}
-        </div>
-      )}
-    </div>
+    <PagedPreview
+      title={scopeLabel}
+      storageKey="print-settings:carta"
+      defaultOrientation="portrait"
+      documentMargins={CARTA_MARGINS}
+      css={CSS}
+      contentClassName="carta-doc"
+      items={items}
+      footer={(page) => <span className="carta-page-number">{page}</span>}
+      loading={isLoading}
+      loadingText={t.print.cartaLoading}
+      error={error}
+    />
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Printer, X } from "lucide-react";
+import { PagedPreview, type FlowItem, type FlowRow } from "@/components/print/paged-preview";
 import type { GrappaFiltersState } from "@/components/grappe/grappa-filters";
 import type { WineFiltersState } from "@/components/wines/wine-filters";
 import { describeSpiritFilters, filterSpirits } from "@/features/grappe/filters";
@@ -24,43 +24,19 @@ import { formatVintage, type Wine } from "@/types/wine";
 const LOW_STOCK = 6;
 
 const CSS = `
-@page {
-  size: letter landscape;
-  margin: 0.45in 0.4in 0.5in;
-  @bottom-right {
-    content: "Pagina " counter(page) " di " counter(pages);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 8pt;
-    color: #555;
-  }
-}
-html, body { background: #fff !important; }
-.int-root { color: #111; background: #fff; min-height: 100dvh; font-family: Arial, Helvetica, sans-serif; }
-.int-toolbar {
-  position: sticky; top: 0; z-index: 10;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 10px 16px; border-bottom: 1px solid #e5e5e5; background: #fafafa;
-  font-family: system-ui, sans-serif; font-size: 14px; color: #333;
-}
-.int-toolbar button {
-  display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px;
-  border-radius: 8px; border: 1px solid #d4d4d4; background: #fff; font-weight: 600; cursor: pointer;
-}
-.int-toolbar .primary { background: #8e2f45; border-color: #8e2f45; color: #fff; }
-.int-sheet { width: 11in; margin: 24px auto; padding: 0.45in 0.4in 0.5in; background: #fff; box-shadow: 0 1px 12px rgba(0,0,0,.12); }
+.int-doc { color: #111; font-family: Arial, Helvetica, sans-serif; }
 .int-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; border-bottom: 2px solid #111; padding-bottom: 6pt; }
 .int-head h1 { font-size: 15pt; margin: 0; letter-spacing: .02em; }
 .int-head .meta { font-size: 8.5pt; color: #444; text-align: right; line-height: 1.4; }
-.int-filters { margin-top: 5pt; font-size: 8.5pt; color: #333; }
-.int-table { width: 100%; border-collapse: collapse; margin-top: 8pt; font-size: 8pt; table-layout: fixed; }
+.int-filters { margin-top: 5pt; font-size: 8.5pt; color: #333; padding-bottom: 8pt; }
+.int-table { width: 100%; border-collapse: collapse; font-size: 8pt; table-layout: fixed; }
 .int-table thead th {
   text-align: left; background: #2e2e2e; color: #fff; font-weight: 700; padding: 4pt 5pt;
   font-size: 7pt; text-transform: uppercase; letter-spacing: .03em;
   -webkit-print-color-adjust: exact; print-color-adjust: exact;
 }
 .int-table td { padding: 2pt 4pt; line-height: 1.2; border-bottom: 1px solid #ddd; vertical-align: top; overflow-wrap: anywhere; }
-.int-table tbody tr:nth-child(even) td { background: #f6f6f6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.int-table tr { break-inside: avoid; }
+.int-table tr.even td { background: #f6f6f6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .int-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .int-table th.num { text-align: right; }
 .int-table .name { font-weight: 700; }
@@ -68,14 +44,10 @@ html, body { background: #fff !important; }
 .int-table .out td { color: #777; }
 .int-table .count { border-left: 1px solid #bbb; }
 .int-table .count-box { display: inline-block; width: 100%; height: 9pt; border-bottom: 1px solid #999; }
-.int-totals { margin-top: 10pt; display: flex; gap: 28pt; font-size: 9pt; break-inside: avoid; }
+.int-totals { padding-top: 10pt; display: flex; gap: 28pt; font-size: 9pt; }
 .int-totals b { font-size: 11pt; }
 .int-legend { margin-top: 4pt; font-size: 7.5pt; color: #666; }
-.int-status { font-family: system-ui, sans-serif; padding: 48px; text-align: center; color: #555; }
-@media print {
-  .int-toolbar { display: none; }
-  .int-sheet { width: auto; margin: 0; padding: 0; box-shadow: none; }
-}
+.int-page-number { font-family: Arial, Helvetica, sans-serif; font-size: 8pt; color: #555; }
 `;
 
 type Column = {
@@ -171,96 +143,98 @@ function InternalPrintLayout({
     return { labels: items.length, bottles, value };
   }, [items]);
 
-  const printedAt = formatDateTime(new Date(), lang);
-  const colCount = columns.length + 2;
+  const printedAt = useMemo(() => formatDateTime(new Date(), lang), [lang]);
 
-  return (
-    <div className="int-root">
-      <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <div className="int-toolbar">
-        <span>
-          <strong>{ti.toolbarTitle}</strong> · {t.print.previewLandscape}
-        </span>
-        <span style={{ display: "flex", gap: 8 }}>
-          <button type="button" onClick={() => window.close()}>
-            <X size={16} aria-hidden /> {t.common.close}
-          </button>
-          <button
-            type="button"
-            className="primary"
-            onClick={() => window.print()}
-            disabled={isLoading || Boolean(error)}
-          >
-            <Printer size={16} aria-hidden /> {t.common.print}
-          </button>
-        </span>
-      </div>
-
-      {isLoading ? (
-        <p className="int-status">{t.common.loading}</p>
-      ) : error ? (
-        <p className="int-status">{error}</p>
-      ) : (
-        <div className="int-sheet">
-          <div className="int-head">
-            <h1>{title}</h1>
-            <div className="meta">
-              {ti.printedAt(printedAt)}
-              <br />
-              {countLabel(items.length)}
-            </div>
-          </div>
-          <div className="int-filters">
-            <strong>{ti.filters}</strong> {filterParts.length ? filterParts.join(" · ") : ti.noFilters}
-          </div>
-
-          <table className="int-table">
-            <colgroup>
-              {columns.map((c) => (
-                <col key={c.label} style={{ width: c.width }} />
-              ))}
-              <col style={{ width: "4%" }} />
-              <col style={{ width: "9%" }} />
-            </colgroup>
-            <thead>
-              <tr>
-                {columns.map((c) => (
-                  <th key={c.label} className={c.numeric ? "num" : undefined}>
-                    {c.label}
-                  </th>
-                ))}
-                <th className="num">{t.common.qty}</th>
-                <th>{ti.count}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 ? (
+  const flow = useMemo((): FlowItem[] => {
+    const colCount = columns.length + 2;
+    const rows: FlowRow[] =
+      items.length === 0
+        ? [
+            {
+              key: "empty",
+              node: (
                 <tr>
                   <td colSpan={colCount} style={{ textAlign: "center", padding: "20pt", color: "#666" }}>
                     {ti.noItems}
                   </td>
                 </tr>
-              ) : (
-                items.map((w) => {
-                  const qty = w.isAvailable ? w.quantity : 0;
-                  return (
-                    <tr key={w.id} className={qty === 0 ? "out" : undefined}>
-                      {columns.map((c) => (
-                        <td key={c.label} className={[c.numeric ? "num" : "", c.bold ? "name" : ""].join(" ")}>
-                          {c.value(w)}
-                        </td>
-                      ))}
-                      <td className={`num ${qty < LOW_STOCK ? "low" : ""}`}>{qty === 0 ? ti.soldOut : qty}</td>
-                      <td className="count">
-                        <span className="count-box" />
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+              )
+            }
+          ]
+        : items.map((w, i) => {
+            const qty = w.isAvailable ? w.quantity : 0;
+            // Righe alterne con una classe: nth-child ripartirebbe da capo a ogni pagina.
+            const cls = [qty === 0 ? "out" : "", i % 2 === 1 ? "even" : ""].join(" ").trim();
+            return {
+              key: w.id,
+              node: (
+                <tr className={cls || undefined}>
+                  {columns.map((c) => (
+                    <td key={c.label} className={[c.numeric ? "num" : "", c.bold ? "name" : ""].join(" ")}>
+                      {c.value(w)}
+                    </td>
+                  ))}
+                  <td className={`num ${qty < LOW_STOCK ? "low" : ""}`}>{qty === 0 ? ti.soldOut : qty}</td>
+                  <td className="count">
+                    <span className="count-box" />
+                  </td>
+                </tr>
+              )
+            };
+          });
 
+    return [
+      {
+        kind: "block",
+        key: "head",
+        keepWithNext: true,
+        node: (
+          <>
+            <div className="int-head">
+              <h1>{title}</h1>
+              <div className="meta">
+                {ti.printedAt(printedAt)}
+                <br />
+                {countLabel(items.length)}
+              </div>
+            </div>
+            <div className="int-filters">
+              <strong>{ti.filters}</strong> {filterParts.length ? filterParts.join(" · ") : ti.noFilters}
+            </div>
+          </>
+        )
+      },
+      {
+        kind: "table",
+        key: "list",
+        className: "int-table",
+        colgroup: (
+          <colgroup>
+            {columns.map((c) => (
+              <col key={c.label} style={{ width: c.width }} />
+            ))}
+            <col style={{ width: "4%" }} />
+            <col style={{ width: "9%" }} />
+          </colgroup>
+        ),
+        head: (
+          <tr>
+            {columns.map((c) => (
+              <th key={c.label} className={c.numeric ? "num" : undefined}>
+                {c.label}
+              </th>
+            ))}
+            <th className="num">{t.common.qty}</th>
+            <th>{ti.count}</th>
+          </tr>
+        ),
+        rows
+      },
+      {
+        kind: "block",
+        key: "totals",
+        keepWithNext: true,
+        node: (
           <div className="int-totals">
             <span>
               {ti.labels} <b>{totals.labels}</b>
@@ -274,27 +248,55 @@ function InternalPrintLayout({
               </span>
             ) : null}
           </div>
+        )
+      },
+      {
+        kind: "block",
+        key: "legend",
+        node: (
           <div className="int-legend">
             {ti.lowStock(LOW_STOCK)} {footnote}
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    ];
+  }, [items, columns, title, countLabel, filterParts, showValue, footnote, totals, currency, printedAt, t, ti]);
+
+  return (
+    <PagedPreview
+      title={ti.toolbarTitle}
+      storageKey="print-settings:internal"
+      defaultOrientation="landscape"
+      documentMargins={INTERNAL_MARGINS}
+      css={CSS}
+      contentClassName="int-doc"
+      items={flow}
+      footer={(page, total) => <span className="int-page-number">{t.print.preview.pageOf(page, total)}</span>}
+      footerAlign="right"
+      loading={isLoading}
+      error={error}
+    />
   );
 }
+
+/** Margini della stampa interna, in pollici. */
+const INTERNAL_MARGINS = { top: 0.45, right: 0.4, bottom: 0.5, left: 0.4 };
 
 export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
   const { t, lang } = useI18n();
   const currency = useCurrency();
   const { wines, isLoading, error } = useWines("wines");
   const items = useMemo(() => filterWines(wines, filters), [wines, filters]);
+  // Colonne e filtri stabili: ogni nuovo array farebbe rimisurare e reimpaginare il documento.
+  const columns = useMemo(() => wineColumns(t, lang, currency), [t, lang, currency]);
+  const filterParts = useMemo(() => describeFilters(filters, t, lang), [filters, t, lang]);
   return (
     <InternalPrintLayout
       title={t.print.internal.winesTitle}
       countLabel={t.print.internal.wineCount}
       items={items}
-      columns={wineColumns(t, lang, currency)}
-      filterParts={describeFilters(filters, t, lang)}
+      columns={columns}
+      filterParts={filterParts}
       isLoading={isLoading}
       error={error}
       showValue
@@ -308,13 +310,15 @@ export function InternalSpiritsPrintView({ filters }: { filters: GrappaFiltersSt
   const currency = useCurrency();
   const { wines, isLoading, error } = useWines("grappeDistillati");
   const items = useMemo(() => filterSpirits(wines, filters), [wines, filters]);
+  const columns = useMemo(() => spiritColumns(t, currency), [t, currency]);
+  const filterParts = useMemo(() => describeSpiritFilters(filters, t), [filters, t]);
   return (
     <InternalPrintLayout
       title={t.print.internal.spiritsTitle}
       countLabel={t.print.internal.spiritCount}
       items={items}
-      columns={spiritColumns(t, currency)}
-      filterParts={describeSpiritFilters(filters, t)}
+      columns={columns}
+      filterParts={filterParts}
       isLoading={isLoading}
       error={error}
       showValue={false}
