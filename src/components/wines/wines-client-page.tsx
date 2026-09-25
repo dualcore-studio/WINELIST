@@ -7,6 +7,8 @@ import { WineFormModal } from "@/components/wines/wine-form-modal";
 import { PrintMenu } from "@/components/wines/print-menu";
 import { WineTable } from "@/components/wines/wine-table";
 import { filterWines, filtersToSearchParams, initialWineFilters } from "@/features/wines/filters";
+import { sortWines, type WineSort } from "@/features/wines/sort";
+import { sortToSearchParams } from "@/lib/table-sort";
 import {
   createWine,
   DEFAULT_WINES_COLLECTION,
@@ -20,9 +22,11 @@ import type { Wine } from "@/types/wine";
 
 export function WinesClientPage() {
   const collection = DEFAULT_WINES_COLLECTION;
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { wines, isLoading, error } = getWines(collection);
   const [filters, setFilters] = useState<WineFiltersState>(initialWineFilters);
+  // Ordinamento scelto dalle intestazioni; al ricaricamento si torna all'ordine per bin.
+  const [sort, setSort] = useState<WineSort>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [selectedWine, setSelectedWine] = useState<Wine | null>(null);
@@ -32,7 +36,10 @@ export function WinesClientPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const filteredWines = useMemo(() => filterWines(wines, filters), [wines, filters]);
+  const filteredWines = useMemo(
+    () => sortWines(filterWines(wines, filters), sort, lang),
+    [wines, filters, sort, lang]
+  );
 
   const openCreate = useCallback(() => {
     setActionError(null);
@@ -118,7 +125,7 @@ export function WinesClientPage() {
                 cartaDescription={t.print.menu.cartaWinesDesc}
                 internalDescription={t.print.menu.internalWinesDesc}
                 onPrintInternal={() =>
-                  window.open(`/stampa/interna?${filtersToSearchParams(filters)}`, "_blank")
+                  window.open(`/stampa/interna?${sortToSearchParams(sort, filtersToSearchParams(filters))}`, "_blank")
                 }
                 disabled={isLoading || filteredWines.length === 0}
               />
@@ -160,6 +167,8 @@ export function WinesClientPage() {
             onEdit={openEdit}
             onDeleteRequest={requestDelete}
             selectedId={formOpen && selectedWine ? selectedWine.id : null}
+            sort={sort}
+            onSortChange={setSort}
             className="min-h-0 flex-1"
           />
         </div>

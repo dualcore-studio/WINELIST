@@ -1,5 +1,7 @@
 import { Pencil, Trash2 } from "lucide-react";
+import { SortableTh } from "@/components/ui/sortable-th";
 import { TableScrollArea } from "@/components/ui/table-scroll-area";
+import type { SpiritSort } from "@/features/grappe/sort";
 import { formatPrice } from "@/lib/i18n/format";
 import type { Currency } from "@/lib/currency";
 import { useCurrency } from "@/features/settings/currency";
@@ -15,6 +17,8 @@ type Props = {
   onDeleteRequest: (wine: Wine) => void;
   /** Riga aperta nel pannello laterale (evidenziata). */
   selectedId?: string | null;
+  sort: SpiritSort;
+  onSortChange: (sort: SpiritSort) => void;
   className?: string;
 };
 
@@ -61,10 +65,13 @@ export function GrappaTable({
   onEdit,
   onDeleteRequest,
   selectedId = null,
+  sort,
+  onSortChange,
   className
 }: Props) {
   const { t } = useI18n();
   const currency = useCurrency();
+  const sortProps = { sort, onSortChange };
   if (isLoading) {
     return (
       <div className={cn(tableRoot, className)}>
@@ -111,12 +118,48 @@ export function GrappaTable({
             >
               <thead>
                 <tr>
-                  <th className={cn(thBase, "text-left")}>{t.spirits.col.name}</th>
-                  <th className={cn(thBase, "text-left")}>{t.spirits.col.producer}</th>
-                  <th className={cn(thBase, "text-left")}>{t.spirits.col.type}</th>
-                  <th className={cn(thBase, "text-right")}>{t.spirits.col.glassPrice}</th>
-                  <th className={cn(thBase, "text-right")}>{t.spirits.col.bottlePrice}</th>
-                  <th className={cn(thBase, "w-[3rem] text-right")}>{t.common.qty}</th>
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="name"
+                    label={t.spirits.col.name}
+                    align="left"
+                    className={cn(thBase, "text-left")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="producer"
+                    label={t.spirits.col.producer}
+                    align="left"
+                    className={cn(thBase, "text-left")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="type"
+                    label={t.spirits.col.type}
+                    align="left"
+                    className={cn(thBase, "text-left")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="glass"
+                    label={t.spirits.col.glassPrice}
+                    align="right"
+                    className={cn(thBase, "text-right")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="bottle"
+                    label={t.spirits.col.bottlePrice}
+                    align="right"
+                    className={cn(thBase, "text-right")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="quantity"
+                    label={t.common.qty}
+                    align="right"
+                    className={cn(thBase, "w-[3rem] text-right")}
+                  />
                   <th className={cn(thBase, "text-center")}>{t.common.actions}</th>
                 </tr>
               </thead>

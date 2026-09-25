@@ -10,6 +10,8 @@ import {
 import { GrappaFormModal } from "@/components/grappe/grappa-form-modal";
 import { GrappaTable } from "@/components/grappe/grappa-table";
 import { filterSpirits, spiritFiltersToSearchParams } from "@/features/grappe/filters";
+import { sortSpirits, type SpiritSort } from "@/features/grappe/sort";
+import { sortToSearchParams } from "@/lib/table-sort";
 import { PrintMenu } from "@/components/wines/print-menu";
 import { useI18n } from "@/lib/i18n/provider";
 import {
@@ -33,9 +35,11 @@ import type { Wine } from "@/types/wine";
 const GRAPPE_COLLECTION = SPIRITS_COLLECTION;
 
 export function GrappeDistillatiClientPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { wines, isLoading, error } = getWines(GRAPPE_COLLECTION);
   const [filters, setFilters] = useState<GrappaFiltersState>(initialGrappaFilters);
+  // Ordinamento scelto dalle intestazioni; al ricaricamento si torna all'ordine della carta.
+  const [sort, setSort] = useState<SpiritSort>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [selectedWine, setSelectedWine] = useState<Wine | null>(null);
@@ -45,7 +49,10 @@ export function GrappeDistillatiClientPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const filteredWines = useMemo(() => filterSpirits(wines, filters), [wines, filters]);
+  const filteredWines = useMemo(
+    () => sortSpirits(filterSpirits(wines, filters), sort, lang),
+    [wines, filters, sort, lang]
+  );
 
   const openCreate = useCallback(() => {
     setActionError(null);
@@ -136,7 +143,7 @@ export function GrappeDistillatiClientPage() {
                 cartaDescription={t.print.menu.cartaSpiritsDesc}
                 onPrintInternal={() =>
                   window.open(
-                    `/stampa/interna/distillati?${spiritFiltersToSearchParams(filters)}`,
+                    `/stampa/interna/distillati?${sortToSearchParams(sort, spiritFiltersToSearchParams(filters))}`,
                     "_blank"
                   )
                 }
@@ -180,6 +187,8 @@ export function GrappeDistillatiClientPage() {
             onEdit={openEdit}
             onDeleteRequest={requestDelete}
             selectedId={formOpen && selectedWine ? selectedWine.id : null}
+            sort={sort}
+            onSortChange={setSort}
             className="min-h-0 flex-1"
           />
         </div>

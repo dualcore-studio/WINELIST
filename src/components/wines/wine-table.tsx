@@ -1,5 +1,7 @@
 import { Pencil, Trash2 } from "lucide-react";
+import { SortableTh } from "@/components/ui/sortable-th";
 import { TableScrollArea } from "@/components/ui/table-scroll-area";
+import type { WineSort } from "@/features/wines/sort";
 import { countryLabel, formatPrice, wineTypeLabel } from "@/lib/i18n/format";
 import { useI18n } from "@/lib/i18n/provider";
 import { useCurrency } from "@/features/settings/currency";
@@ -14,6 +16,8 @@ type Props = {
   onDeleteRequest: (wine: Wine) => void;
   /** Riga aperta nel pannello laterale (evidenziata). */
   selectedId?: string | null;
+  sort: WineSort;
+  onSortChange: (sort: WineSort) => void;
   className?: string;
 };
 
@@ -62,10 +66,13 @@ export function WineTable({
   onEdit,
   onDeleteRequest,
   selectedId = null,
+  sort,
+  onSortChange,
   className
 }: Props) {
   const { t, lang } = useI18n();
   const currency = useCurrency();
+  const sortProps = { sort, onSortChange };
   if (isLoading) {
     return (
       <div className={cn(tableRoot, className)}>
@@ -98,16 +105,76 @@ export function WineTable({
             >
               <thead>
                 <tr>
-                  <th className={cn(thBase, "w-[3.5rem] text-center")}>{t.wines.col.bin}</th>
-                  <th className={cn(thBase, "text-left")}>{t.wines.col.name}</th>
-                  <th className={cn(thBase, "text-left")}>{t.wines.col.winery}</th>
-                  <th className={cn(thBase, "text-left")}>{t.wines.col.category}</th>
-                  <th className={cn(thBase, "w-[4rem] text-right")}>{t.wines.col.vintage}</th>
-                  <th className={cn(thBase, "text-left")}>{t.wines.col.type}</th>
-                  <th className={cn(thBase, "text-left")}>{t.wines.col.country}</th>
-                  <th className={cn(thBase, "text-left")}>{t.wines.col.region}</th>
-                  <th className={cn(thBase, "w-[4.5rem] text-right")}>{t.wines.col.price}</th>
-                  <th className={cn(thBase, "w-[3rem] text-right")}>{t.common.qty}</th>
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="bin"
+                    label={t.wines.col.bin}
+                    align="center"
+                    className={cn(thBase, "w-[3.5rem] text-center")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="name"
+                    label={t.wines.col.name}
+                    align="left"
+                    className={cn(thBase, "text-left")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="winery"
+                    label={t.wines.col.winery}
+                    align="left"
+                    className={cn(thBase, "text-left")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="category"
+                    label={t.wines.col.category}
+                    align="left"
+                    className={cn(thBase, "text-left")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="vintage"
+                    label={t.wines.col.vintage}
+                    align="right"
+                    className={cn(thBase, "w-[4rem] text-right")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="type"
+                    label={t.wines.col.type}
+                    align="left"
+                    className={cn(thBase, "text-left")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="country"
+                    label={t.wines.col.country}
+                    align="left"
+                    className={cn(thBase, "text-left")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="region"
+                    label={t.wines.col.region}
+                    align="left"
+                    className={cn(thBase, "text-left")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="price"
+                    label={t.wines.col.price}
+                    align="right"
+                    className={cn(thBase, "w-[4.5rem] text-right")}
+                  />
+                  <SortableTh
+                    {...sortProps}
+                    sortKey="quantity"
+                    label={t.common.qty}
+                    align="right"
+                    className={cn(thBase, "w-[3rem] text-right")}
+                  />
                   <th className={cn(thBase, "w-[4.5rem] text-center")}>{t.common.actions}</th>
                 </tr>
               </thead>

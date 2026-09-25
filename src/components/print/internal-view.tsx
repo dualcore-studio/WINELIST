@@ -6,6 +6,8 @@ import type { GrappaFiltersState } from "@/components/grappe/grappa-filters";
 import type { WineFiltersState } from "@/components/wines/wine-filters";
 import { describeSpiritFilters, filterSpirits } from "@/features/grappe/filters";
 import { describeFilters, filterWines } from "@/features/wines/filters";
+import { sortSpirits, type SpiritSort, type SpiritSortKey } from "@/features/grappe/sort";
+import { sortWines, type WineSort, type WineSortKey } from "@/features/wines/sort";
 import { useWines } from "@/features/wines/repository";
 import type { Lang } from "@/lib/i18n/config";
 import type { Currency } from "@/lib/currency";
@@ -282,11 +284,43 @@ function InternalPrintLayout({
 /** Margini della stampa interna, in pollici. */
 const INTERNAL_MARGINS = { top: 0.45, right: 0.4, bottom: 0.5, left: 0.4 };
 
-export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
+/** Nome della colonna ordinata, come nell'intestazione della tabella a schermo. */
+function wineSortLabel(t: Dictionary, key: WineSortKey): string {
+  const c = t.wines.col;
+  const labels: Record<WineSortKey, string> = {
+    bin: c.bin,
+    name: c.name,
+    winery: c.winery,
+    category: c.category,
+    vintage: c.vintage,
+    type: c.type,
+    country: c.country,
+    region: c.region,
+    price: c.price,
+    quantity: t.common.qty
+  };
+  return labels[key];
+}
+
+function spiritSortLabel(t: Dictionary, key: SpiritSortKey): string {
+  const c = t.spirits.col;
+  const labels: Record<SpiritSortKey, string> = {
+    name: c.name,
+    producer: c.producer,
+    type: c.type,
+    glass: c.glassPrice,
+    bottle: c.bottlePrice,
+    quantity: t.common.qty
+  };
+  return labels[key];
+}
+
+/** Stesso ordine della tabella a schermo; la nota in fondo dice quale. */
+export function InternalPrintView({ filters, sort }: { filters: WineFiltersState; sort: WineSort }) {
   const { t, lang } = useI18n();
   const currency = useCurrency();
   const { wines, isLoading, error } = useWines("wines");
-  const items = useMemo(() => filterWines(wines, filters), [wines, filters]);
+  const items = useMemo(() => sortWines(filterWines(wines, filters), sort, lang), [wines, filters, sort, lang]);
   // Colonne e filtri stabili: ogni nuovo array farebbe rimisurare e reimpaginare il documento.
   const columns = useMemo(() => wineColumns(t, lang, currency), [t, lang, currency]);
   const filterParts = useMemo(() => describeFilters(filters, t, lang), [filters, t, lang]);
@@ -300,16 +334,19 @@ export function InternalPrintView({ filters }: { filters: WineFiltersState }) {
       isLoading={isLoading}
       error={error}
       showValue
-      footnote={t.print.internal.orderByBin}
+      footnote={sort ? t.print.internal.sortedBy(wineSortLabel(t, sort.key), sort.dir === "desc") : t.print.internal.orderByBin}
     />
   );
 }
 
-export function InternalSpiritsPrintView({ filters }: { filters: GrappaFiltersState }) {
-  const { t } = useI18n();
+export function InternalSpiritsPrintView({ filters, sort }: { filters: GrappaFiltersState; sort: SpiritSort }) {
+  const { t, lang } = useI18n();
   const currency = useCurrency();
   const { wines, isLoading, error } = useWines("grappeDistillati");
-  const items = useMemo(() => filterSpirits(wines, filters), [wines, filters]);
+  const items = useMemo(
+    () => sortSpirits(filterSpirits(wines, filters), sort, lang),
+    [wines, filters, sort, lang]
+  );
   const columns = useMemo(() => spiritColumns(t, currency), [t, currency]);
   const filterParts = useMemo(() => describeSpiritFilters(filters, t), [filters, t]);
   return (
@@ -322,7 +359,9 @@ export function InternalSpiritsPrintView({ filters }: { filters: GrappaFiltersSt
       isLoading={isLoading}
       error={error}
       showValue={false}
-      footnote={t.print.internal.orderByCarta}
+      footnote={
+        sort ? t.print.internal.sortedBy(spiritSortLabel(t, sort.key), sort.dir === "desc") : t.print.internal.orderByCarta
+      }
     />
   );
 }

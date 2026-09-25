@@ -32,7 +32,8 @@ const it = {
     searchOrSelect: "Cerca o seleziona…",
     qty: "Qtà",
     qtyMin: "Q.min",
-    qtyMax: "Q.max"
+    qtyMax: "Q.max",
+    sortBy: (column: string) => `Ordina per ${column}`
   },
   nav: {
     mainNavigation: "Navigazione principale",
@@ -233,7 +234,9 @@ const it = {
       stockValue: "Valore magazzino (prezzi di carta)",
       lowStock: (n: number) => `Quantità in grassetto: sotto ${n} bottiglie.`,
       orderByBin: "Ordine per bin.",
-      orderByCarta: "Ordine della carta."
+      orderByCarta: "Ordine della carta.",
+      sortedBy: (column: string, desc: boolean) =>
+        `Ordinata per ${column.toLowerCase()}, ${desc ? "decrescente" : "crescente"}.`
     },
     filterSummary: {
       bin: "Bin",
@@ -346,7 +349,8 @@ const en: Dictionary = {
     searchOrSelect: "Search or select…",
     qty: "Qty",
     qtyMin: "Min qty",
-    qtyMax: "Max qty"
+    qtyMax: "Max qty",
+    sortBy: (column: string) => `Sort by ${column}`
   },
   nav: {
     mainNavigation: "Main navigation",
@@ -547,7 +551,9 @@ const en: Dictionary = {
       stockValue: "Stock value (list prices)",
       lowStock: (n: number) => `Bold quantities: fewer than ${n} bottles.`,
       orderByBin: "Sorted by bin.",
-      orderByCarta: "Sorted as on the list."
+      orderByCarta: "Sorted as on the list.",
+      sortedBy: (column: string, desc: boolean) =>
+        `Sorted by ${column.toLowerCase()}, ${desc ? "descending" : "ascending"}.`
     },
     filterSummary: {
       bin: "Bin",
