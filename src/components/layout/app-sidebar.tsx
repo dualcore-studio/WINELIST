@@ -6,6 +6,7 @@ import {
   createLucideIcon,
   FlaskConical,
   GlassWater,
+  History,
   LayoutDashboard,
   Settings,
   Users,
@@ -19,6 +20,7 @@ import { LanguageSwitch } from "@/components/layout/language-switch";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { useI18n } from "@/lib/i18n/provider";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
+import { useReorderCount } from "@/features/stock/use-reorder-count";
 import {
   ADMIN_NAV,
   ADMIN_ONLY_NAV,
@@ -43,6 +45,7 @@ const WineBottle = createLucideIcon("wine-bottle", [
 
 const ICON_MAP: Record<SidebarIconName, LucideIcon> = {
   LayoutDashboard,
+  History,
   Wine,
   WineBottle,
   FlaskConical,
@@ -53,6 +56,8 @@ const ICON_MAP: Record<SidebarIconName, LucideIcon> = {
 
 /** Etichette tradotte delle voci fisse; le categorie extra create dall'utente restano col loro nome. */
 const NAV_LABEL_KEYS = {
+  dashboard: "dashboard",
+  movements: "movements",
   winelist: "wineList",
   "grappe-distillati": "spirits",
   settings: "settings",
@@ -63,10 +68,13 @@ function NavRow({
   item,
   active,
   collapsed,
+  badge = 0,
   onNavigate
 }: {
   item: SidebarNavItem;
   active: boolean;
+  /** Numero di avvisi (es. articoli da ordinare); 0 = nessun badge. */
+  badge?: number;
   /** Barra ridotta: solo icona, etichetta nel tooltip. */
   collapsed: boolean;
   onNavigate?: () => void;
@@ -85,13 +93,25 @@ function NavRow({
       ? "bg-white/[0.16] text-white"
       : "text-white/75 hover:bg-white/10 hover:text-white"
     : "cursor-not-allowed text-white/35";
+  const badgeText = badge > 99 ? "99+" : String(badge);
   const icon = (
-    <Icon
-      className={clsx("size-[18px] shrink-0", active ? "text-white" : "text-white/60 group-hover:text-white")}
-      strokeWidth={1.75}
-      aria-hidden
-    />
+    <span className="relative shrink-0">
+      <Icon
+        className={clsx("size-[18px]", active ? "text-white" : "text-white/60 group-hover:text-white")}
+        strokeWidth={1.75}
+        aria-hidden
+      />
+      {badge > 0 && collapsed ? (
+        <span className="absolute -right-2 -top-1.5 min-w-[16px] rounded-full bg-white px-1 text-center text-[10px] font-bold leading-4 text-accent">
+          {badgeText}
+        </span>
+      ) : null}
+    </span>
   );
+  const badgePill =
+    badge > 0 && !collapsed ? (
+      <span className="ml-auto rounded-full bg-white px-1.5 text-[11px] font-bold leading-[18px] text-accent">{badgeText}</span>
+    ) : null;
 
   if (item.href) {
     return (
@@ -100,11 +120,12 @@ function NavRow({
         onClick={onNavigate}
         className={clsx(base, state)}
         aria-current={active ? "page" : undefined}
-        aria-label={collapsed ? label : undefined}
+        aria-label={collapsed ? (badge > 0 ? `${label} (${badge})` : label) : undefined}
         title={collapsed ? label : undefined}
       >
         {icon}
         {collapsed ? null : <span className="min-w-0 truncate">{label}</span>}
+        {badgePill}
       </Link>
     );
   }
@@ -179,6 +200,7 @@ export function AppSidebar() {
   const { primaryLinks, isRouteActive } = useSidebarNavState();
   const { user } = useCurrentUser();
   const { t } = useI18n();
+  const reorderCount = useReorderCount();
   const [expanded, setExpanded] = useState(false);
   const collapsed = !expanded;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -217,7 +239,6 @@ export function AppSidebar() {
           if (!e.currentTarget.contains(e.relatedTarget as Node | null)) scheduleExpanded(false);
         }}
       >
-        {/* Per ora "/" porta alla wine list; diventerà la home/dashboard. */}
         <Link
           href="/"
           className="flex h-[84px] shrink-0 items-center gap-3 pl-[14px] pr-3 transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/40"
@@ -240,7 +261,12 @@ export function AppSidebar() {
           <ul className="space-y-0.5">
             {primaryLinks.map((item) => (
               <li key={item.id}>
-                <NavRow item={item} active={isRouteActive(item.href)} collapsed={collapsed} />
+                <NavRow
+                  item={item}
+                  active={isRouteActive(item.href)}
+                  collapsed={collapsed}
+                  badge={item.id === "dashboard" ? reorderCount : 0}
+                />
               </li>
             ))}
           </ul>

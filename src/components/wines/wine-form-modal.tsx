@@ -10,6 +10,13 @@ import { countryLabel, wineTypeLabel } from "@/lib/i18n/format";
 import { useI18n } from "@/lib/i18n/provider";
 import { binKey, formatVintage, type Wine, type WineCategory, type WineType } from "@/types/wine";
 import type { WineInput } from "@/features/wines/repository";
+import {
+  emptyStockForm,
+  parseStockForm,
+  StockFields,
+  stockFormFrom,
+  type StockFormState
+} from "@/components/stock/stock-fields";
 
 type Props = {
   open: boolean;
@@ -142,6 +149,7 @@ export function WineFormModal({
 }: Props) {
   const { t, lang } = useI18n();
   const [form, setForm] = useState<FormState>(initialState);
+  const [stockForm, setStockForm] = useState<StockFormState>(emptyStockForm);
   const [error, setError] = useState<string | null>(null);
   const binInputRef = useRef<HTMLInputElement>(null);
 
@@ -166,6 +174,7 @@ export function WineFormModal({
     } else {
       setForm(initialState);
     }
+    setStockForm(stockFormFrom(mode === "edit" ? wine : null));
     setError(null);
   }, [open, mode, wine]);
 
@@ -250,6 +259,11 @@ export function WineFormModal({
       setError(t.wines.form.errQuantity);
       return;
     }
+    const stock = parseStockForm(stockForm, t);
+    if (typeof stock === "string") {
+      setError(stock);
+      return;
+    }
 
     try {
       await onSubmit({
@@ -264,7 +278,8 @@ export function WineFormModal({
         vintage,
         pricePerGlass: form.pricePerGlass === "" ? undefined : form.pricePerGlass,
         grape: form.grape.trim(),
-        quantity
+        quantity,
+        ...stock
       });
       onClose();
     } catch (err) {
@@ -486,6 +501,8 @@ export function WineFormModal({
               </div>
             ) : null}
           </div>
+
+          <StockFields idPrefix="wine" value={stockForm} onChange={setStockForm} />
 
           {error ? (
             <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

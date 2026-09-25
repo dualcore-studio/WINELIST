@@ -36,7 +36,7 @@ export function proxy(request: NextRequest) {
     if (isApi) {
       return apiError("forbidden", 403);
     }
-    return NextResponse.redirect(new URL("/wines", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

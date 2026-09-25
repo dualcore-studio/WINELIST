@@ -39,6 +39,16 @@ export type Wine = {
   spiritType?: string;
   quantity: number;
   isAvailable: boolean;
+  /** Scorta minima: a questa quantità o sotto scatta l'avviso. null = non monitorato. */
+  minStock: number | null;
+  /** Scorta ideale: la quantità da raggiungere riordinando (suggerisce quanto ordinare). */
+  targetStock: number | null;
+  /** Fornitore/distributore a cui si ordina. */
+  supplier: string;
+  /** Data (ISO) in cui è stato segnato come ordinato; null = nessun ordine in corso. */
+  orderedAt: string | null;
+  /** Quantità ordinata (per il carico all'arrivo). */
+  orderedQty: number | null;
   isFeatured: boolean;
   displayOrder: number;
   createdAt: string;

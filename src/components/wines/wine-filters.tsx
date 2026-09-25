@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { RotateCcw } from "lucide-react";
 import { FilterSelect } from "@/components/ui/filter-select";
+import { STOCK_FILTERS } from "@/features/stock/stock";
 import { countryLabel, wineTypeLabel } from "@/lib/i18n/format";
 import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,8 @@ export type WineFiltersState = {
   vintage: string;
   quantityMin: string;
   quantityMax: string;
+  /** Filtro scorte (vedi STOCK_FILTERS); vuoto = tutti. */
+  stock: string;
   onlyAvailable: boolean;
 };
 
@@ -152,6 +155,15 @@ export function WineFilters({ filters, wines, onFiltersChange, onReset }: Props)
           value={filters.quantityMax}
           onChange={(e) => onFiltersChange({ ...filters, quantityMax: e.target.value })}
           className={cn(field, "!w-[5.5rem] !min-w-0 flex-none")}
+        />
+        <FilterSelect
+          value={filters.stock}
+          onChange={(stock) =>
+            // Gli esauriti sono nascosti da "Solo disp.": cercando cosa ordinare vanno mostrati.
+            onFiltersChange({ ...filters, stock, onlyAvailable: stock ? false : filters.onlyAvailable })
+          }
+          placeholder={t.stock.filter.label}
+          options={STOCK_FILTERS.map((f) => ({ value: f, label: t.stock.filter[f] }))}
         />
         <label className="flex h-9 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-line bg-white px-3.5 text-[13px] text-neutral-700 transition-colors hover:border-neutral-300">
           <input

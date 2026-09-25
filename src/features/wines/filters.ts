@@ -2,7 +2,10 @@ import type { WineFiltersState } from "@/components/wines/wine-filters";
 import { countryLabel, wineTypeLabel } from "@/lib/i18n/format";
 import type { Lang } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { matchesStockFilter, STOCK_FILTERS, type StockFilter } from "@/features/stock/stock";
 import { formatVintage, type Wine } from "@/types/wine";
+
+const isStockFilter = (v: string): v is StockFilter => (STOCK_FILTERS as readonly string[]).includes(v);
 
 export const initialWineFilters: WineFiltersState = {
   binNumber: "",
@@ -16,6 +19,7 @@ export const initialWineFilters: WineFiltersState = {
   vintage: "",
   quantityMin: "",
   quantityMax: "",
+  stock: "",
   onlyAvailable: true
 };
 
@@ -44,6 +48,7 @@ export function filterWines(wines: readonly Wine[], filters: WineFiltersState): 
     if (byCategoryText && !`${wine.grape} ${wine.category}`.toLowerCase().includes(byCategoryText)) {
       return false;
     }
+    if (!matchesStockFilter(wine, filters.stock)) return false;
     return true;
   });
 }
@@ -59,7 +64,8 @@ const TEXT_KEYS = [
   "category",
   "vintage",
   "quantityMin",
-  "quantityMax"
+  "quantityMax",
+  "stock"
 ] as const;
 
 /** Filtri → query string (solo i valori diversi dal default). */
@@ -102,6 +108,7 @@ export function describeFilters(filters: WineFiltersState, t: Dictionary, lang: 
   if (filters.vintage.trim()) parts.push(`${f.vintage}: ${filters.vintage.trim()}`);
   if (filters.quantityMin.trim()) parts.push(`${t.common.qtyMin}: ${filters.quantityMin.trim()}`);
   if (filters.quantityMax.trim()) parts.push(`${t.common.qtyMax}: ${filters.quantityMax.trim()}`);
+  if (isStockFilter(filters.stock)) parts.push(`${t.stock.filter.label}: ${t.stock.filter[filters.stock]}`);
   if (filters.onlyAvailable) parts.push(f.onlyAvailable);
   return parts;
 }

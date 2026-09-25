@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { RotateCcw } from "lucide-react";
 import { FilterSelect } from "@/components/ui/filter-select";
+import { STOCK_FILTERS } from "@/features/stock/stock";
 import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 import { SPIRIT_TYPE_SUGGESTIONS } from "@/components/grappe/grappa-form-modal";
@@ -25,6 +26,8 @@ export type GrappaFiltersState = {
   quantityMin: string;
   /** Quantità massima (stringa, vuota = nessun filtro). */
   quantityMax: string;
+  /** Filtro scorte (vedi STOCK_FILTERS); vuoto = tutti. */
+  stock: string;
 };
 
 export const initialGrappaFilters: GrappaFiltersState = {
@@ -34,7 +37,8 @@ export const initialGrappaFilters: GrappaFiltersState = {
   pricePerGlassMax: "",
   priceMax: "",
   quantityMin: "",
-  quantityMax: ""
+  quantityMax: "",
+  stock: ""
 };
 
 type Props = {
@@ -155,6 +159,12 @@ export function GrappaFilters({
             onFiltersChange({ ...filters, quantityMax: e.target.value })
           }
           className={cn(field, "!w-[5.5rem] !min-w-0 flex-none")}
+        />
+        <FilterSelect
+          value={filters.stock}
+          onChange={(stock) => onFiltersChange({ ...filters, stock })}
+          placeholder={t.stock.filter.label}
+          options={STOCK_FILTERS.map((f) => ({ value: f, label: t.stock.filter[f] }))}
         />
         <button
           type="button"

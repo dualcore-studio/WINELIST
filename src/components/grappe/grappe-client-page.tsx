@@ -13,6 +13,9 @@ import { filterSpirits, spiritFiltersToSearchParams } from "@/features/grappe/fi
 import { sortSpirits, type SpiritSort } from "@/features/grappe/sort";
 import { sortToSearchParams } from "@/lib/table-sort";
 import { PrintMenu } from "@/components/wines/print-menu";
+import { recordMovement } from "@/features/stock/movements";
+import { stockQuantity } from "@/features/stock/stock";
+import { useUsername } from "@/lib/auth/use-current-user";
 import { useI18n } from "@/lib/i18n/provider";
 import {
   createWine,
@@ -48,6 +51,7 @@ export function GrappeDistillatiClientPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const username = useUsername();
 
   const filteredWines = useMemo(
     () => sortSpirits(filterSpirits(wines, filters), sort, lang),
@@ -81,6 +85,15 @@ export function GrappeDistillatiClientPage() {
           await createWine(input, GRAPPE_COLLECTION);
         } else if (selectedWine) {
           await updateWine(selectedWine.id, input, GRAPPE_COLLECTION);
+          // Quantità cambiata a mano dal modulo: nel registro come rettifica d'inventario.
+          await recordMovement(
+            selectedWine,
+            GRAPPE_COLLECTION,
+            stockQuantity(selectedWine),
+            input.isAvailable ? input.quantity : 0,
+            "inventory",
+            username
+          );
         }
       } catch (err) {
         const message =
@@ -91,7 +104,7 @@ export function GrappeDistillatiClientPage() {
         setIsSaving(false);
       }
     },
-    [formMode, selectedWine, t]
+    [formMode, selectedWine, t, username]
   );
 
   const requestDelete = useCallback((wine: Wine) => {

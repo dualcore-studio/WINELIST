@@ -5,6 +5,7 @@
 
 export type SidebarIconName =
   | "LayoutDashboard"
+  | "History"
   | "Wine"
   | "WineBottle"
   | "FlaskConical"
@@ -21,7 +22,10 @@ export type SidebarNavItem = {
 };
 
 /** Navigazione principale (in alto). */
-export const MAIN_NAV: SidebarNavItem[] = [];
+export const MAIN_NAV: SidebarNavItem[] = [
+  { id: "dashboard", label: "Dashboard", href: "/", icon: "LayoutDashboard" },
+  { id: "movements", label: "Movimenti", href: "/movimenti", icon: "History" }
+];
 
 /** Voci principali (link a pagine dedicate, non rimovibili dall'utente). */
 export const WINELIST_CATEGORIES: SidebarNavItem[] = [

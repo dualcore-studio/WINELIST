@@ -34,6 +34,15 @@ export function formatDateTime(date: Date, lang: Lang): string {
   });
 }
 
+/** Solo data, nella lingua scelta. */
+export function formatDate(date: Date, lang: Lang): string {
+  return date.toLocaleDateString(lang === "en" ? "en-US" : "it-IT", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
 /**
  * Valori salvati in italiano nel database (tipologia, nazione) mostrati nella lingua scelta.
  * Il database non cambia: si traduce solo a schermo. Le regioni restano col nome originale.

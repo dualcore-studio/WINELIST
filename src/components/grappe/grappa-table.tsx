@@ -1,4 +1,6 @@
 import { Pencil, Trash2 } from "lucide-react";
+import { StockAdjuster } from "@/components/stock/stock-adjuster";
+import { SPIRITS_COLLECTION } from "@/features/wines/repository";
 import { SortableTh } from "@/components/ui/sortable-th";
 import { TableScrollArea } from "@/components/ui/table-scroll-area";
 import type { SpiritSort } from "@/features/grappe/sort";
@@ -49,13 +51,6 @@ function formatGlassPrice(value: number | undefined, currency: Currency): string
   if (value === undefined || value === null) return "—";
   if (!Number.isFinite(Number(value))) return "—";
   return formatPrice(Number(value), currency);
-}
-
-/** Soglia "scorte basse" coerente con la winelist: sotto 6 bottiglie il numero diventa rosso. */
-function quantityLabelClass(qty: number) {
-  return qty >= 6
-    ? "font-semibold text-emerald-600"
-    : "font-semibold text-red-600";
 }
 
 export function GrappaTable({
@@ -158,7 +153,7 @@ export function GrappaTable({
                     sortKey="quantity"
                     label={t.common.qty}
                     align="right"
-                    className={cn(thBase, "w-[3rem] text-right")}
+                    className={cn(thBase, "w-[7.5rem] text-right")}
                   />
                   <th className={cn(thBase, "text-center")}>{t.common.actions}</th>
                 </tr>
@@ -223,14 +218,7 @@ export function GrappaTable({
                         "bg-inherit text-right"
                       )}
                     >
-                      <span
-                        className={cn(
-                          "inline-block tabular-nums text-[14px]",
-                          quantityLabelClass(wine.quantity)
-                        )}
-                      >
-                        {wine.quantity}
-                      </span>
+                      <StockAdjuster item={wine} collection={SPIRITS_COLLECTION} />
                     </td>
                     <td
                       className={cn(

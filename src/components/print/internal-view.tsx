@@ -8,6 +8,7 @@ import { describeSpiritFilters, filterSpirits } from "@/features/grappe/filters"
 import { describeFilters, filterWines } from "@/features/wines/filters";
 import { sortSpirits, type SpiritSort, type SpiritSortKey } from "@/features/grappe/sort";
 import { sortWines, type WineSort, type WineSortKey } from "@/features/wines/sort";
+import { needsReorder } from "@/features/stock/stock";
 import { useWines } from "@/features/wines/repository";
 import type { Lang } from "@/lib/i18n/config";
 import type { Currency } from "@/lib/currency";
@@ -21,9 +22,6 @@ import { formatVintage, type Wine } from "@/types/wine";
  * Stampa ad uso interno (vini e distillati): la lista filtrata con tutte le colonne, quantità
  * comprese, una colonna vuota "Conteggio" per l'inventario a mano e i totali in fondo.
  */
-
-/** Stessa soglia della tabella: sotto 6 bottiglie la quantità è evidenziata. */
-const LOW_STOCK = 6;
 
 const CSS = `
 .int-doc { color: #111; font-family: Arial, Helvetica, sans-serif; }
@@ -176,7 +174,7 @@ function InternalPrintLayout({
                       {c.value(w)}
                     </td>
                   ))}
-                  <td className={`num ${qty < LOW_STOCK ? "low" : ""}`}>{qty === 0 ? ti.soldOut : qty}</td>
+                  <td className={`num ${needsReorder(w) ? "low" : ""}`}>{qty === 0 ? ti.soldOut : qty}</td>
                   <td className="count">
                     <span className="count-box" />
                   </td>
@@ -257,7 +255,7 @@ function InternalPrintLayout({
         key: "legend",
         node: (
           <div className="int-legend">
-            {ti.lowStock(LOW_STOCK)} {footnote}
+            {ti.lowStock} {footnote}
           </div>
         )
       }

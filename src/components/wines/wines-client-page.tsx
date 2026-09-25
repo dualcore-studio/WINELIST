@@ -17,6 +17,9 @@ import {
   updateWine,
   type WineInput
 } from "@/features/wines/repository";
+import { recordMovement } from "@/features/stock/movements";
+import { stockQuantity } from "@/features/stock/stock";
+import { useUsername } from "@/lib/auth/use-current-user";
 import { useI18n } from "@/lib/i18n/provider";
 import type { Wine } from "@/types/wine";
 
@@ -35,6 +38,7 @@ export function WinesClientPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const username = useUsername();
 
   const filteredWines = useMemo(
     () => sortWines(filterWines(wines, filters), sort, lang),
@@ -68,6 +72,15 @@ export function WinesClientPage() {
           await createWine(input, collection);
         } else if (selectedWine) {
           await updateWine(selectedWine.id, input, collection);
+          // Quantità cambiata a mano dal modulo: nel registro come rettifica d'inventario.
+          await recordMovement(
+            selectedWine,
+            collection,
+            stockQuantity(selectedWine),
+            input.isAvailable ? input.quantity : 0,
+            "inventory",
+            username
+          );
         }
       } catch (err) {
         const message =
@@ -78,7 +91,7 @@ export function WinesClientPage() {
         setIsSaving(false);
       }
     },
-    [formMode, selectedWine, collection, t]
+    [formMode, selectedWine, collection, t, username]
   );
 
   const requestDelete = useCallback((wine: Wine) => {

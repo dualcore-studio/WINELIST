@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { CurrencyPanel } from "@/components/settings/currency-panel";
+import { StockSettingsPanel } from "@/components/stock/stock-settings-panel";
 import { BinResetPanel } from "@/components/wines/bin-reset-panel";
 import { useI18n } from "@/lib/i18n/provider";
 
@@ -9,7 +10,7 @@ export function SettingsView() {
   const { t: tr } = useI18n();
 
   return (
-    <div className="h-full w-full max-w-3xl overflow-y-auto px-5 pb-10 pt-7 sm:px-8 md:pt-9 lg:px-10">
+    <div className="w-full max-w-3xl px-5 pb-10 pt-7 sm:px-8 md:pt-9 lg:px-10">
       <h1 className="font-display text-[34px] font-bold leading-none tracking-tight text-text">
         {tr.settings.title}
       </h1>
@@ -18,6 +19,7 @@ export function SettingsView() {
       </p>
 
       <CurrencyPanel />
+      <StockSettingsPanel />
       <BinResetPanel />
 
       <Link

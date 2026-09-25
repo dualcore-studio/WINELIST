@@ -7,6 +7,13 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n/provider";
 import type { Wine } from "@/types/wine";
 import type { WineInput } from "@/features/wines/repository";
+import {
+  emptyStockForm,
+  parseStockForm,
+  StockFields,
+  stockFormFrom,
+  type StockFormState
+} from "@/components/stock/stock-fields";
 
 type Props = {
   open: boolean;
@@ -83,6 +90,7 @@ export function GrappaFormModal({
 }: Props) {
   const { t } = useI18n();
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [stockForm, setStockForm] = useState<StockFormState>(emptyStockForm);
   const [error, setError] = useState<string | null>(null);
   const firstFieldRef = useRef<HTMLInputElement>(null);
 
@@ -105,6 +113,7 @@ export function GrappaFormModal({
     } else {
       setForm(emptyForm);
     }
+    setStockForm(stockFormFrom(mode === "edit" ? wine : null));
     setError(null);
   }, [open, mode, wine]);
 
@@ -161,6 +170,11 @@ export function GrappaFormModal({
       setError(t.spirits.form.errQuantity);
       return;
     }
+    const stock = parseStockForm(stockForm, t);
+    if (typeof stock === "string") {
+      setError(stock);
+      return;
+    }
 
     const isAvailable = quantityValue > 0;
 
@@ -181,7 +195,8 @@ export function GrappaFormModal({
           binNumber: wine.binNumber ?? DEFAULTS.binNumber,
           vintage: wine.vintage,
           quantity: quantityValue,
-          isAvailable
+          isAvailable,
+          ...stock
         });
       } else {
         await onSubmit({
@@ -198,7 +213,8 @@ export function GrappaFormModal({
           binNumber: DEFAULTS.binNumber,
           vintage: null,
           quantity: quantityValue,
-          isAvailable
+          isAvailable,
+          ...stock
         });
       }
       onClose();
@@ -345,6 +361,8 @@ export function GrappaFormModal({
               />
             </div>
           </div>
+
+          <StockFields idPrefix="grappa" value={stockForm} onChange={setStockForm} />
 
           {error ? (
             <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

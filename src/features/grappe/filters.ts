@@ -1,6 +1,9 @@
 import { initialGrappaFilters, type GrappaFiltersState } from "@/components/grappe/grappa-filters";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { matchesStockFilter, STOCK_FILTERS, type StockFilter } from "@/features/stock/stock";
 import type { Wine } from "@/types/wine";
+
+const isStockFilter = (v: string): v is StockFilter => (STOCK_FILTERS as readonly string[]).includes(v);
 
 /** Applica i filtri della pagina Distillati (stessa logica per tabella e stampa interna). */
 export function filterSpirits(spirits: readonly Wine[], filters: GrappaFiltersState): Wine[] {
@@ -35,6 +38,7 @@ export function filterSpirits(spirits: readonly Wine[], filters: GrappaFiltersSt
     }
     if (hasQtyMin && wine.quantity < qtyMin) return false;
     if (hasQtyMax && wine.quantity > qtyMax) return false;
+    if (!matchesStockFilter(wine, filters.stock)) return false;
     return true;
   });
 }
@@ -74,5 +78,6 @@ export function describeSpiritFilters(filters: GrappaFiltersState, t: Dictionary
   if (filters.priceMax.trim()) parts.push(`${f.bottleMax}: ${filters.priceMax.trim()}`);
   if (filters.quantityMin.trim()) parts.push(`${t.common.qtyMin}: ${filters.quantityMin.trim()}`);
   if (filters.quantityMax.trim()) parts.push(`${t.common.qtyMax}: ${filters.quantityMax.trim()}`);
+  if (isStockFilter(filters.stock)) parts.push(`${t.stock.filter.label}: ${t.stock.filter[filters.stock]}`);
   return parts;
 }

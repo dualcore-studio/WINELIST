@@ -1,4 +1,6 @@
 import { Pencil, Trash2 } from "lucide-react";
+import { StockAdjuster } from "@/components/stock/stock-adjuster";
+import { DEFAULT_WINES_COLLECTION } from "@/features/wines/repository";
 import { SortableTh } from "@/components/ui/sortable-th";
 import { TableScrollArea } from "@/components/ui/table-scroll-area";
 import type { WineSort } from "@/features/wines/sort";
@@ -21,9 +23,6 @@ type Props = {
   className?: string;
 };
 
-function quantityLabelClass(qty: number) {
-  return qty >= 6 ? "font-semibold text-emerald-600" : "font-semibold text-red-600";
-}
 
 function vitignoCategoryLabel(grape: string, category: string) {
   const v = grape.trim();
@@ -173,7 +172,7 @@ export function WineTable({
                     sortKey="quantity"
                     label={t.common.qty}
                     align="right"
-                    className={cn(thBase, "w-[3rem] text-right")}
+                    className={cn(thBase, "w-[7.5rem] text-right")}
                   />
                   <th className={cn(thBase, "w-[4.5rem] text-center")}>{t.common.actions}</th>
                 </tr>
@@ -241,14 +240,7 @@ export function WineTable({
                       {formatPrice(wine.price, currency)}
                     </td>
                     <td className={cn(cellPad, cellNowrap, "bg-inherit text-right")}>
-                      <span
-                        className={cn(
-                          "inline-block tabular-nums text-[14px]",
-                          quantityLabelClass(wine.quantity)
-                        )}
-                      >
-                        {wine.quantity}
-                      </span>
+                      <StockAdjuster item={wine} collection={DEFAULT_WINES_COLLECTION} />
                     </td>
                     <td className={cn(cellPad, cellNowrap, "bg-inherit text-center")}>
                       <div className="flex items-center justify-center gap-0.5 whitespace-nowrap">

@@ -74,6 +74,11 @@ export type WineInput = Pick<
       | "updatedAt"
       | "pricePerGlass"
       | "spiritType"
+      | "minStock"
+      | "targetStock"
+      | "supplier"
+      | "orderedAt"
+      | "orderedQty"
     >
   >;
 
@@ -93,6 +98,13 @@ type InstantWineRecord = Partial<Wine> & {
 function normalizeBinNumber(raw: unknown): string {
   if (typeof raw === "number") return Number.isFinite(raw) && raw > 0 ? String(Math.trunc(raw)) : "";
   return String(raw ?? "").trim().replace(/\s+/g, " ");
+}
+
+/** Numero intero ≥ 0 oppure null (campo vuoto o non valido). */
+function normalizeCount(raw: unknown): number | null {
+  if (raw === null || raw === undefined || raw === "") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? Math.trunc(n) : null;
 }
 
 /** 0 = NV; null/undefined = nessuna annata. */
@@ -133,6 +145,11 @@ function normalizeWine(record: InstantWineRecord): Wine | null {
       record.quantity ?? (record.isAvailable === false ? 0 : 1)
     ),
     isAvailable: Boolean(record.isAvailable ?? true),
+    minStock: normalizeCount(record.minStock),
+    targetStock: normalizeCount(record.targetStock),
+    supplier: String(record.supplier ?? "").trim(),
+    orderedAt: typeof record.orderedAt === "string" && record.orderedAt ? record.orderedAt : null,
+    orderedQty: normalizeCount(record.orderedQty),
     isFeatured: Boolean(record.isFeatured ?? false),
     displayOrder: Number(record.displayOrder ?? 0),
     createdAt: String(record.createdAt ?? new Date().toISOString()),
@@ -254,4 +271,19 @@ export async function deleteWine(wineId: string): Promise<void> {
   }
 
   await db.transact(db.tx.wines[wineId].delete());
+}
+
+/** Stessi campi su più record in una volta (es. scorte impostate sui vini filtrati). */
+export async function updateWines(wineIds: readonly string[], patch: Partial<WineInput>): Promise<void> {
+  if (!isInstantConfigured || !db) {
+    throw new Error("InstantDB non configurato. Aggiorna NEXT_PUBLIC_INSTANT_APP_ID.");
+  }
+  const updatedAt = new Date().toISOString();
+  const instant = db;
+  // A blocchi, per non mandare transazioni enormi con centinaia di vini.
+  for (let i = 0; i < wineIds.length; i += 100) {
+    await instant.transact(
+      wineIds.slice(i, i + 100).map((wineId) => instant.tx.wines[wineId].update({ ...patch, updatedAt }))
+    );
+  }
 }
